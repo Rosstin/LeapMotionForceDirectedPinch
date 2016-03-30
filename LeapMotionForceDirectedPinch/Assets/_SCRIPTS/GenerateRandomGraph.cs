@@ -11,12 +11,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 	float SPRING_CONSTANT = 2.0f;
 
 	float CHANCE_OF_CONNECTION = 0.09f;
-	int NUMBER_NODES = 20;
+	int NUMBER_NODES = 30;
 
 	int NODES_PROCESSED_PER_FRAME = 10; // could also do as a percentage, could have some logic for that, or the max number that can be done
 
-	float DISTANCE_FROM_FACE = 17.0f;
-	float NODE_SPREAD = 10.0f;
+	float DISTANCE_FROM_FACE = 9.0f;
+	float NODE_SPREAD = 12.0f;
 
 	int currentIndex = 0;
 

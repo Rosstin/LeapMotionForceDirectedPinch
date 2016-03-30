@@ -20,37 +20,38 @@ public class MouseRaycast : MonoBehaviour {
 	public GameObject sceneGod;
 	GenerateRandomGraph graphGenerator;
 
-	//public GameObject rightHandObject;
-	//public CapsuleHand rightHandScript;
-	//private Transform pointerFingerTip;
-
-	public GameObject rightPinchDetector;
-	private LeapPinchDetector rightPinchDetectorScript;
 	Node[] nodes;
 
-	int state;
+	int stateR;
+	public GameObject rightPinchDetector;
+	private LeapPinchDetector rightPinchDetectorScript;
+	GameObject draggedObjectR = null;
+	float distanceOfDraggedObjectR = 0.0f;
+
+	int stateL;
+	public GameObject leftPinchDetector;
+	private LeapPinchDetector leftPinchDetectorScript;
+	GameObject draggedObjectL = null;
+	float distanceOfDraggedObjectL = 0.0f;
+
 	int STATE_NORMAL = 0;
 	int STATE_DRAGGING = 1;
 
-	GameObject draggedObject = null;
-	float distanceOfDraggedObject = 0.0f;
+	int RIGHT = 0;
+	int LEFT = 1;
 
-	//private Transform objectToMove;     // The object we will move.
-	//private Vector3 offSet;       // The object's position relative to the mouse position.
-	//private float dist;
 
 	void Start () {
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
 		myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 		myLineRenderer.enabled = false;
-		//rightHandScript = rightHandObject.GetComponent<CapsuleHand> ();
-		//GameObject prefabNode = Resources.Load ("Node") as GameObject;
 
 		graphGenerator = sceneGod.GetComponent<GenerateRandomGraph> ();
 		nodes = graphGenerator.masterNodeList;
 
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
+		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 
 	}
 
@@ -61,16 +62,22 @@ public class MouseRaycast : MonoBehaviour {
 
 		//MousePointerUpdate ();
 		//LeapHandsPointerUpdate ();
-		ConeCastPointsFromPinch();
+
+		for (int i = 0; i < nodes.Length; i++) {
+			nodes [i].gameObject.GetComponent<MeshRenderer> ().material.color = Color.black;
+		}
+  
+		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
+		ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
 	}
 
-	void ConeCastPointsFromPinch() {
+	void ConeCastPointsFromPinch(LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
-		bool isActive = rightPinchDetectorScript.IsPinching;
-		bool activeThisFrame = rightPinchDetectorScript.DidStartPinch;
+		bool isActive = detector.IsPinching;
+		bool activeThisFrame = detector.DidStartPinch;
 
 		// GET POSITION OF EVENT
-		Vector3 p = rightPinchDetectorScript.Position;
+		Vector3 p = detector.Position;
 		// camera to pinch vector
 		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
 
@@ -83,15 +90,33 @@ public class MouseRaycast : MonoBehaviour {
 			objectVector = Vector3.Normalize(nodes [i].gameObject.transform.position - playerCamera.transform.position);
 			dotProduct = Vector3.Dot (heading, objectVector);
 
-			nodes[i].gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
-
 			if (dotProduct > biggestDotProduct) {
 				biggestDotProduct = dotProduct;
 				selectedNodeIndex = i;
 			}
 		}
 
-		nodes[selectedNodeIndex].gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+		if (handedness == RIGHT) {
+			nodes [selectedNodeIndex].gameObject.GetComponent<MeshRenderer> ().material.color = Color.red;
+		} else {
+			nodes [selectedNodeIndex].gameObject.GetComponent<MeshRenderer> ().material.color = Color.green;
+		}
+
+
+		GameObject draggedObject = null;
+		float distanceOfDraggedObject = 0.0f;
+
+		int state = -1;
+		if( handedness == RIGHT){
+			state = stateR;
+			distanceOfDraggedObject = distanceOfDraggedObjectR;
+			draggedObject = draggedObjectR;
+		}
+		else{
+			state = stateL;
+			distanceOfDraggedObject = distanceOfDraggedObjectL;
+			draggedObject = draggedObjectL;
+		}
 
 		if(state != STATE_DRAGGING && isActive){ // can start a drag
 			state = STATE_DRAGGING;
@@ -109,6 +134,16 @@ public class MouseRaycast : MonoBehaviour {
 			state = STATE_NORMAL;
 		}
 
+		if( handedness == RIGHT){
+			stateR = state;
+			distanceOfDraggedObjectR = distanceOfDraggedObject;
+			draggedObjectR = draggedObject;
+		}
+		else{
+			stateL = state;
+			distanceOfDraggedObjectL = distanceOfDraggedObject;
+			draggedObjectL = draggedObject;
+		}
 
 		Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
 
@@ -119,6 +154,7 @@ public class MouseRaycast : MonoBehaviour {
 
 	}
 
+	/*
 	void LeapHandsPointerUpdate () {
 
 		// GET ACTIVITY -- are you pinching, clicking?
@@ -167,7 +203,7 @@ public class MouseRaycast : MonoBehaviour {
 		myLineRenderer.SetPosition (1, endRayPosition);
 		myLineRenderer.enabled = true;
 	
-	}
+	}*/
 
 	void MousePointerUpdate () {
 		// MOUSE POINTER STUFF
