@@ -12,7 +12,7 @@ public class Draggable : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		//this.myMeshRenderer.material.color = Color.black;	
 	}
 
 	public void OnHit()

@@ -13,7 +13,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 	float CHANCE_OF_CONNECTION = 0.09f;
 	int NUMBER_NODES = 20;
 
-	int NODES_PROCESSED_PER_FRAME = 5; // could also do as a percentage, could have some logic for that, or the max number that can be done
+	int NODES_PROCESSED_PER_FRAME = 10; // could also do as a percentage, could have some logic for that, or the max number that can be done
 
 	float DISTANCE_FROM_FACE = 17.0f;
 	float NODE_SPREAD = 10.0f;
@@ -24,7 +24,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
-	Node[] masterNodeList;
+	public Node[] masterNodeList;
 
 	//public GameObject nodeToClone;
 

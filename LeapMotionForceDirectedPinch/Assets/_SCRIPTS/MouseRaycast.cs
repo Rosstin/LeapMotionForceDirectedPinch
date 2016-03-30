@@ -17,12 +17,16 @@ public class MouseRaycast : MonoBehaviour {
 
 	public LineRenderer myLineRenderer;
 
+	public GameObject sceneGod;
+	GenerateRandomGraph graphGenerator;
+
 	//public GameObject rightHandObject;
 	//public CapsuleHand rightHandScript;
 	//private Transform pointerFingerTip;
 
 	public GameObject rightPinchDetector;
 	private LeapPinchDetector rightPinchDetectorScript;
+	Node[] nodes;
 
 	int state;
 	int STATE_NORMAL = 0;
@@ -43,6 +47,9 @@ public class MouseRaycast : MonoBehaviour {
 		//rightHandScript = rightHandObject.GetComponent<CapsuleHand> ();
 		//GameObject prefabNode = Resources.Load ("Node") as GameObject;
 
+		graphGenerator = sceneGod.GetComponent<GenerateRandomGraph> ();
+		nodes = graphGenerator.masterNodeList;
+
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
 
 	}
@@ -53,7 +60,62 @@ public class MouseRaycast : MonoBehaviour {
 	void FixedUpdate () {
 
 		//MousePointerUpdate ();
-		LeapHandsPointerUpdate ();
+		//LeapHandsPointerUpdate ();
+		ConeCastPointsFromPinch();
+	}
+
+	void ConeCastPointsFromPinch() {
+		// GET ACTIVITY -- are you pinching, clicking?
+		bool isActive = rightPinchDetectorScript.IsPinching;
+		bool activeThisFrame = rightPinchDetectorScript.DidStartPinch;
+
+		// GET POSITION OF EVENT
+		Vector3 p = rightPinchDetectorScript.Position;
+		// camera to pinch vector
+		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
+
+		// camera to object vector
+		Vector3 objectVector;
+		float biggestDotProduct= 0.0f;
+		int selectedNodeIndex = 0;
+		float dotProduct;
+		for (int i = 0; i < nodes.Length; i++) {
+			objectVector = Vector3.Normalize(nodes [i].gameObject.transform.position - playerCamera.transform.position);
+			dotProduct = Vector3.Dot (heading, objectVector);
+
+			nodes[i].gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
+
+			if (dotProduct > biggestDotProduct) {
+				biggestDotProduct = dotProduct;
+				selectedNodeIndex = i;
+			}
+		}
+
+		nodes[selectedNodeIndex].gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+
+		if(state != STATE_DRAGGING && isActive){ // can start a drag
+			state = STATE_DRAGGING;
+			draggedObject = nodes[selectedNodeIndex].gameObject;
+			distanceOfDraggedObject = Vector3.Distance (playerCamera.transform.position, draggedObject.transform.position);
+		}
+
+		if (state == STATE_DRAGGING) { // already dragging
+			Vector3 direction = heading / distanceOfDraggedObject;
+			Vector3 objectPosition = playerCamera.transform.position + (direction.normalized * distanceOfDraggedObject);
+			draggedObject.transform.position = objectPosition;
+		}
+
+		if (!isActive) { // if you let go you're not dragging
+			state = STATE_NORMAL;
+		}
+
+
+		Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
+
+		myLineRenderer.SetVertexCount (2);
+		myLineRenderer.SetPosition (0, p);
+		myLineRenderer.SetPosition (1, endRayPosition);
+		myLineRenderer.enabled = true;
 
 	}
 
@@ -73,7 +135,6 @@ public class MouseRaycast : MonoBehaviour {
 		// RAY STUFF
 
 		RaycastHit hit = new RaycastHit ();
-
 
 		//if (Physics.Raycast (playerCamera.transform.position, p, out hit)) { // if you hit something
 		if (Physics.SphereCast (playerCamera.transform.position, 12.0f, heading, out hit, 200.0f)) {

@@ -2603,8 +2603,8 @@ MonoBehaviour:
   pointer: {fileID: 0}
   canvas: {fileID: 0}
   myLineRenderer: {fileID: 0}
+  sceneGod: {fileID: 1993002016}
   rightPinchDetector: {fileID: 525701292}
-  leftPinchDetector: {fileID: 390684572}
 --- !u!4 &2067794022 stripped
 Transform:
   m_PrefabParentObject: {fileID: 475100, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
