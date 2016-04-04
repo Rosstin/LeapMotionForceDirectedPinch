@@ -8,6 +8,7 @@ public class MouseRaycast : MonoBehaviour {
 
 	// the screen aspect ratio matters for the vert and horiz, you'll need to recognize that
 	// use "force pull" / "force push" to bring objects closer or farther
+	// weight it towards objects closer to your face
 
 	public Camera playerCamera;
 
@@ -65,7 +66,7 @@ public class MouseRaycast : MonoBehaviour {
 		//LeapHandsPointerUpdate ();
 
 		for (int i = 0; i < nodes.Length; i++) {
-			nodes [i].gameObject.GetComponent<MeshRenderer> ().material.color = Color.black;
+			nodes [i].nodeForce.RevertColor ();
 		}
   
 		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
