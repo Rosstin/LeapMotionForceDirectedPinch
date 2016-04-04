@@ -67,6 +67,7 @@ public class MouseRaycast : MonoBehaviour {
 
 		for (int i = 0; i < nodes.Length; i++) {
 			nodes [i].nodeForce.RevertColor ();
+			nodes [i].nodeForce.TextFaceCamera (playerCamera.transform);
 		}
   
 		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);

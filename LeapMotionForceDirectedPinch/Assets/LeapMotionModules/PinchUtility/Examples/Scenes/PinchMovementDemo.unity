@@ -150,6 +150,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   charge: 1
   mass: 1
+  scale: 1
+  color: {r: 0, g: 0, b: 0, a: 0}
+  myTextMeshGameObject: {fileID: 0}
 --- !u!1 &166724741
 GameObject:
   m_ObjectHideFlags: 0
