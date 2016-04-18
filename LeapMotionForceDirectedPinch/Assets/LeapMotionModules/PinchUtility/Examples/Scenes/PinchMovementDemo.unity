@@ -150,7 +150,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   charge: 1
   mass: 1
-  scale: 1
   color: {r: 0, g: 0, b: 0, a: 0}
   myTextMeshGameObject: {fileID: 0}
 --- !u!1 &166724741
@@ -267,7 +266,7 @@ Transform:
   m_GameObject: {fileID: 181299710}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 3, y: 0.1, z: 3}
+  m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
@@ -2560,7 +2559,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1993002018}
   - 114: {fileID: 1993002017}
-  - 114: {fileID: 1993002019}
+  - 114: {fileID: 1993002020}
   m_Layer: 0
   m_Name: SceneGod
   m_TagString: Untagged
@@ -2591,7 +2590,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
---- !u!114 &1993002019
+--- !u!114 &1993002020
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}

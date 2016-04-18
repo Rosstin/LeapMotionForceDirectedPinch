@@ -5,7 +5,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 	public float charge = 1.0f;
 	public float mass = 1.0f;
-	public float scale = 1.0f;
+	private float scale = 0.10f;
 	public Color color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	private MeshRenderer myRenderer;
@@ -19,10 +19,10 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		RandomText ();
 
-		float randomScale = Random.value * 3.0f;
-		SetScale (randomScale);
+		//float randomScale = Random.value * 2.0f + 1.0f;
+		SetScale (scale);
 
-		Color randomColor = new Color (Random.value, Random.value, Random.value, 1.0f);
+		Color randomColor = new Color (1.0f, Random.value, Random.value, 1.0f);
 		SetColor (randomColor);
 	}
 	

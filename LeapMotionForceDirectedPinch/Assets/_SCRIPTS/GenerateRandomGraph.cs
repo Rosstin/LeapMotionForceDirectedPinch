@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 // TODO: read in the data
 // TODO: improve speed/performance, only update a subset of the nodes each call
@@ -7,20 +8,25 @@ using System.Collections;
 
 public class GenerateRandomGraph : MonoBehaviour {
 
-	float CHARGE_CONSTANT = 1000.0f;
-	float SPRING_CONSTANT = 2.0f;
+	float CHARGE_CONSTANT = 0.5f;
+	float SPRING_CONSTANT = 4.0f;
 
 	float CHANCE_OF_CONNECTION = 0.09f;
-	int NUMBER_NODES = 30;
+	int NUMBER_NODES = 40;
 
-	int NODES_PROCESSED_PER_FRAME = 10; // could also do as a percentage, could have some logic for that, or the max number that can be done
+	int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
 
-	float DISTANCE_FROM_FACE = 9.0f;
-	float NODE_SPREAD = 12.0f;
+	float NODE_SPREAD_X = 1.0f;
+	float NODE_SPREAD_Y = 0.8f;
+	float ELEVATION_CONSTANT = 0.5f;
+	float NODE_SPREAD_Z = 1.0f;
+	float DISTANCE_FROM_FACE = 2.5f;
 
 	int currentIndex = 0;
 
 	int highestNode = 0;
+
+	GameObject nodeContainer;
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
@@ -30,17 +36,25 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+		nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject,
+			new Vector3 (0.0f,0.0f,0.0f),
+			Quaternion.identity) as GameObject;
+
 		//generateGraphFromCSV ();
 		generateGraphRandomly();
-	}
 
+		StartCoroutine ("ProcessNodesCoroutine");
+
+
+	}
+		
 	void generateGraphFromCSV(){
 		print ("readCSVData");
 		TextAsset text = Resources.Load ("L") as TextAsset;
 		string[,] outputGrid = CSVReader.SplitCsvGrid (text.text);
 
 		int numberOfEdges = outputGrid.GetUpperBound(1);
-
 
 		// find the highest node
 		for (int i = 1; i < numberOfEdges; i++) {
@@ -109,9 +123,14 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			GameObject myNodeInstance = 
 				Instantiate (Resources.Load("Node") as GameObject,
-					new Vector3 (Random.Range (-NODE_SPREAD, NODE_SPREAD), Random.Range (-NODE_SPREAD, NODE_SPREAD)+5.0f, Random.Range (-NODE_SPREAD, NODE_SPREAD)+DISTANCE_FROM_FACE),
+					new Vector3 (Random.Range (-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range (-NODE_SPREAD_Y, NODE_SPREAD_Y)+ELEVATION_CONSTANT, Random.Range (-NODE_SPREAD_Z, NODE_SPREAD_Z) + DISTANCE_FROM_FACE),
 					Quaternion.identity) as GameObject;
+
+			//myNodeInstance.transform.parent = nodeContainer.transform;
+
 			masterNodeList [i] = new Node (myNodeInstance, i); 
+
+
 		}
 	}
 
@@ -124,7 +143,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 
 		if (adjacencyList.isAdjacent (smaller, bigger) == false) {
-			adjacencyList.AddEdge (smaller, bigger);
+			adjacencyList.AddEdge (smaller, bigger, nodeContainer);
 		}
 	}
 
@@ -172,7 +191,38 @@ public class GenerateRandomGraph : MonoBehaviour {
 		Vector3 direction = masterNodeList [i].gameObject.transform.position - masterNodeList [j].gameObject.transform.position;
 
 		// apply it
+
 		Vector3 newPositionForI = masterNodeList [i].gameObject.transform.position + direction.normalized * distanceChange;
+
+		//if (i == 0) {Debug.Log ("new position for I before constraint: " + newPositionForI);}
+
+		if (newPositionForI.x > NODE_SPREAD_X) {
+			newPositionForI.x = NODE_SPREAD_X;
+		}
+
+		if (newPositionForI.x < -NODE_SPREAD_X) {
+			newPositionForI.x = -NODE_SPREAD_X;
+		}
+
+		if (newPositionForI.y > NODE_SPREAD_Y + ELEVATION_CONSTANT) {
+			newPositionForI.y = NODE_SPREAD_Y + ELEVATION_CONSTANT;
+		}
+
+		if (newPositionForI.y < -NODE_SPREAD_Y + ELEVATION_CONSTANT) {
+			newPositionForI.y = -NODE_SPREAD_Y + ELEVATION_CONSTANT;
+		}
+
+		if (newPositionForI.z > NODE_SPREAD_Z + DISTANCE_FROM_FACE) {
+			newPositionForI.z = NODE_SPREAD_Z + DISTANCE_FROM_FACE;
+		}
+
+		if (newPositionForI.z < -NODE_SPREAD_Z + DISTANCE_FROM_FACE) {
+			newPositionForI.z = -NODE_SPREAD_Z + DISTANCE_FROM_FACE;
+		}
+
+		//if (i == 0) {Debug.Log ("new position for I after constraint: " + newPositionForI);}
+
+
 		masterNodeList [i].gameObject.transform.position = newPositionForI;
 
 		// put in something to dampen it and stop calculations after it settles down
@@ -184,6 +234,21 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 		// update only one per frame? don't update every node every frame
 		// render lines
+
+		//ProcessNodes ();
+	}
+
+
+	IEnumerator ProcessNodesCoroutine() {
+		while (true) {
+			for (int j = 0; j < 2; j++) {
+				ProcessNodes ();
+			}
+			yield return null;
+		}
+	}
+
+	void ProcessNodes () {
 
 		int nodesProcessedThisFrame = 0;
 		while( nodesProcessedThisFrame < NODES_PROCESSED_PER_FRAME){
@@ -199,6 +264,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 				}
 			}
 		}
+
 	}
 
 }

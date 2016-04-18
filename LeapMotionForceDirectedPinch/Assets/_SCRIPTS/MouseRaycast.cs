@@ -70,8 +70,13 @@ public class MouseRaycast : MonoBehaviour {
 			nodes [i].nodeForce.TextFaceCamera (playerCamera.transform);
 		}
   
-		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
-		ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
+
+
+		//ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
+		//ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
+	}
+
+	void rotateAndZoomGraph() {
 	}
 
 	void ConeCastPointsFromPinch(LeapPinchDetector detector, int handedness) {

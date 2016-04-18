@@ -25,7 +25,7 @@ public class AdjacencyList : MonoBehaviour
 		return vertex;
 	}
 
-	public void AddEdge(int startKey, int endKey)
+	public void AddEdge(int startKey, int endKey, GameObject container)
 	{      
 		List<int> startVertex = _vertexDict.ContainsKey(startKey) ? _vertexDict[startKey] : null;
 		List<int> endVertex = _vertexDict.ContainsKey(endKey) ? _vertexDict[endKey] : null;
@@ -48,6 +48,7 @@ public class AdjacencyList : MonoBehaviour
 
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
+		//lineToRender.transform.parent = container.transform;
 		LineRenderer myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 
 		if ( UnityEngine.Random.Range (0.0f, 1.0f) < 0.50f) {
