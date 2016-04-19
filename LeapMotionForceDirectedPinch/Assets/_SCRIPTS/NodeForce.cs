@@ -17,7 +17,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		myRenderer = this.GetComponent<MeshRenderer> ();
 		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();
 
-		RandomText ();
+		//RandomText ();
 
 		//float randomScale = Random.value * 2.0f + 1.0f;
 		SetScale (scale);
@@ -63,6 +63,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	}
 
 	public void SetText(string newText) {
+		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();
 		myTextMesh.text = newText;
 	}
 
