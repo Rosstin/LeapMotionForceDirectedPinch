@@ -48,7 +48,7 @@ public class AdjacencyList : MonoBehaviour
 
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
-		//lineToRender.transform.parent = container.transform;
+		lineToRender.transform.parent = container.transform;
 		LineRenderer myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 
 		if ( UnityEngine.Random.Range (0.0f, 1.0f) < 0.50f) {

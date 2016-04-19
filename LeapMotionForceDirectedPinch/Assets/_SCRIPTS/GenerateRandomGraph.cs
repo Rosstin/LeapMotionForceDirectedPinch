@@ -18,9 +18,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	float NODE_SPREAD_X = 1.0f;
 	float NODE_SPREAD_Y = 0.8f;
-	float ELEVATION_CONSTANT = 0.5f;
+	float ELEVATION_CONSTANT = 2.0f;
 	float NODE_SPREAD_Z = 1.0f;
-	float DISTANCE_FROM_FACE = 2.5f;
+	float DISTANCE_FROM_FACE = 5.0f;
 
 	int currentIndex = 0;
 
@@ -43,6 +43,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 		//generateGraphFromCSV ();
 		generateGraphRandomly();
+
+		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
 
 		StartCoroutine ("ProcessNodesCoroutine");
 
@@ -123,10 +125,10 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			GameObject myNodeInstance = 
 				Instantiate (Resources.Load("Node") as GameObject,
-					new Vector3 (Random.Range (-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range (-NODE_SPREAD_Y, NODE_SPREAD_Y)+ELEVATION_CONSTANT, Random.Range (-NODE_SPREAD_Z, NODE_SPREAD_Z) + DISTANCE_FROM_FACE),
+					new Vector3 (Random.Range (-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range (-NODE_SPREAD_Y, NODE_SPREAD_Y), Random.Range (-NODE_SPREAD_Z, NODE_SPREAD_Z)),
 					Quaternion.identity) as GameObject;
 
-			//myNodeInstance.transform.parent = nodeContainer.transform;
+			myNodeInstance.transform.parent = nodeContainer.transform;
 
 			masterNodeList [i] = new Node (myNodeInstance, i); 
 
@@ -153,7 +155,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		// force = constant * absolute(myNodes[i].charge * myNodes[j].charge)/square(distance(myNodes[i], myNodes[j]))
 
 		// CALC REPULSIVE FORCE
-		float distance = Vector3.Distance (masterNodeList [i].gameObject.transform.position, masterNodeList [j].gameObject.transform.position); 
+		float distance = Vector3.Distance (masterNodeList [i].gameObject.transform.localPosition, masterNodeList [j].gameObject.transform.localPosition); 
 
 		float chargeForce = (CHARGE_CONSTANT) * ((masterNodeList [i].nodeForce.charge * masterNodeList [j].nodeForce.charge) / (distance * distance));
 
@@ -171,7 +173,6 @@ public class GenerateRandomGraph : MonoBehaviour {
 			}
 
 			string key = "" + smaller + "." + bigger;
-
 			//print ("key: " + key);
 
 			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
@@ -188,14 +189,17 @@ public class GenerateRandomGraph : MonoBehaviour {
 		float accel = totalForce / masterNodeList [i].nodeForce.mass;
 		float distanceChange = /* v0*t */ 0.5f * (accel) * (Time.deltaTime) * (Time.deltaTime);
 
-		Vector3 direction = masterNodeList [i].gameObject.transform.position - masterNodeList [j].gameObject.transform.position;
+		Vector3 direction = masterNodeList [i].gameObject.transform.localPosition - masterNodeList [j].gameObject.transform.localPosition;
 
 		// apply it
 
-		Vector3 newPositionForI = masterNodeList [i].gameObject.transform.position + direction.normalized * distanceChange;
+		Vector3 newPositionForI = masterNodeList [i].gameObject.transform.localPosition + direction.normalized * distanceChange;
 
 		//if (i == 0) {Debug.Log ("new position for I before constraint: " + newPositionForI);}
 
+		//TODO have to redo the math for these if we're going to move the thing around
+
+		// now it's a local position so this should work again
 		if (newPositionForI.x > NODE_SPREAD_X) {
 			newPositionForI.x = NODE_SPREAD_X;
 		}
@@ -204,26 +208,26 @@ public class GenerateRandomGraph : MonoBehaviour {
 			newPositionForI.x = -NODE_SPREAD_X;
 		}
 
-		if (newPositionForI.y > NODE_SPREAD_Y + ELEVATION_CONSTANT) {
-			newPositionForI.y = NODE_SPREAD_Y + ELEVATION_CONSTANT;
+		if (newPositionForI.y > NODE_SPREAD_Y) {
+			newPositionForI.y = NODE_SPREAD_Y;
 		}
 
-		if (newPositionForI.y < -NODE_SPREAD_Y + ELEVATION_CONSTANT) {
-			newPositionForI.y = -NODE_SPREAD_Y + ELEVATION_CONSTANT;
+		if (newPositionForI.y < -NODE_SPREAD_Y ) {
+			newPositionForI.y = -NODE_SPREAD_Y ;
 		}
 
-		if (newPositionForI.z > NODE_SPREAD_Z + DISTANCE_FROM_FACE) {
-			newPositionForI.z = NODE_SPREAD_Z + DISTANCE_FROM_FACE;
+		if (newPositionForI.z > NODE_SPREAD_Z ) {
+			newPositionForI.z = NODE_SPREAD_Z ;
 		}
 
-		if (newPositionForI.z < -NODE_SPREAD_Z + DISTANCE_FROM_FACE) {
-			newPositionForI.z = -NODE_SPREAD_Z + DISTANCE_FROM_FACE;
+		if (newPositionForI.z < -NODE_SPREAD_Z ) {
+			newPositionForI.z = -NODE_SPREAD_Z ;
 		}
 
 		//if (i == 0) {Debug.Log ("new position for I after constraint: " + newPositionForI);}
 
 
-		masterNodeList [i].gameObject.transform.position = newPositionForI;
+		masterNodeList [i].gameObject.transform.localPosition = newPositionForI;
 
 		// put in something to dampen it and stop calculations after it settles down
 		// TODO
@@ -231,6 +235,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
+
+		//nodeContainer.transform.Rotate (0, Time.deltaTime*10, 0);
 
 		// update only one per frame? don't update every node every frame
 		// render lines

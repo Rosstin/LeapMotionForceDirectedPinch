@@ -72,8 +72,8 @@ public class MouseRaycast : MonoBehaviour {
   
 
 
-		//ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
-		//ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
+		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
+		ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
 	}
 
 	void rotateAndZoomGraph() {
