@@ -43,6 +43,18 @@ public class MouseRaycast : MonoBehaviour {
 	int RIGHT = 0;
 	int LEFT = 1;
 
+	int stateZoom;
+	int STATE_ZOOM_NEUTRAL = 0;
+	int STATE_ZOOM_BEGIN = 1;
+
+	Vector3 nodeContainerStartPosition;
+	Vector3 zoomPinchStartPositionL;
+	Vector3 zoomPinchStartPositionR;
+	float zoomPinchStartDistance;
+	float lastZoomPinchDistance;
+
+	float ZOOM_CONSTANT = 10.0f;
+
 	void Start () {
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
@@ -71,12 +83,69 @@ public class MouseRaycast : MonoBehaviour {
 		}
   
 
+		pinchActions ();
 
-		ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
-		ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
+
+		//ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
+		//ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
+	}
+
+	void pinchActions() {
+
+		// if you're pinching but state_zoom_begin hasn't happened, put yourself in STATE_ZOOM_BEGIN
+		if (stateZoom != STATE_ZOOM_BEGIN && rightPinchDetectorScript.IsPinching && leftPinchDetectorScript.IsPinching) {
+			stateZoom = STATE_ZOOM_BEGIN;
+			nodeContainerStartPosition = graphGenerator.nodeContainer.transform.position;
+			zoomPinchStartPositionL = leftPinchDetectorScript.Position;
+			zoomPinchStartPositionR = rightPinchDetectorScript.Position;
+			zoomPinchStartDistance = Vector3.Distance(zoomPinchStartPositionL, zoomPinchStartPositionR);
+		}
+
+		// exiting STATE_ZOOM_BEGIN because you stopped pinching... record the position of the graph, that's the new neutral
+		if (stateZoom == STATE_ZOOM_BEGIN && (!rightPinchDetectorScript.IsPinching || !leftPinchDetectorScript.IsPinching)) {
+			stateZoom = STATE_ZOOM_NEUTRAL;
+		}
+
+		// we might want to lock the player into zooming or rotating
+
+		if (stateZoom == STATE_ZOOM_BEGIN) {
+			rotateAndZoomGraph ();
+		}
+
+
 	}
 
 	void rotateAndZoomGraph() {
+
+		Vector3 pr = rightPinchDetectorScript.Position;
+		Vector3 pl = leftPinchDetectorScript.Position;
+
+		float currentPinchDistance = Vector3.Distance (pr, pl);
+
+		//print ("currentPinchDistance: " + currentPinchDistance + "... zoomPinchStartDistance: " + zoomPinchStartDistance);
+
+		// make a position based on starting and current pinch positions
+		graphGenerator.nodeContainer.transform.position = 
+			new Vector3(
+				nodeContainerStartPosition.x, 
+				nodeContainerStartPosition.y, 
+				nodeContainerStartPosition.z - ZOOM_CONSTANT*(currentPinchDistance-zoomPinchStartDistance)
+			);
+
+		//lastZoomPinchDistance = currentPinchDistance;
+
+		//print ("graphGenerator.nodeContainer.transform.position: " + graphGenerator.nodeContainer.transform.position + "... nodeContainerStartPosition: " + nodeContainerStartPosition);
+
+		// if both are pinching and the distance between pinches is increasing or decreasing, zoom in or out
+
+
+
+
+		// if both are pinching and one is rotating around the other, rotate the dude
+
+
+
+
 	}
 
 	void ConeCastPointsFromPinch(LeapPinchDetector detector, int handedness) {

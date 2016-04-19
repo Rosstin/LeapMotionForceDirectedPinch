@@ -18,7 +18,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	float NODE_SPREAD_X = 1.0f;
 	float NODE_SPREAD_Y = 0.8f;
-	float ELEVATION_CONSTANT = 2.0f;
+	float ELEVATION_CONSTANT = 1.5f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
 	float NODE_SPREAD_Z = 1.0f;
 	float DISTANCE_FROM_FACE = 5.0f;
 
@@ -26,7 +26,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	int highestNode = 0;
 
-	GameObject nodeContainer;
+	public GameObject nodeContainer;
+	public Vector3 nodeContainerOriginalPosition;
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
@@ -45,6 +46,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		generateGraphRandomly();
 
 		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
+		nodeContainerOriginalPosition = nodeContainer.transform.position;
 
 		StartCoroutine ("ProcessNodesCoroutine");
 
