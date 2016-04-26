@@ -20,13 +20,17 @@ public class GenerateRandomGraph : MonoBehaviour {
 	float NODE_SPREAD_Y = 0.8f;
 	float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
 	float NODE_SPREAD_Z = 1.0f;
-	float DISTANCE_FROM_FACE = 3.0f;
+	float DISTANCE_FROM_FACE = 10.0f;
 
-	float GRAPH_SCALE_CONSTANT = 0.01f;
+	float GRAPH_SCALE_CONSTANT = 0.005f;
+
+	int NODE_LIMIT = 200;
 
 	int currentIndex = 0;
 
 	int highestNode = 0;
+
+	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
 	public GameObject nodeContainer;
 	public Vector3 nodeContainerOriginalPosition;
@@ -45,8 +49,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 		generateGraphFromCSV ();
 		//generateGraphRandomly();
 
+		//RenderLinesOnce ();
+		HideAllLines();
+
 		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
 		nodeContainerOriginalPosition = nodeContainer.transform.position;
+
 
 		//StartCoroutine ("ProcessNodesCoroutine");
 
@@ -55,53 +63,64 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	void generateGraphFromCSV(){
 		//print ("readCSVData");
-		TextAsset text = Resources.Load ("L") as TextAsset;
-		string[,] outputGrid = CSVReader.SplitCsvGrid (text.text);
+		TextAsset edgesText = Resources.Load ("b1") as TextAsset;
+		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
+		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
 
-		int numberOfEdges = outputGrid.GetUpperBound(1);
+		TextAsset positionsText = Resources.Load ("b2") as TextAsset;
+		string[,] positionsGrid = CSVReader.SplitCsvGrid (positionsText.text);
+		int numberOfNodes = positionsGrid.GetUpperBound(1)-1;
 
-		// find the highest node
-		for (int i = 1; i < numberOfEdges; i++) {
-			float source = float.Parse(outputGrid [0,i]); // source
-			float target = float.Parse(outputGrid [1,i]); // target
-			// change it so that it ignores the last newline in a file
-
-			int s = (int) source;
-			int t = (int) target;
-
-			if (s > highestNode) {
-				highestNode = s;
-			}
-
-			if (t > highestNode) {
-				highestNode = t;
-			}
-
-			//Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
-		}
-
-
-
-		masterNodeList = new Node[highestNode];
+		masterNodeList = new Node[numberOfNodes];
 
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
 		// add nodes
-		generatePositionsFromCSV ();
+		for (int i = 1; (i < numberOfNodes+1) ; i++) { // check your integer stuff so you dont mess it up man
+			//print("i in add nodes: " + i);
+			// add vertexes
+			if (i != 0) { adjacencyList.AddVertex (i);}
+
+			string label = positionsGrid [0, i];
+			Vector3 position = 
+				new Vector3 (
+					float.Parse (positionsGrid [1, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [2, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [3, i]) * GRAPH_SCALE_CONSTANT
+				);
+
+			GameObject myNodeInstance = 
+				Instantiate (Resources.Load("Node") as GameObject,
+					position,
+					Quaternion.identity) as GameObject;
+
+
+			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
+			nodeScript.SetText (label);
+
+			myNodeInstance.transform.parent = nodeContainer.transform;
+
+			masterNodeList [i-1] = new Node (myNodeInstance, i); 
+
+			nameToID.Add (label, i-1);
+		}
 
 		// add edges
 		for (int i = 1; i < numberOfEdges; i++) {
 
 			//Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
 
-			float source = float.Parse(outputGrid [0,i]); // source
-			float target = float.Parse(outputGrid [1,i]); // target
+			//print ("edgesGrid [0, i]: " + edgesGrid [0, i] + "... edgesGrid [1,i]: " + edgesGrid [1,i] );
+
+			int source = nameToID[(edgesGrid [0,i])]; // source
+			int target = nameToID[(edgesGrid [1,i])]; // target
 
 			int s = (int) source;
 			int t = (int) target;
 
 			addEdgeToAdjacencyListAfterValidation (s, t);
 		}
+
 
 	}
 
@@ -299,10 +318,32 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 	}
 
+	void hideLinesBetween(int i, int j){ 
+		if (adjacencyList.isAdjacent (i, j)) {
+			int smaller = j;
+			int bigger = i;
+			if (i < j) {
+				smaller = i;
+				bigger = j;
+			}
+
+			string key = "" + smaller + "." + bigger;
+			//print ("key: " + key);
+
+			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
+			myLineRenderer.SetVertexCount (2);
+			myLineRenderer.SetPosition (0, masterNodeList [smaller].gameObject.transform.position);
+			myLineRenderer.SetPosition (1, masterNodeList [bigger].gameObject.transform.position);
+			myLineRenderer.enabled = false;
+		} else {
+			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+		}
+	}
+
+
 
 	// Update is called once per frame
 	void Update () {
-
 
 		//nodeContainer.transform.Rotate (0, Time.deltaTime*10, 0);
 
@@ -310,7 +351,6 @@ public class GenerateRandomGraph : MonoBehaviour {
 		// render lines
 
 		//ProcessNodes ();
-		RenderLines ();
 
 	}
 
@@ -343,24 +383,26 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	}
 
-	void RenderLines () {
-
-		int nodesProcessedThisFrame = 0;
-		while( nodesProcessedThisFrame < NODES_PROCESSED_PER_FRAME){
-			nodesProcessedThisFrame += 1;
-			currentIndex += 1;
-			if (currentIndex >= masterNodeList.Length) {
-				currentIndex = 0;
-			}
-			int i = currentIndex;
-			for (int j = 0; j < masterNodeList.Length; j++) {
+	void RenderLinesOnce () { 
+		for(int i = 0; i < masterNodeList.Length-1; i++){
+			for (int j = 0; j < masterNodeList.Length-1; j++) {
 				if (i != j) {
 					renderLinesBetween (i, j);
 				}
 			}
 		}
-
 	}
+
+	void HideAllLines () { 
+		for(int i = 0; i < masterNodeList.Length-1; i++){
+			for (int j = 0; j < masterNodeList.Length-1; j++) {
+				if (i != j) {
+					hideLinesBetween (i, j);
+				}
+			}
+		}
+	}
+
 
 
 }

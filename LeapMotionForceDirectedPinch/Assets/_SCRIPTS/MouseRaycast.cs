@@ -39,6 +39,7 @@ public class MouseRaycast : MonoBehaviour {
 
 	int STATE_NORMAL = 0;
 	int STATE_DRAGGING = 1;
+	int STATE_NODESELECTED = 2;
 
 	int RIGHT = 0;
 	int LEFT = 1;
@@ -46,6 +47,15 @@ public class MouseRaycast : MonoBehaviour {
 	int stateZoom;
 	int STATE_ZOOM_NEUTRAL = 0;
 	int STATE_ZOOM_BEGIN = 1;
+
+	// STATE FOR NODE SELECTION THING
+
+	int nstate;
+	int NSTATE_NORMAL = 0;
+	int NSTATE_NODESELECTED = 1;
+
+	GameObject highlightedObject = null;
+
 
 	Vector3 nodeContainerStartPosition;
 	Vector3 zoomPinchStartPositionL;
@@ -79,12 +89,13 @@ public class MouseRaycast : MonoBehaviour {
 
 		for (int i = 0; i < nodes.Length; i++) {
 			nodes [i].nodeForce.RevertColor ();
-			nodes [i].nodeForce.TextFaceCamera (playerCamera.transform);
+			//nodes [i].nodeForce.TextFaceCamera (playerCamera.transform);
 		}
   
-
-		pinchActions ();
-
+		HighlightNearPointFromPinch (rightPinchDetectorScript, RIGHT);
+		HighlightNearPointFromPinch (leftPinchDetectorScript, LEFT);
+	
+		//pinchActions ();
 
 		//ConeCastPointsFromPinch(rightPinchDetectorScript, RIGHT);
 		//ConeCastPointsFromPinch(leftPinchDetectorScript, LEFT);
@@ -148,7 +159,7 @@ public class MouseRaycast : MonoBehaviour {
 
 	}
 
-	void ConeCastPointsFromPinch(LeapPinchDetector detector, int handedness) {
+	void HighlightNearPointFromPinch(LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
@@ -173,6 +184,81 @@ public class MouseRaycast : MonoBehaviour {
 			}
 		}
 
+		GameObject highlightedObject = null;
+		float distanceOfDraggedObject = 0.0f;
+		float originalPinchDistance = 0.0f;
+
+		if (handedness == RIGHT) {
+			nodes [selectedNodeIndex].nodeForce.SetColor (Color.red);
+			originalPinchDistance = originalPinchDistanceR;
+		} else {
+			nodes [selectedNodeIndex].nodeForce.SetColor (Color.green);
+			originalPinchDistance = originalPinchDistanceL;
+		}
+
+		int state = -1;
+		if( handedness == RIGHT){
+			state = stateR;
+			distanceOfDraggedObject = distanceOfDraggedObjectR;
+		}
+		else{
+			state = stateL;
+			distanceOfDraggedObject = distanceOfDraggedObjectL;
+		}
+
+
+		//STATE STUFF
+		if (nstate != NSTATE_NODESELECTED && isActive) { // select the node
+			nstate = STATE_NODESELECTED;
+			highlightedObject = nodes [selectedNodeIndex].gameObject;
+		}
+
+		if (state == NSTATE_NODESELECTED) { // already selected
+			//highlightedObject; //increase time selected
+		}
+
+		if (!isActive) { // if you let go you're not dragging
+			nstate = NSTATE_NORMAL;
+		}
+
+		if( handedness == RIGHT){
+			stateR = state;
+			distanceOfDraggedObjectR = distanceOfDraggedObject;
+			originalPinchDistanceR = originalPinchDistance;
+		}
+		else{
+			stateL = state;
+			distanceOfDraggedObjectL = distanceOfDraggedObject;
+			originalPinchDistanceL = originalPinchDistance;
+		}
+
+	}
+
+
+	void ConeCastPointsFromPinch(LeapPinchDetector detector, int handedness) {
+		// GET ACTIVITY -- are you pinching, clicking?
+		bool isActive = detector.IsPinching;
+		bool activeThisFrame = detector.DidStartPinch;
+
+		// GET POSITION OF EVENT
+		Vector3 p = detector.Position;
+		// camera to pinch vector
+		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
+
+		// camera to object vector
+		Vector3 objectVector;
+		float biggestDotProduct= 0.0f;
+		int selectedNodeIndex = 0;
+		float dotProduct;
+		for (int i = 0; i < nodes.Length; i++) {
+			objectVector = Vector3.Normalize(nodes [i].gameObject.transform.position - playerCamera.transform.position);
+			dotProduct = Vector3.Dot (heading, objectVector);
+
+			if (dotProduct > biggestDotProduct) {
+				biggestDotProduct = dotProduct;
+				selectedNodeIndex = i;
+			}
+		}
 
 		GameObject draggedObject = null;
 		float distanceOfDraggedObject = 0.0f;

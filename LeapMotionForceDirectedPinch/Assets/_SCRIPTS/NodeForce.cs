@@ -22,8 +22,10 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		//float randomScale = Random.value * 2.0f + 1.0f;
 		SetScale (scale);
 
-		Color randomColor = new Color (1.0f, Random.value, Random.value, 1.0f);
+		Color randomColor = new Color (Random.value, Random.value, 1.0f, 1.0f);
 		SetColor (randomColor);
+
+		DeactivateText ();
 	}
 	
 	// Update is called once per frame
@@ -65,6 +67,14 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public void SetText(string newText) {
 		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();
 		myTextMesh.text = newText;
+	}
+
+	public void DeactivateText() {
+		myTextMeshGameObject.SetActive (false);
+	}
+
+	public void ActivateText() {
+		myTextMeshGameObject.SetActive (false);
 	}
 
 	public void TextFaceCamera(Transform cameraPosition){
