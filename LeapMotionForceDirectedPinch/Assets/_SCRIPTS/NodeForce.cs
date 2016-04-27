@@ -9,6 +9,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public Color color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 	public Color selectedColor = Color.green;
 
+	public float timeSelected = 0.0f;
+
 	bool selected = false;
 
 	private MeshRenderer myRenderer;
@@ -86,7 +88,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	}
 
 	public void ActivateText() {
-		myTextMeshGameObject.SetActive (false);
+		myTextMeshGameObject.SetActive (true);
 	}
 
 	public void TextFaceCamera(Transform cameraPosition){

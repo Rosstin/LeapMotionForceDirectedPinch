@@ -37,9 +37,11 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
-	public Node[] masterNodeList;
+	//List<int> tier2Nodes = new List<int> ();
 
-	//public GameObject nodeToClone;
+	public Node[] masterNodeList;
+	int[] indicesToShowOrExplode;
+
 
 	// Use this for initialization
 	void Start () {
@@ -49,7 +51,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		generateGraphFromCSV ();
 		//generateGraphRandomly();
 
-		//RenderLinesOnce ();
+		RenderLinesOnce ();
 		HideAllLines();
 
 		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
@@ -60,6 +62,54 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 
 	}
+
+	public void explodeSelectedNode(Node highlightedNode) {
+		if (highlightedNode != null) {
+			float time = highlightedNode.nodeForce.timeSelected;
+
+			// show more connections over time
+
+			if (time >= 6.0f) {
+
+				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
+
+				foreach (int subIndex in myList) {
+					showConnectedNodes (adjacencyList.GetEdgesForVertex (subIndex), subIndex);
+				}
+
+			}
+			if (time >= 4.0f) {
+				// a list of vertices... show every vertex here
+				showConnectedNodes (adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
+
+
+			} else if (time >= 2.0f) {
+				// hide all other nodes
+				hideNodes ();
+				highlightedNode.gameObject.SetActive (true);
+				//HideAllLines();
+			}
+
+
+		}
+		// then... show lines and nodes based on connections
+
+
+
+		// first, hide all other nodes
+
+		// then, draw the edges connecting this node to others
+		// then, draw the edges connecting those nodes to others
+
+		// coroutine?
+
+	}
+
+	public void unselectNode(){
+		showNodes();
+		//HideAllLines ();
+	}
+
 
 	void generateGraphFromCSV(){
 		//print ("readCSVData");
@@ -72,6 +122,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 		int numberOfNodes = positionsGrid.GetUpperBound(1)-1;
 
 		masterNodeList = new Node[numberOfNodes];
+		indicesToShowOrExplode = new int[numberOfNodes];
+
 
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
@@ -100,7 +152,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			myNodeInstance.transform.parent = nodeContainer.transform;
 
-			masterNodeList [i-1] = new Node (myNodeInstance, i); 
+			masterNodeList [i-1] = new Node (myNodeInstance, i-1); 
 
 			nameToID.Add (label, i-1);
 		}
@@ -181,8 +233,34 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 	}
 
+	void hideNodes(){
+		for (int i = 0; i < masterNodeList.Length; i++) {
+			masterNodeList [i].gameObject.SetActive (false);
+		}
+	}
+
+	void showNodes(){
+		for (int i = 0; i < masterNodeList.Length; i++) {
+			masterNodeList [i].gameObject.SetActive (true);
+		}
+	}
+
+	void showConnectedNodes(List<int> indices, int mainIndex){
+		foreach (int index in indices) {
+			masterNodeList [index].gameObject.SetActive (true);
+			masterNodeList [index].nodeForce.ActivateText ();
+			showLinesBetween (index, mainIndex);
+
+
+			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
+		}
+	}
+
+
+
 	void generateGraphRandomly(){
 		masterNodeList = new Node[NUMBER_NODES];
+		indicesToShowOrExplode = new int[NUMBER_NODES];
 
 		// add nodes
 		randomlyPlaceNodes();
@@ -295,7 +373,6 @@ public class GenerateRandomGraph : MonoBehaviour {
 		// TODO
 	}
 
-
 	void renderLinesBetween(int i, int j){ 
 		if (adjacencyList.isAdjacent (i, j)) {
 			int smaller = j;
@@ -331,10 +408,26 @@ public class GenerateRandomGraph : MonoBehaviour {
 			//print ("key: " + key);
 
 			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
-			myLineRenderer.SetVertexCount (2);
-			myLineRenderer.SetPosition (0, masterNodeList [smaller].gameObject.transform.position);
-			myLineRenderer.SetPosition (1, masterNodeList [bigger].gameObject.transform.position);
 			myLineRenderer.enabled = false;
+		} else {
+			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+		}
+	}
+
+	void showLinesBetween(int i, int j){ 
+		if (adjacencyList.isAdjacent (i, j)) {
+			int smaller = j;
+			int bigger = i;
+			if (i < j) {
+				smaller = i;
+				bigger = j;
+			}
+
+			string key = "" + smaller + "." + bigger;
+			//Debug.Log ("key: " + key);
+
+			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
+			myLineRenderer.enabled = true;
 		} else {
 			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
 		}
@@ -393,6 +486,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 	}
 
+	//TODO: this is hella slow
 	void HideAllLines () { 
 		for(int i = 0; i < masterNodeList.Length-1; i++){
 			for (int j = 0; j < masterNodeList.Length-1; j++) {

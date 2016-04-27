@@ -45,23 +45,12 @@ public class MouseRaycast : MonoBehaviour {
 	int RIGHT = 0;
 	int LEFT = 1;
 
-	// STATE FOR NODE SELECTION THING
-
-	int nstate;
-	int NSTATE_NORMAL = 0;
-	int NSTATE_NODESELECTED = 1;
-	float selectionTime = 0.0f;
-
-	Node highlightedObject = null;
-
 
 	Vector3 nodeContainerStartPosition;
 	Vector3 zoomPinchStartPositionL;
 	Vector3 zoomPinchStartPositionR;
 	float zoomPinchStartDistance;
 	float lastZoomPinchDistance;
-
-	float ZOOM_CONSTANT = 10.0f;
 
 	void Start () {
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
@@ -76,11 +65,22 @@ public class MouseRaycast : MonoBehaviour {
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 	}
 
-	// Attach this script to an orthographic camera.
 
+
+
+	// Attach this script to an orthographic camera.
 	void FixedUpdate () {
-		HighlightNearPointFromPinch (rightPinchDetectorScript, RIGHT);
 		HighlightNearPointFromPinch (leftPinchDetectorScript, LEFT);
+		HighlightNearPointFromPinch (rightPinchDetectorScript, RIGHT);
+
+		if (stateL == STATE_DRAGGING) {
+			graphGenerator.explodeSelectedNode (highlightedObjectL);
+		} 
+
+		if (stateR == STATE_DRAGGING) {
+			graphGenerator.explodeSelectedNode (highlightedObjectR);
+		}
+
 	}
 
 	void HighlightNearPointFromPinch(LeapPinchDetector detector, int handedness) {
@@ -135,21 +135,25 @@ public class MouseRaycast : MonoBehaviour {
 			if (handedness == LEFT) {
 				highlightedObjectL = nodes [selectedNodeIndex];
 				highlightedObjectL.nodeForce.Selected ();
-				Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
+				//Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 			}
 			else {
 				highlightedObjectR = nodes [selectedNodeIndex];
 				highlightedObjectR.nodeForce.Selected ();
-				Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
+				//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
 			}
 		}
 
 		if (state == STATE_DRAGGING) { // already dragging
 
 			if (handedness == LEFT) {
-				Debug.Log ("dragging" );
+				if (highlightedObjectL != null) {
+					highlightedObjectL.nodeForce.timeSelected += Time.deltaTime;
+				}
 			} else {
-
+				if (highlightedObjectR != null) {
+					highlightedObjectR.nodeForce.timeSelected += Time.deltaTime;
+				}
 			}
 
 
@@ -161,14 +165,18 @@ public class MouseRaycast : MonoBehaviour {
 
 			if (handedness == LEFT) {
 				if (highlightedObjectL != null) {
-					Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
+					//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 					highlightedObjectL.nodeForce.Unselected ();
+					graphGenerator.unselectNode ();
+					highlightedObjectL.nodeForce.timeSelected = 0.0f;
 					highlightedObjectL = null;
 				}
 			} else {
 				if (highlightedObjectR != null) {
-					Debug.Log ("letgo highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
+					//Debug.Log ("letgo highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
 					highlightedObjectR.nodeForce.Unselected ();
+					graphGenerator.unselectNode ();
+					highlightedObjectR.nodeForce.timeSelected = 0.0f;
 					highlightedObjectR = null;
 				}
 			}
