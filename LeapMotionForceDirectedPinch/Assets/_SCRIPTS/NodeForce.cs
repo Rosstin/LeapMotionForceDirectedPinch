@@ -7,11 +7,14 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public float mass = 1.0f;
 	private float scale = 0.10f;
 	public Color color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+	public Color selectedColor = Color.green;
+
+	bool selected = false;
 
 	private MeshRenderer myRenderer;
 
 	public GameObject myTextMeshGameObject;
-	private TextMesh myTextMesh;
+	public TextMesh myTextMesh;
 
 	void Start () {
 		myRenderer = this.GetComponent<MeshRenderer> ();
@@ -49,6 +52,15 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		this.myRenderer.material.color = color;
 	}
 
+	public void Selected() {
+		this.myRenderer.material.color = selectedColor;
+	}
+
+	public void Unselected() {
+		this.myRenderer.material.color = color;
+	}
+
+
 	public void RandomText() {
 		float r = Random.value;
 		if (r < 0.20f) {
@@ -68,7 +80,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();
 		myTextMesh.text = newText;
 	}
-
+		
 	public void DeactivateText() {
 		myTextMeshGameObject.SetActive (false);
 	}
