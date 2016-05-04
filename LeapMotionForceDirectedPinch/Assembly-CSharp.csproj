@@ -129,6 +129,7 @@
      <Compile Include="Assets\LeapMotionModules\PinchUtility\Scripts\LeapPinchDetector.cs" />
      <Compile Include="Assets\LeapMotionModules\PinchUtility\Scripts\LeapRTS.cs" />
      <Compile Include="Assets\_SCRIPTS\AdjacencyList.cs" />
+     <Compile Include="Assets\_SCRIPTS\ButtonActivate.cs" />
      <Compile Include="Assets\_SCRIPTS\CSVReader.cs" />
      <Compile Include="Assets\_SCRIPTS\Draggable.cs" />
      <Compile Include="Assets\_SCRIPTS\GenerateRandomGraph.cs" />

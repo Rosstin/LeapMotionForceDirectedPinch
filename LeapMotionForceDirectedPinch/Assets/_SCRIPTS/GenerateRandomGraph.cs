@@ -150,6 +150,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
 			nodeScript.SetText (positionsGrid [0, i]);
 
+			nodeScript.degree = int.Parse(positionsGrid [2, i]);
+
+
 			myNodeInstance.transform.parent = nodeContainer.transform;
 
 			masterNodeList [i-1] = new Node (myNodeInstance, i-1); 
@@ -211,6 +214,17 @@ public class GenerateRandomGraph : MonoBehaviour {
 			masterNodeList [i].gameObject.SetActive (true);
 		}
 	}
+
+	public void showNodesOfDegreeGreaterThan(int myDegree){
+		for (int i = 0; i < masterNodeList.Length; i++) {
+			if (masterNodeList [i].nodeForce.degree >= myDegree) {
+				masterNodeList [i].gameObject.SetActive (true);
+			} else {
+				masterNodeList [i].gameObject.SetActive (false);
+			}
+		}
+	}
+
 
 	void showConnectedNodes(List<int> indices, int mainIndex){
 		foreach (int index in indices) {

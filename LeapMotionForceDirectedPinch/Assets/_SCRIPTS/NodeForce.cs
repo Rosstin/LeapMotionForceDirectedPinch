@@ -9,6 +9,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public Color color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 	public Color selectedColor = Color.green;
 
+	public int degree;
+
 	public float timeSelected = 0.0f;
 
 	bool selected = false;
