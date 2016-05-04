@@ -113,11 +113,11 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	void generateGraphFromCSV(){
 		//print ("readCSVData");
-		TextAsset edgesText = Resources.Load ("b1") as TextAsset;
+		TextAsset edgesText = Resources.Load ("c_edge") as TextAsset;
 		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
 		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
 
-		TextAsset positionsText = Resources.Load ("b2") as TextAsset;
+		TextAsset positionsText = Resources.Load ("c_node") as TextAsset;
 		string[,] positionsGrid = CSVReader.SplitCsvGrid (positionsText.text);
 		int numberOfNodes = positionsGrid.GetUpperBound(1)-1;
 
@@ -133,12 +133,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 			// add vertexes
 			if (i != 0) { adjacencyList.AddVertex (i);}
 
-			string label = positionsGrid [0, i];
+			string label = positionsGrid [1, i];
 			Vector3 position = 
 				new Vector3 (
-					float.Parse (positionsGrid [1, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [2, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [3, i]) * GRAPH_SCALE_CONSTANT
+					float.Parse (positionsGrid [4, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [5, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [6, i]) * GRAPH_SCALE_CONSTANT
 				);
 
 			GameObject myNodeInstance = 
@@ -148,11 +148,13 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 
 			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
-			nodeScript.SetText (label);
+			nodeScript.SetText (positionsGrid [0, i]);
 
 			myNodeInstance.transform.parent = nodeContainer.transform;
 
 			masterNodeList [i-1] = new Node (myNodeInstance, i-1); 
+
+			masterNodeList [i - 1].nodeForce.SetColorByGroup (int.Parse(positionsGrid [3, i]));
 
 			nameToID.Add (label, i-1);
 		}
@@ -176,41 +178,6 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	}
 
-	void generatePositionsFromCSV(){
-		//print ("generatePositionsFromCSV");
-		TextAsset text = Resources.Load ("L2") as TextAsset;
-		string[,] outputGrid = CSVReader.SplitCsvGrid (text.text);
-
-		int numNodes = masterNodeList.Length;
-
-		for (int i = 1; i < numNodes+1; i++) {
-
-			// add vertexes
-			if (i != 0) { adjacencyList.AddVertex (i);}
-
-			string label = outputGrid [0, i];
-			Vector3 position = 
-				new Vector3 (
-					float.Parse (outputGrid [1, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (outputGrid [2, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (outputGrid [3, i]) * GRAPH_SCALE_CONSTANT
-				);
-
-			GameObject myNodeInstance = 
-				Instantiate (Resources.Load("Node") as GameObject,
-					position,
-					Quaternion.identity) as GameObject;
-
-
-			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
-			nodeScript.SetText (label);
-
-			myNodeInstance.transform.parent = nodeContainer.transform;
-
-			masterNodeList [i-1] = new Node (myNodeInstance, i); 
-		}
-
-	}
 
 	void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
 		int numNodes = masterNodeList.Length;

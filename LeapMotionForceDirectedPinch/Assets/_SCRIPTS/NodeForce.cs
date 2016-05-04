@@ -27,8 +27,10 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		//float randomScale = Random.value * 2.0f + 1.0f;
 		SetScale (scale);
 
-		Color randomColor = new Color (Random.value, Random.value, 1.0f, 1.0f);
-		SetColor (randomColor);
+		//Color randomColor = new Color (Random.value, Random.value, 1.0f, 1.0f);
+		//SetColor (randomColor);
+
+		SetColor (color);
 
 		DeactivateText ();
 	}
@@ -48,6 +50,38 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public void SetColor (Color newColor) {
 		color = newColor;
 		this.myRenderer.material.color = newColor;
+	}
+
+	public void SetColorByGroup(int group) {
+
+		//Debug.Log ("color group: " + group);
+
+		float r = Mathf.PerlinNoise (group*1.0f, 1.0f);
+		float g = Mathf.PerlinNoise (group*1.0f, 2.0f);
+		float b = Mathf.PerlinNoise (group*1.0f, 3.0f);
+
+		Color newColor = new Color(r, g, b, 1.0f);
+
+		if (group == 0) {
+			newColor = Color.blue;
+		} else if (group == 1) {
+			newColor = Color.magenta;
+		} else if (group == 2) {
+			newColor = Color.yellow;
+		} else if (group == 3) {
+			newColor = Color.red;
+		} else if (group == 4) {
+			newColor = Color.white;
+		} else if (group == 5) {
+			newColor = Color.gray;
+		} else {
+			newColor = Color.black;
+		}
+
+
+
+		color = newColor;
+		//this.myRenderer.material.color = newColor;
 	}
 
 	public void RevertColor () {
