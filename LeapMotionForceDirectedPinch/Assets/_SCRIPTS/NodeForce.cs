@@ -49,6 +49,10 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		this.transform.localScale = new Vector3(scale, scale, scale);
 	}
 
+	public void SetScaleFromDegree (int degree) {
+		SetScale (Mathf.Log (degree)/10.0f);
+	}
+
 	public void SetColor (Color newColor) {
 		color = newColor;
 		this.myRenderer.material.color = newColor;

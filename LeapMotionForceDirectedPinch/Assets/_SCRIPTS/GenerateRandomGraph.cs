@@ -69,7 +69,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			// show more connections over time
 
-			if (time >= 6.0f) {
+			if (time >= 20.0f) {
 
 				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
 
@@ -78,12 +78,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 				}
 
 			}
-			if (time >= 4.0f) {
+			if (time >= 16.0f) {
 				// a list of vertices... show every vertex here
 				showConnectedNodes (adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
 
 
-			} else if (time >= 2.0f) {
+			} else if (time >= 8.0f) {
 				// hide all other nodes
 				hideNodes ();
 				highlightedNode.gameObject.SetActive (true);
@@ -152,6 +152,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			nodeScript.degree = int.Parse(positionsGrid [2, i]);
 
+			nodeScript.SetScaleFromDegree (int.Parse(positionsGrid [2, i]));
 
 			myNodeInstance.transform.parent = nodeContainer.transform;
 
