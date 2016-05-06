@@ -3046,6 +3046,7 @@ MonoBehaviour:
   pointer: {fileID: 481675529}
   canvas: {fileID: 2033046015}
   sceneGod: {fileID: 1993002016}
+  myLineRenderer: {fileID: 0}
 --- !u!114 &1993002020
 MonoBehaviour:
   m_ObjectHideFlags: 0

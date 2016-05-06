@@ -61,9 +61,6 @@ public class HandsRaycast : MonoBehaviour {
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 	}
 
-
-
-
 	// Attach this script to an orthographic camera.
 	void FixedUpdate () {
 		HighlightNearPointFromPinch (leftPinchDetectorScript, LEFT);

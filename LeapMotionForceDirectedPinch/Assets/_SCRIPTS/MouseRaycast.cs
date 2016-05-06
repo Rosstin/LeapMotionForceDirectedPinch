@@ -23,12 +23,15 @@ public class MouseRaycast : MonoBehaviour {
 
 	GenerateRandomGraph myGraph;
 
+	public LineRenderer myLineRenderer;
+
 	void Start () {
 		myGraph = sceneGod.GetComponent<GenerateRandomGraph> ();
 
-		//GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
-
-
+		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
+		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
+		myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
+		myLineRenderer.enabled = false;
 	}
 
 	// Attach this script to an orthographic camera.
@@ -58,11 +61,22 @@ public class MouseRaycast : MonoBehaviour {
 
 			ButtonActivate hitObject;
 
+			Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
+
+
 			if (Physics.Raycast (playerCamera.transform.position, p, out hit)) { // if you hit something
 			//if(Physics.SphereCast(playerCamera.transform.position, 12.0f, heading, out hit, 200.0f)) {
 
 				Debug.Log("Hit something.");
 				if (hit.transform.gameObject.tag == "Clickable") { // if it was a draggable object
+
+					myLineRenderer.SetVertexCount (2);
+					myLineRenderer.SetPosition (0, p);
+					myLineRenderer.SetPosition (1, endRayPosition);
+					myLineRenderer.enabled = true;
+
+
+
 					Debug.Log("Hit Clickable.");
 					hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
 					myGraph.showNodesOfDegreeGreaterThan (22);
