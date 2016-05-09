@@ -6,7 +6,11 @@ using Leap.Unity.PinchUtility;
 
 public class HandsRaycast : MonoBehaviour {
 
+	public GameObject button1;
+	Collider button1Collider;
 	public GameObject PanelContainer;
+	// an object with an array of all buttons should be included 
+
 
 	// VIEWPANEL
 	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 12.0f;
@@ -68,13 +72,19 @@ public class HandsRaycast : MonoBehaviour {
 
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
+
+		button1Collider = button1.GetComponent<Collider> ();
+
+
 	}
 
 	void FixedUpdate () {
-		HighlightNearPointFromPinch (leftPinchDetectorScript, LEFT);
-		HighlightNearPointFromPinch (rightPinchDetectorScript, RIGHT);
+		UpdateControlPanel ();
 
-		if (stateL == STATE_DRAGGING) {
+		HandlePinches (leftPinchDetectorScript, LEFT);
+		HandlePinches (rightPinchDetectorScript, RIGHT);
+
+		if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
 			graphGenerator.explodeSelectedNode (highlightedObjectL);
 		} 
 
@@ -82,10 +92,6 @@ public class HandsRaycast : MonoBehaviour {
 			graphGenerator.explodeSelectedNode (highlightedObjectR);
 		}
 
-	}
-
-	void Update() {
-		UpdateControlPanel ();
 	}
 
 	void UpdateControlPanel () {
@@ -119,7 +125,7 @@ public class HandsRaycast : MonoBehaviour {
 
 	}
 
-	void HighlightNearPointFromPinch(LeapPinchDetector detector, int handedness) {
+	void HandlePinches(LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
@@ -143,86 +149,116 @@ public class HandsRaycast : MonoBehaviour {
 			state = stateL;
 		}
 
-		if(state != STATE_DRAGGING && isActive){ // can start a drag
-			state = STATE_DRAGGING;
+		if (panelState == PANEL_ON) {
 
-			for (int i = 0; i < nodes.Length; i++) {
-				objectVector = Vector3.Normalize(nodes [i].gameObject.transform.position - playerCamera.transform.position);
-				dotProduct = Vector3.Dot (heading, objectVector);
+			// do panel actions
+			graphGenerator.NodesAreDraggable (false);
 
-				if (dotProduct > biggestDotProduct) {
-					biggestDotProduct = dotProduct;
-					selectedNodeIndex = i;
+			RaycastHit hit = new RaycastHit ();
+			ButtonActivate hitObject;
+			Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
+
+			//myLineRenderer.SetVertexCount (2);
+			//myLineRenderer.SetPosition (0, p);
+			//myLineRenderer.SetPosition (1, endRayPosition);
+			//myLineRenderer.enabled = true;
+
+
+
+			if ( button1Collider.Raycast (new Ray(playerCamera.transform.position, heading), out hit, 200.0f)) { // if you hit something
+
+				//Debug.Log("Hit something.");
+				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button
+					//Debug.Log("Hit Clickable.");
+
+					hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
+					graphGenerator.showNodesOfDegreeGreaterThan (22);
 				}
 			}
 
-			GameObject draggedObject = null;
-			float distanceOfDraggedObject = 0.0f;
-			float originalPinchDistance = 0.0f;
+		} else {
+
+			graphGenerator.NodesAreDraggable (true);
+
+			if (state != STATE_DRAGGING && isActive) { // can start a drag
+				state = STATE_DRAGGING;
+
+				for (int i = 0; i < nodes.Length; i++) {
+					objectVector = Vector3.Normalize (nodes [i].gameObject.transform.position - playerCamera.transform.position);
+					dotProduct = Vector3.Dot (heading, objectVector);
+
+					if (dotProduct > biggestDotProduct) {
+						biggestDotProduct = dotProduct;
+						selectedNodeIndex = i;
+					}
+				}
+
+				GameObject draggedObject = null;
+				float distanceOfDraggedObject = 0.0f;
+				float originalPinchDistance = 0.0f;
+
+				if (handedness == RIGHT) {
+					nodes [selectedNodeIndex].nodeForce.Selected ();
+					originalPinchDistance = originalPinchDistanceR;
+				} else {
+					nodes [selectedNodeIndex].nodeForce.Selected ();
+					originalPinchDistance = originalPinchDistanceL;
+				}
+
+				if (handedness == LEFT) {
+					highlightedObjectL = nodes [selectedNodeIndex];
+					highlightedObjectL.nodeForce.Selected ();
+					//Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
+				} else {
+					highlightedObjectR = nodes [selectedNodeIndex];
+					highlightedObjectR.nodeForce.Selected ();
+					//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
+				}
+			}
+
+			if (state == STATE_DRAGGING) { // already dragging
+
+				if (handedness == LEFT) {
+					if (highlightedObjectL != null) {
+						highlightedObjectL.nodeForce.timeSelected += Time.deltaTime;
+					}
+				} else {
+					if (highlightedObjectR != null) {
+						highlightedObjectR.nodeForce.timeSelected += Time.deltaTime;
+					}
+				}
+
+
+
+			}
+
+			if (!isActive) { // if you let go you're not dragging
+				state = STATE_NORMAL;
+
+				if (handedness == LEFT) {
+					if (highlightedObjectL != null) {
+						//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
+						highlightedObjectL.nodeForce.Unselected ();
+						graphGenerator.unselectNode ();
+						highlightedObjectL.nodeForce.timeSelected = 0.0f;
+						highlightedObjectL = null;
+					}
+				} else {
+					if (highlightedObjectR != null) {
+						//Debug.Log ("letgo highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
+						highlightedObjectR.nodeForce.Unselected ();
+						graphGenerator.unselectNode ();
+						highlightedObjectR.nodeForce.timeSelected = 0.0f;
+						highlightedObjectR = null;
+					}
+				}
+			}
 
 			if (handedness == RIGHT) {
-				nodes [selectedNodeIndex].nodeForce.Selected ();
-				originalPinchDistance = originalPinchDistanceR;
+				stateR = state;
 			} else {
-				nodes [selectedNodeIndex].nodeForce.Selected ();
-				originalPinchDistance = originalPinchDistanceL;
+				stateL = state;
 			}
-
-			if (handedness == LEFT) {
-				highlightedObjectL = nodes [selectedNodeIndex];
-				highlightedObjectL.nodeForce.Selected ();
-				//Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
-			}
-			else {
-				highlightedObjectR = nodes [selectedNodeIndex];
-				highlightedObjectR.nodeForce.Selected ();
-				//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
-			}
-		}
-
-		if (state == STATE_DRAGGING) { // already dragging
-
-			if (handedness == LEFT) {
-				if (highlightedObjectL != null) {
-					highlightedObjectL.nodeForce.timeSelected += Time.deltaTime;
-				}
-			} else {
-				if (highlightedObjectR != null) {
-					highlightedObjectR.nodeForce.timeSelected += Time.deltaTime;
-				}
-			}
-
-
-
-		}
-
-		if (!isActive) { // if you let go you're not dragging
-			state = STATE_NORMAL;
-
-			if (handedness == LEFT) {
-				if (highlightedObjectL != null) {
-					//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
-					highlightedObjectL.nodeForce.Unselected ();
-					graphGenerator.unselectNode ();
-					highlightedObjectL.nodeForce.timeSelected = 0.0f;
-					highlightedObjectL = null;
-				}
-			} else {
-				if (highlightedObjectR != null) {
-					//Debug.Log ("letgo highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
-					highlightedObjectR.nodeForce.Unselected ();
-					graphGenerator.unselectNode ();
-					highlightedObjectR.nodeForce.timeSelected = 0.0f;
-					highlightedObjectR = null;
-				}
-			}
-		}
-
-		if( handedness == RIGHT){
-			stateR = state;
-		}
-		else{
-			stateL = state;
 		}
 	}
 

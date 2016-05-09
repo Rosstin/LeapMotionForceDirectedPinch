@@ -33,6 +33,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
 	public GameObject nodeContainer;
+	Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
+
 	public Vector3 nodeContainerOriginalPosition;
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
@@ -57,6 +59,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
 		nodeContainerOriginalPosition = nodeContainer.transform.position;
 
+		myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS> ();
 
 		//StartCoroutine ("ProcessNodesCoroutine");
 
@@ -201,6 +204,14 @@ public class GenerateRandomGraph : MonoBehaviour {
 			masterNodeList [i] = new Node (myNodeInstance, i); 
 
 
+		}
+	}
+
+	public void NodesAreDraggable(bool draggable){
+		if (draggable) {
+			myLeapRTS.enabled = true;
+		} else {
+			myLeapRTS.enabled = false;
 		}
 	}
 

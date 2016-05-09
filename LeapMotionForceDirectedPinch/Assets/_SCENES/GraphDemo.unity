@@ -1017,7 +1017,7 @@ BoxCollider:
   m_GameObject: {fileID: 1218101343}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -3090,6 +3090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PanelContainer: {fileID: 900574211}
+  buttonOne: {fileID: 634930387}
   playerCamera: {fileID: 2098797249}
   sceneGod: {fileID: 1993002016}
   rightPinchDetector: {fileID: 525701292}
