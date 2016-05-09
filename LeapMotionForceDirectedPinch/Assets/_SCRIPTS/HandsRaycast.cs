@@ -8,12 +8,16 @@ public class HandsRaycast : MonoBehaviour {
 
 	public GameObject button1;
 	Collider button1Collider;
+	public GameObject slider1;
+	Collider slider1Collider;
+	Slider slider1script;
 	public GameObject PanelContainer;
 	// an object with an array of all buttons should be included 
 
+	float SLIDER_MOVE_SPEED = 0.003f;
 
 	// VIEWPANEL
-	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 12.0f;
+	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 10.0f;
 	float VIEWPANEL_EULER_X_UPPER_THRESHHOLD = 100.0f;
 
 	int panelState;
@@ -74,6 +78,8 @@ public class HandsRaycast : MonoBehaviour {
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 
 		button1Collider = button1.GetComponent<Collider> ();
+		slider1Collider = slider1.GetComponent<Collider> ();
+		slider1script = slider1.GetComponent<Slider> ();
 
 
 	}
@@ -96,30 +102,95 @@ public class HandsRaycast : MonoBehaviour {
 
 	void UpdateControlPanel () {
 		// looking at panel
-		if (playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
-			turnPanelOffTimer = 0.0f;
-			turnPanelOnTimer += Time.deltaTime;
-
-			if (turnPanelOnTimer >= PANEL_TIMER_CONSTANT) {
-				panelState = PANEL_ON;
-			}
-
-		} 
 		// not looking at panel
-		else { 
-			turnPanelOnTimer = 0.0f;
-			turnPanelOffTimer += Time.deltaTime;
-
-			if (turnPanelOffTimer >= PANEL_TIMER_CONSTANT) {
-				panelState = PANEL_OFF;
-			}
-		}
 
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
+
+			if (!(playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD)) {
+				turnPanelOnTimer = 0.0f;
+				turnPanelOffTimer += Time.deltaTime;
+
+				if (turnPanelOffTimer >= PANEL_TIMER_CONSTANT) {
+					panelState = PANEL_OFF;
+				}
+			}
+
 		} else if (panelState == PANEL_OFF) {
 			PanelContainer.SetActive (false);
+
+			if (playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
+				turnPanelOffTimer = 0.0f;
+				turnPanelOnTimer += Time.deltaTime;
+
+				if (turnPanelOnTimer >= PANEL_TIMER_CONSTANT) {
+					PanelContainer.transform.eulerAngles = new Vector3( PanelContainer.transform.eulerAngles.x, playerCamera.transform.eulerAngles.y, PanelContainer.transform.eulerAngles.z ); 
+					panelState = PANEL_ON;
+				}
+
+			} 
+
+
 		}
+
+
+
+	}
+
+	void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
+
+		RaycastHit hit = new RaycastHit ();
+
+		if (slider.state != slider.DRAGGING && collider.Raycast (ray, out hit, 200.0f)) { // start a drag
+			slider.state = slider.DRAGGING;
+			slider.OnGrab ();
+			slider.handUsed = handedness;
+
+			// do things related to starting a drag
+
+		}
+
+		if (slider.state == slider.DRAGGING && slider.handUsed == handedness) {
+
+			Vector3 perp = Vector3.Cross (heading, (playerCamera.transform.position - slider.transform.position));
+			float dir = Vector3.Dot (perp, playerCamera.transform.up);
+
+			if (dir > 0f) {
+				// left?
+				//Debug.Log("left");
+
+				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x + SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
+
+
+
+			} else if (dir < 0f) {
+				// right?
+				//Debug.Log("right");
+
+				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x - SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
+
+
+			} else {
+				// ontarget?
+				Debug.Log("ontarget");
+			}
+
+
+
+			//slider.transform.position.x = 
+
+			//new Plane()
+
+			// you can move it around
+
+			if (!isActive) { // no longer dragging
+				slider.state = slider.NORMAL;
+			}
+
+		}
+
+
+
 
 
 
@@ -163,18 +234,24 @@ public class HandsRaycast : MonoBehaviour {
 			//myLineRenderer.SetPosition (1, endRayPosition);
 			//myLineRenderer.enabled = true;
 
+			Ray myRay = new Ray (playerCamera.transform.position, heading);
 
-
-			if ( button1Collider.Raycast (new Ray(playerCamera.transform.position, heading), out hit, 200.0f)) { // if you hit something
+			if ( button1Collider.Raycast (myRay, out hit, 200.0f)) { // if you hit something
 
 				//Debug.Log("Hit something.");
-				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button
+				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button //don't really need this anymore
 					//Debug.Log("Hit Clickable.");
 
 					hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
 					graphGenerator.showNodesOfDegreeGreaterThan (22);
 				}
 			}
+
+			UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
+
+
+
+
 
 		} else {
 
