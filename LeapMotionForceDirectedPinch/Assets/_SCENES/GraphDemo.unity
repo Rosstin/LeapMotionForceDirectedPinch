@@ -3138,7 +3138,6 @@ GameObject:
   - 114: {fileID: 1993002017}
   - 114: {fileID: 1993002020}
   - 114: {fileID: 1993002019}
-  - 114: {fileID: 1993002021}
   m_Layer: 0
   m_Name: SceneGod
   m_TagString: Untagged
@@ -3205,19 +3204,6 @@ MonoBehaviour:
   sceneGod: {fileID: 1993002016}
   rightPinchDetector: {fileID: 525701292}
   leftPinchDetector: {fileID: 390684572}
---- !u!114 &1993002021
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1993002016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59c8d22acaa871f43b97c924be59edd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Panel: {fileID: 900574211}
-  CenterEyeAnchor: {fileID: 2098797246}
 --- !u!1 &2033046011
 GameObject:
   m_ObjectHideFlags: 0
@@ -3506,3 +3492,4 @@ MonoBehaviour:
   state: 0
   NORMAL: 0
   DRAGGING: 1
+  handUsed: 0
