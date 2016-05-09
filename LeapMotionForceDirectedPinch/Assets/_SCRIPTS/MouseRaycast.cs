@@ -23,7 +23,7 @@ public class MouseRaycast : MonoBehaviour {
 
 	GenerateRandomGraph myGraph;
 
-	public LineRenderer myLineRenderer;
+	LineRenderer myLineRenderer;
 
 	void Start () {
 		myGraph = sceneGod.GetComponent<GenerateRandomGraph> ();

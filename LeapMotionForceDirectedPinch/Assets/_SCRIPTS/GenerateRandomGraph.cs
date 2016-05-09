@@ -69,7 +69,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			// show more connections over time
 
-			if (time >= 20.0f) {
+			if (time >= 8.0f) {
 
 				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
 
@@ -78,12 +78,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 				}
 
 			}
-			if (time >= 16.0f) {
+			if (time >= 6.0f) {
 				// a list of vertices... show every vertex here
 				showConnectedNodes (adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
 
 
-			} else if (time >= 8.0f) {
+			} else if (time >= 4.0f) {
 				// hide all other nodes
 				hideNodes ();
 				highlightedNode.gameObject.SetActive (true);

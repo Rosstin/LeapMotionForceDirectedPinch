@@ -6,13 +6,23 @@ using Leap.Unity.PinchUtility;
 
 public class HandsRaycast : MonoBehaviour {
 
-	public Camera playerCamera;
+	public GameObject PanelContainer;
 
-	public GameObject pointer;
+	// VIEWPANEL
+	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 12.0f;
+	float VIEWPANEL_EULER_X_UPPER_THRESHHOLD = 100.0f;
 
-	public Canvas canvas;
+	int panelState;
+	int PANEL_ON = 0;
+	float turnPanelOffTimer = 0.0f;
+	int PANEL_OFF = 1;
+	float turnPanelOnTimer = 0.0f;
 
-	public LineRenderer myLineRenderer;
+	float PANEL_TIMER_CONSTANT = 0.5f;
+
+	public Camera playerCamera; // aka CenterEyeAnchor
+
+	LineRenderer myLineRenderer;
 
 	public GameObject sceneGod;
 	GenerateRandomGraph graphGenerator;
@@ -41,7 +51,6 @@ public class HandsRaycast : MonoBehaviour {
 	int RIGHT = 0;
 	int LEFT = 1;
 
-
 	Vector3 nodeContainerStartPosition;
 	Vector3 zoomPinchStartPositionL;
 	Vector3 zoomPinchStartPositionR;
@@ -61,7 +70,6 @@ public class HandsRaycast : MonoBehaviour {
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 	}
 
-	// Attach this script to an orthographic camera.
 	void FixedUpdate () {
 		HighlightNearPointFromPinch (leftPinchDetectorScript, LEFT);
 		HighlightNearPointFromPinch (rightPinchDetectorScript, RIGHT);
@@ -73,6 +81,41 @@ public class HandsRaycast : MonoBehaviour {
 		if (stateR == STATE_DRAGGING) {
 			graphGenerator.explodeSelectedNode (highlightedObjectR);
 		}
+
+	}
+
+	void Update() {
+		UpdateControlPanel ();
+	}
+
+	void UpdateControlPanel () {
+		// looking at panel
+		if (playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
+			turnPanelOffTimer = 0.0f;
+			turnPanelOnTimer += Time.deltaTime;
+
+			if (turnPanelOnTimer >= PANEL_TIMER_CONSTANT) {
+				panelState = PANEL_ON;
+			}
+
+		} 
+		// not looking at panel
+		else { 
+			turnPanelOnTimer = 0.0f;
+			turnPanelOffTimer += Time.deltaTime;
+
+			if (turnPanelOffTimer >= PANEL_TIMER_CONSTANT) {
+				panelState = PANEL_OFF;
+			}
+		}
+
+		if (panelState == PANEL_ON) {
+			PanelContainer.SetActive (true);
+		} else if (panelState == PANEL_OFF) {
+			PanelContainer.SetActive (false);
+		}
+
+
 
 	}
 
