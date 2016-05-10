@@ -30,6 +30,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	int highestNode = 0;
 
+	int NodeDegree = 0;
+
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
 	public GameObject nodeContainer;
@@ -109,7 +111,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 	}
 
 	public void unselectNode(){
-		showNodes();
+		showNodesOfDegreeGreaterThan (NodeDegree);
+
 		//HideAllLines ();
 	}
 
@@ -228,6 +231,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 	}
 
 	public void showNodesOfDegreeGreaterThan(int myDegree){
+
+		NodeDegree = myDegree;
+
 		for (int i = 0; i < masterNodeList.Length; i++) {
 			if (masterNodeList [i].nodeForce.degree >= myDegree) {
 				masterNodeList [i].gameObject.SetActive (true);

@@ -26,7 +26,8 @@ public class HandsRaycast : MonoBehaviour {
 	int PANEL_OFF = 1;
 	float turnPanelOnTimer = 0.0f;
 
-	float PANEL_TIMER_CONSTANT = 0.5f;
+	float PANEL_ON_TIMER_CONSTANT = 0.5f;
+	float PANEL_OFF_TIMER_CONSTANT = 4.0f;
 
 	public Camera playerCamera; // aka CenterEyeAnchor
 
@@ -111,7 +112,7 @@ public class HandsRaycast : MonoBehaviour {
 				turnPanelOnTimer = 0.0f;
 				turnPanelOffTimer += Time.deltaTime;
 
-				if (turnPanelOffTimer >= PANEL_TIMER_CONSTANT) {
+				if (turnPanelOffTimer >= PANEL_OFF_TIMER_CONSTANT) {
 					panelState = PANEL_OFF;
 				}
 			}
@@ -123,7 +124,7 @@ public class HandsRaycast : MonoBehaviour {
 				turnPanelOffTimer = 0.0f;
 				turnPanelOnTimer += Time.deltaTime;
 
-				if (turnPanelOnTimer >= PANEL_TIMER_CONSTANT) {
+				if (turnPanelOnTimer >= PANEL_ON_TIMER_CONSTANT) {
 					PanelContainer.transform.eulerAngles = new Vector3( PanelContainer.transform.eulerAngles.x, playerCamera.transform.eulerAngles.y, PanelContainer.transform.eulerAngles.z ); 
 					panelState = PANEL_ON;
 				}
@@ -175,16 +176,14 @@ public class HandsRaycast : MonoBehaviour {
 				Debug.Log("ontarget");
 			}
 
-
-
-			//slider.transform.position.x = 
-
-			//new Plane()
-
-			// you can move it around
-
+			if (slider.UpdateBarValue ()) { // value changed
+				graphGenerator.showNodesOfDegreeGreaterThan (slider.currentValue);
+			}
+				
 			if (!isActive) { // no longer dragging
 				slider.state = slider.NORMAL;
+				graphGenerator.showNodesOfDegreeGreaterThan (slider.currentValue);
+				slider.UnGrab ();
 			}
 
 		}
