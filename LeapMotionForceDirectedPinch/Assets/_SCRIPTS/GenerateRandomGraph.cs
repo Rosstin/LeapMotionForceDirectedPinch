@@ -32,7 +32,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	int highestNode = 0;
 
-	int NodeDegree = 0;
+	public int NodeDegree = 0;
 
 	float EXPLOSION_TIME_1 = 4.0f;
 	float EXPLOSION_TIME_2 = 6.0f;
@@ -260,12 +260,14 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	void showConnectedNodes(List<int> indices, int mainIndex){
 		foreach (int index in indices) {
-			masterNodeList [index].gameObject.SetActive (true);
-			masterNodeList [index].nodeForce.ActivateText ();
 
-			masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
+			if (masterNodeList [index].nodeForce.degree > NodeDegree) {
 
-			showLinesBetween (index, mainIndex);
+				masterNodeList [index].gameObject.SetActive (true);
+				masterNodeList [index].nodeForce.ActivateText ();
+				masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
+				showLinesBetween (index, mainIndex);
+			}
 
 			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
 		}

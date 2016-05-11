@@ -14,7 +14,7 @@ public class HandsRaycast : MonoBehaviour {
 	public GameObject PanelContainer;
 	// an object with an array of all buttons should be included 
 
-	float SLIDER_MOVE_SPEED = 0.003f;
+	float SLIDER_MOVE_SPEED = 0.004f;
 
 	// VIEWPANEL
 	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 10.0f;
@@ -262,12 +262,14 @@ public class HandsRaycast : MonoBehaviour {
 				state = STATE_DRAGGING;
 
 				for (int i = 0; i < nodes.Length; i++) {
-					objectVector = Vector3.Normalize (nodes [i].gameObject.transform.position - playerCamera.transform.position);
-					dotProduct = Vector3.Dot (heading, objectVector);
+					if (nodes [i].nodeForce.degree > graphGenerator.NodeDegree) {
+						objectVector = Vector3.Normalize (nodes [i].gameObject.transform.position - playerCamera.transform.position);
+						dotProduct = Vector3.Dot (heading, objectVector);
 
-					if (dotProduct > biggestDotProduct) {
-						biggestDotProduct = dotProduct;
-						selectedNodeIndex = i;
+						if (dotProduct > biggestDotProduct) { // dont select nodes that are not visible
+							biggestDotProduct = dotProduct;
+							selectedNodeIndex = i;
+						}
 					}
 				}
 
