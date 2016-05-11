@@ -27,7 +27,7 @@ public class HandsRaycast : MonoBehaviour {
 	float turnPanelOnTimer = 0.0f;
 
 	float PANEL_ON_TIMER_CONSTANT = 0.5f;
-	float PANEL_OFF_TIMER_CONSTANT = 4.0f;
+	float PANEL_OFF_TIMER_CONSTANT = 3.0f;
 
 	public Camera playerCamera; // aka CenterEyeAnchor
 
@@ -105,6 +105,7 @@ public class HandsRaycast : MonoBehaviour {
 		// looking at panel
 		// not looking at panel
 
+
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
 
@@ -112,7 +113,8 @@ public class HandsRaycast : MonoBehaviour {
 				turnPanelOnTimer = 0.0f;
 				turnPanelOffTimer += Time.deltaTime;
 
-				if (turnPanelOffTimer >= PANEL_OFF_TIMER_CONSTANT) {
+				// if you're pinching, don't turn the panel off quite yet
+				if (!(rightPinchDetectorScript.IsPinching || leftPinchDetectorScript.IsPinching) && turnPanelOffTimer >= PANEL_OFF_TIMER_CONSTANT) {
 					panelState = PANEL_OFF;
 				}
 			}
