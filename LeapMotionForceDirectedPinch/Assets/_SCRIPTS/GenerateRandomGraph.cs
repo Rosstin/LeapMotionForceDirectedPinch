@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 public class GenerateRandomGraph : MonoBehaviour {
 
+	public Camera playerCamera; //aka centereyeanchor
+
 	float CHARGE_CONSTANT = 0.5f;
 	float SPRING_CONSTANT = 4.0f;
 
@@ -31,6 +33,10 @@ public class GenerateRandomGraph : MonoBehaviour {
 	int highestNode = 0;
 
 	int NodeDegree = 0;
+
+	float EXPLOSION_TIME_1 = 4.0f;
+	float EXPLOSION_TIME_2 = 6.0f;
+	float EXPLOSION_TIME_3 = 8.0f;
 
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
@@ -72,9 +78,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 		if (highlightedNode != null) {
 			float time = highlightedNode.nodeForce.timeSelected;
 
-			// show more connections over time
+			// show more connections over time // only do these once!
 
-			if (time >= 8.0f) {
+			if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
 
 				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
 
@@ -83,12 +89,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 				}
 
 			}
-			if (time >= 6.0f) {
+			else if (time >= EXPLOSION_TIME_2 && ((time - Time.deltaTime) < EXPLOSION_TIME_2)) {
 				// a list of vertices... show every vertex here
 				showConnectedNodes (adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
 
 
-			} else if (time >= 4.0f) {
+			} else if (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1)) {
 				// hide all other nodes
 				hideNodes ();
 				highlightedNode.gameObject.SetActive (true);
@@ -113,7 +119,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 	public void unselectNode(){
 		showNodesOfDegreeGreaterThan (NodeDegree);
 
-		//HideAllLines ();
+		hideLabels ();
+
+		HideAllLines (); 
 	}
 
 
@@ -230,6 +238,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 	}
 
+	void hideLabels(){
+		for (int i = 0; i < masterNodeList.Length; i++) {
+			masterNodeList [i].nodeForce.DeactivateText();
+		}
+	}
+
 	public void showNodesOfDegreeGreaterThan(int myDegree){
 
 		NodeDegree = myDegree;
@@ -248,8 +262,10 @@ public class GenerateRandomGraph : MonoBehaviour {
 		foreach (int index in indices) {
 			masterNodeList [index].gameObject.SetActive (true);
 			masterNodeList [index].nodeForce.ActivateText ();
-			showLinesBetween (index, mainIndex);
 
+			masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
+
+			showLinesBetween (index, mainIndex);
 
 			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
 		}
@@ -485,14 +501,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 	}
 
-	//TODO: this is hella slow
 	void HideAllLines () { 
-		for(int i = 0; i < masterNodeList.Length-1; i++){
-			for (int j = 0; j < masterNodeList.Length-1; j++) {
-				if (i != j) {
-					hideLinesBetween (i, j);
-				}
-			}
+		foreach (KeyValuePair<string, LineRenderer> item in adjacencyList._edgesToRender) {
+			item.Value.enabled = false;
 		}
 	}
 

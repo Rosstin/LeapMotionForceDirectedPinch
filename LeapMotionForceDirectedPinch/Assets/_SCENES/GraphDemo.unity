@@ -3214,6 +3214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ff3a377d8a673e488d83c1b16fe4af5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCamera: {fileID: 2098797249}
   nodeContainer: {fileID: 1081610661}
   nodeContainerOriginalPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1993002018

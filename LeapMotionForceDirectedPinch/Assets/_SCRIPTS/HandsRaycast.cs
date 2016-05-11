@@ -254,7 +254,7 @@ public class HandsRaycast : MonoBehaviour {
 
 
 
-		} else {
+		} else { // not looking at panel
 
 			graphGenerator.NodesAreDraggable (true);
 
