@@ -34,9 +34,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	public int NodeDegree = 0;
 
-	float EXPLOSION_TIME_1 = 4.0f;
-	float EXPLOSION_TIME_2 = 6.0f;
-	float EXPLOSION_TIME_3 = 8.0f;
+	float EXPLOSION_TIME_1 = 2.0f;
+	float EXPLOSION_TIME_2 = 4.0f;
+	float EXPLOSION_TIME_3 = 6.0f;
 
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 

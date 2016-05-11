@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class NodeForce : MonoBehaviour { // place this script on the node
 
@@ -19,6 +20,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 	public GameObject myTextMeshGameObject;
 	public TextMesh myTextMesh;
+
+	List <Color> colors = new List <Color>();
 
 	void Start () {
 		myRenderer = this.GetComponent<MeshRenderer> ();
@@ -62,11 +65,17 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		//Debug.Log ("color group: " + group);
 
-		float r = Mathf.PerlinNoise (group*1.0f, 1.0f);
-		float g = Mathf.PerlinNoise (group*1.0f, 2.0f);
-		float b = Mathf.PerlinNoise (group*1.0f, 3.0f);
+		//Random.seed = group;
 
-		Color newColor = new Color(r, g, b, 1.0f);
+
+
+		//float r = Mathf.PerlinNoise (group*1.0f, 1.0f);
+		//float g = Mathf.PerlinNoise (group*2.0f, 2.0f);
+		//unityfloat b = Mathf.PerlinNoise (group*3.0f, 3.0f);
+
+		Color newColor = new Color(Random.value, Random.value, Random.value, 1.0f);
+
+		//Debug.Log ("group: " + group + "... r: " + r + "... g: " + g + "... b: " + b);
 
 		if (group == 0) {
 			newColor = Color.blue;
@@ -84,10 +93,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 			newColor = Color.black;
 		}
 
-
-
 		color = newColor;
-		//this.myRenderer.material.color = newColor;
 	}
 
 	public void RevertColor () {

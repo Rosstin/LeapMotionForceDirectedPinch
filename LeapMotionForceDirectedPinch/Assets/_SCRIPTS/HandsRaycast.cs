@@ -27,7 +27,7 @@ public class HandsRaycast : MonoBehaviour {
 	float turnPanelOnTimer = 0.0f;
 
 	float PANEL_ON_TIMER_CONSTANT = 0.5f;
-	float PANEL_OFF_TIMER_CONSTANT = 3.0f;
+	float PANEL_OFF_TIMER_CONSTANT = 2.0f;
 
 	public Camera playerCamera; // aka CenterEyeAnchor
 
