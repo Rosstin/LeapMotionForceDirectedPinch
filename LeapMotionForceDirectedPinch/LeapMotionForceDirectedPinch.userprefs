@@ -1,21 +1,21 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_SCRIPTS\GenerateRandomGraph.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_SCRIPTS\NodeForce.cs">
     <Files>
+      <File FileName="Assets\LeapMotionModules\PinchUtility\Scripts\LeapRTS.cs" Line="21" Column="39" />
       <File FileName="Assets\_SCRIPTS\HandsRaycast.cs" Line="222" Column="4" />
-      <File FileName="Assets\_SCRIPTS\ButtonActivate.cs" Line="22" Column="3" />
-      <File FileName="Assets\_SCRIPTS\NodeForce.cs" Line="111" Column="2" />
-      <File FileName="Assets\_SCRIPTS\GenerateRandomGraph.cs" Line="58" Column="32" />
-      <File FileName="Assets\_SCRIPTS\Slider.cs" Line="10" Column="11" />
+      <File FileName="Assets\_SCRIPTS\ButtonActivate.cs" Line="1" Column="1" />
+      <File FileName="Assets\_SCRIPTS\NodeForce.cs" Line="142" Column="59" />
+      <File FileName="Assets\_SCRIPTS\GenerateRandomGraph.cs" Line="174" Column="4" />
+      <File FileName="Assets\_SCRIPTS\Slider.cs" Line="1" Column="1" />
       <File FileName="Assets\_SCRIPTS\AdjacencyList.cs" Line="1" Column="1" />
       <File FileName="Assets\_SCRIPTS\PlacePanelBasedOnHead.cs" Line="1" Column="1" />
       <File FileName="Assets\_SCRIPTS\CSVReader.cs" Line="1" Column="1" />
-      <File FileName="Assets\LeapMotionModules\PinchUtility\Scripts\LeapRTS.cs" Line="10" Column="3" />
       <File FileName="Assets\LeapMotionModules\PinchUtility\Scripts\LeapPinchDetector.cs" Line="1" Column="1" />
       <File FileName="Assets\Resources\L2.txt" Line="1" Column="1" />
       <File FileName="Assets\_SCRIPTS\Node.cs" Line="1" Column="1" />
-      <File FileName="Assets\_SCRIPTS\MouseRaycast.cs" Line="51" Column="30" />
-      <File FileName="Assets\Resources\c_node.txt" Line="2" Column="1" />
+      <File FileName="Assets\_SCRIPTS\MouseRaycast.cs" Line="1" Column="1" />
+      <File FileName="Assets\Resources\c_node.txt" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -58,14 +58,14 @@ LineRenderer:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
   m_Parameters:
-    startWidth: 0.005
-    endWidth: 0.005
+    startWidth: 0.02
+    endWidth: 0.02
     m_StartColor:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190335
     m_EndColor:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190335
   m_UseWorldSpace: 0
 --- !u!1001 &100100000
 Prefab:
@@ -84,11 +84,11 @@ Prefab:
       objectReference: {fileID: 2100000, guid: e9dfb2ee5d9e5bf4bb2ccac51acc885a, type: 2}
     - target: {fileID: 0}
       propertyPath: m_Parameters.startWidth
-      value: 0.005
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Parameters.endWidth
-      value: 0.005
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_UseWorldSpace
@@ -113,6 +113,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Parameters.m_StartColor.rgba
+      value: 4278190335
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Parameters.m_EndColor.rgba
+      value: 4278190335
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

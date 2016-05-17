@@ -21,11 +21,13 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public GameObject myTextMeshGameObject;
 	public TextMesh myTextMesh;
 
-	List <Color> colors = new List <Color>();
+	List <Color> colors;
 
 	void Start () {
 		myRenderer = this.GetComponent<MeshRenderer> ();
 		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();
+
+		AddColorsToColorList ();
 
 		//RandomText ();
 
@@ -38,6 +40,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		SetColor (color);
 
 		DeactivateText ();
+
+
 	}
 	
 	// Update is called once per frame
@@ -67,7 +71,9 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		//Random.seed = group;
 
-
+		if (colors == null || colors.Count == 0) {
+			AddColorsToColorList ();
+		}
 
 		//float r = Mathf.PerlinNoise (group*1.0f, 1.0f);
 		//float g = Mathf.PerlinNoise (group*2.0f, 2.0f);
@@ -77,21 +83,9 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		//Debug.Log ("group: " + group + "... r: " + r + "... g: " + g + "... b: " + b);
 
-		if (group == 0) {
-			newColor = Color.blue;
-		} else if (group == 1) {
-			newColor = Color.magenta;
-		} else if (group == 2) {
-			newColor = Color.yellow;
-		} else if (group == 3) {
-			newColor = Color.red;
-		} else if (group == 4) {
-			newColor = Color.white;
-		} else if (group == 5) {
-			newColor = Color.gray;
-		} else {
-			newColor = Color.black;
-		}
+		print (group%12);
+
+		newColor = colors[group%12];
 
 		color = newColor;
 	}
@@ -139,6 +133,26 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 	public void TextFaceCamera(Transform cameraPosition){
 		myTextMesh.transform.rotation = cameraPosition.rotation;
+	}
+
+	private void AddColorsToColorList(){
+		colors = new List <Color>();
+
+		colors.Add (new Color(1.0f, 0.0f, 0.0f, 1.0f));
+		colors.Add (new Color(1.0f, 128.0f/255.0f, 0.0f, 1.0f));
+		colors.Add (new Color(1.0f, 1.0f, 0.0f, 1.0f));
+		colors.Add (new Color(128.0f/255.0f, 1.0f, 0.0f, 1.0f));
+		colors.Add (new Color(0.0f, 1.0f, 0.0f, 1.0f));
+		colors.Add (new Color(0.0f, 1.0f, 128.0f/255.0f, 1.0f));
+
+		colors.Add (new Color(0.0f, 1.0f, 1.0f, 1.0f));
+		colors.Add (new Color(0.0f, 0.5f, 1.0f, 1.0f));
+		colors.Add (new Color(0.0f, 0.0f, 1.0f, 1.0f));
+		colors.Add (new Color(0.5f, 0.0f, 1.0f, 1.0f));
+		colors.Add (new Color(1.0f, 0.0f, 1.0f, 1.0f));
+		colors.Add (new Color(1.0f, 0.0f, 0.5f, 1.0f));
+
+
 	}
 
 }

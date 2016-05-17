@@ -156,6 +156,60 @@ MonoBehaviour:
   timeSelected: 0
   myTextMeshGameObject: {fileID: 0}
   myTextMesh: {fileID: 0}
+--- !u!1001 &155157820
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 498346, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: m_RootOrder
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400248, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: _pinchDetectorA
+      value: 
+      objectReference: {fileID: 390684574}
+    - target: {fileID: 11400248, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+      propertyPath: _pinchDetectorB
+      value: 
+      objectReference: {fileID: 525701294}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+  m_IsPrefabParent: 0
+--- !u!1 &155157821 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 171106, guid: 2ab9d0a66c13e60469d50387b00a51a7, type: 2}
+  m_PrefabInternal: {fileID: 155157820}
 --- !u!1 &160957721
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,7 +359,7 @@ Transform:
   m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
 --- !u!1 &193323429
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,7 +387,7 @@ Transform:
   m_Children:
   - {fileID: 2098797247}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1 &193772738
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,7 +434,7 @@ Transform:
   m_Children:
   - {fileID: 166724742}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
 --- !u!1 &390684572
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +541,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
 --- !u!1 &481675529
 GameObject:
   m_ObjectHideFlags: 0
@@ -931,7 +985,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
 --- !u!1001 &1081610660
 Prefab:
   m_ObjectHideFlags: 0
@@ -2289,7 +2343,7 @@ Transform:
   m_Children:
   - {fileID: 1020142584}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
 --- !u!1001 &1759863750
 Prefab:
   m_ObjectHideFlags: 0
@@ -2407,7 +2461,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1001 &1781939139
 Prefab:
   m_ObjectHideFlags: 0
@@ -3216,7 +3270,7 @@ MonoBehaviour:
   playerCamera: {fileID: 2098797249}
   NodeDegree: 0
   detailingMode: 1
-  nodeContainer: {fileID: 1081610661}
+  nodeContainer: {fileID: 155157821}
   nodeContainerOriginalPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1993002018
 Transform:
@@ -3230,7 +3284,7 @@ Transform:
   m_Children:
   - {fileID: 110840438}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
 --- !u!114 &1993002019
 MonoBehaviour:
   m_ObjectHideFlags: 0
