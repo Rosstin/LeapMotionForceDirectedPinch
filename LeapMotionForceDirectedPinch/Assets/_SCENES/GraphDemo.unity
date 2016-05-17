@@ -679,6 +679,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c34ad383ce780e479f7e0930cc47bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  label: {fileID: 0}
 --- !u!23 &634930389
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -996,7 +997,7 @@ MonoBehaviour:
   _pinchDetectorB: {fileID: 525701294}
   _oneHandedRotationMethod: 0
   _twoHandedRotationMethod: 2
-  _allowScale: 1
+  _allowScale: 0
   _toggleGuiState: 0
   _showGUI: 0
 --- !u!4 &1095659623 stripped
@@ -1132,9 +1133,7 @@ TextMesh:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1363549896}
-  m_Text: 'Show only
-
-    degree>22'
+  m_Text: Detailing Mode On
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -3216,6 +3215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 2098797249}
   NodeDegree: 0
+  detailingMode: 1
   nodeContainer: {fileID: 1081610661}
   nodeContainerOriginalPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1993002018

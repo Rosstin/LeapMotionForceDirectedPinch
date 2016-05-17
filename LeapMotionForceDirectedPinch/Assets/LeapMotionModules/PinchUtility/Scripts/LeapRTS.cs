@@ -15,10 +15,10 @@ namespace Leap.Unity.PinchUtility {
     }
 
     [SerializeField]
-    private LeapPinchDetector _pinchDetectorA;
+    public LeapPinchDetector _pinchDetectorA;
 
     [SerializeField]
-    private LeapPinchDetector _pinchDetectorB;
+    public LeapPinchDetector _pinchDetectorB;
 
     [SerializeField]
     private RotationMethod _oneHandedRotationMethod;

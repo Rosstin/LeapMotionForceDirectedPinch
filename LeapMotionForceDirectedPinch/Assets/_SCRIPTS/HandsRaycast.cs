@@ -221,13 +221,37 @@ public class HandsRaycast : MonoBehaviour {
 			state = stateL;
 		}
 
+		if (Input.GetKeyDown ("d")) {
+			print ("graphGenerator.detailingMode = true");
+			graphGenerator.detailingMode = true;
+		}
+
+		if (Input.GetKeyDown ("f")) {
+			print ("graphGenerator.detailingMode = false");
+			graphGenerator.detailingMode = false;
+		}
+
+		if (Input.GetKeyDown ("b")) {
+			graphGenerator.generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
+		}
+
+		if (Input.GetKeyDown ("h")) {
+			graphGenerator.generateGraphFromCSV ("node_with_attribures_query_hillary", "edgelist_query_hillary");
+		}
+
+		if (Input.GetKeyDown ("t")) {
+			graphGenerator.generateGraphFromCSV ("node_with_attribures_query_trump" ,"edgelist_query_trump");
+		}
+
+
+
+
 		if (panelState == PANEL_ON) {
 
 			// do panel actions
 			graphGenerator.NodesAreDraggable (false);
 
 			RaycastHit hit = new RaycastHit ();
-			ButtonActivate hitObject;
 			Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
 
 			//myLineRenderer.SetVertexCount (2);
@@ -243,8 +267,20 @@ public class HandsRaycast : MonoBehaviour {
 				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button //don't really need this anymore
 					//Debug.Log("Hit Clickable.");
 
-					hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
-					graphGenerator.showNodesOfDegreeGreaterThan (22);
+					//hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
+					//graphGenerator.showNodesOfDegreeGreaterThan (22);
+
+					graphGenerator.detailingMode = !graphGenerator.detailingMode;
+
+					if (graphGenerator.detailingMode == false) {
+						hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
+					}
+					else {
+						hit.transform.gameObject.GetComponent<ButtonActivate> ().UnHit ();
+					}
+
+
+
 				}
 			}
 

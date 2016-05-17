@@ -28,9 +28,9 @@ public class Slider : MonoBehaviour {
 		this.myRenderer.material.color = Color.blue;
 
 		textScript = label.GetComponent<TextMesh> ();
-		slider.transform.localPosition = new Vector3 (min.transform.localPosition.x, slider.transform.localPosition.y, slider.transform.localPosition.z );
+		slider.transform.localPosition = new Vector3 ((min.transform.localPosition.x+max.transform.localPosition.x)/2, slider.transform.localPosition.y, slider.transform.localPosition.z );
 
-
+		UpdateBarValue ();
 
 	}
 	

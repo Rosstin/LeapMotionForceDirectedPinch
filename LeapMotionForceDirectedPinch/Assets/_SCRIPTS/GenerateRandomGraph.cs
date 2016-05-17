@@ -30,13 +30,15 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	int currentIndex = 0;
 
-	int highestNode = 0;
+	//int highestNode = 0;
 
 	public int NodeDegree = 0;
 
 	float EXPLOSION_TIME_1 = 2.0f;
 	float EXPLOSION_TIME_2 = 4.0f;
-	float EXPLOSION_TIME_3 = 6.0f;
+	float EXPLOSION_TIME_3 = 20.0f;
+
+	public bool detailingMode = false;
 
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
@@ -58,7 +60,9 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 		//nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject, new Vector3 (0.0f,0.0f,0.0f),Quaternion.identity) as GameObject;
 
-		generateGraphFromCSV ();
+		//generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
+		generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
+		//generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
 		//generateGraphRandomly();
 
 		RenderLinesOnce ();
@@ -69,13 +73,15 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 		myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS> ();
 
+		showNodesOfDegreeGreaterThan (15);
+
 		//StartCoroutine ("ProcessNodesCoroutine");
 
 
 	}
 
 	public void explodeSelectedNode(Node highlightedNode) {
-		if (highlightedNode != null) {
+		if (highlightedNode != null && detailingMode == true) {
 			float time = highlightedNode.nodeForce.timeSelected;
 
 			// show more connections over time // only do these once!
@@ -125,19 +131,18 @@ public class GenerateRandomGraph : MonoBehaviour {
 	}
 
 
-	void generateGraphFromCSV(){
+	public void generateGraphFromCSV(string nodeAsset, string edgeAsset){
 		//print ("readCSVData");
-		TextAsset edgesText = Resources.Load ("c_edge") as TextAsset;
+		TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
 		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
 		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
 
-		TextAsset positionsText = Resources.Load ("c_node") as TextAsset;
+		TextAsset positionsText = Resources.Load (nodeAsset) as TextAsset;
 		string[,] positionsGrid = CSVReader.SplitCsvGrid (positionsText.text);
 		int numberOfNodes = positionsGrid.GetUpperBound(1)-1;
 
 		masterNodeList = new Node[numberOfNodes];
 		indicesToShowOrExplode = new int[numberOfNodes];
-
 
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
@@ -147,12 +152,12 @@ public class GenerateRandomGraph : MonoBehaviour {
 			// add vertexes
 			if (i != 0) { adjacencyList.AddVertex (i);}
 
-			string label = positionsGrid [1, i];
+			string label = positionsGrid [0, i];
 			Vector3 position = 
 				new Vector3 (
-					float.Parse (positionsGrid [4, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [5, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [6, i]) * GRAPH_SCALE_CONSTANT
+					float.Parse (positionsGrid [8, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [9, i]) * GRAPH_SCALE_CONSTANT,
+					float.Parse (positionsGrid [10, i]) * GRAPH_SCALE_CONSTANT
 				);
 
 			GameObject myNodeInstance = 
@@ -160,9 +165,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 					position,
 					Quaternion.identity) as GameObject;
 
-
 			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
-			nodeScript.SetText (positionsGrid [0, i]);
+			nodeScript.SetText (positionsGrid [1, i]);
 
 			nodeScript.degree = int.Parse(positionsGrid [2, i]);
 
