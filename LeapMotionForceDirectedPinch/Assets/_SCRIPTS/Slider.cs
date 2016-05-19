@@ -36,8 +36,15 @@ public class Slider : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-	}
+        if(state == NORMAL)
+        {
+            this.myRenderer.material.color = Color.blue;
+        }
+        else if(state == DRAGGING)
+        {
+            this.myRenderer.material.color = Color.red;
+        }
+    }
 
 	public bool UpdateBarValue() { // returns whether the value changed
 
@@ -62,11 +69,9 @@ public class Slider : MonoBehaviour {
 
 
 	public void OnGrab () {
-		this.myRenderer.material.color = Color.red;
 	}
 
 	public void UnGrab () {
-		this.myRenderer.material.color = Color.blue;
 	}
 
 

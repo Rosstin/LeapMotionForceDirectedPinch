@@ -100,6 +100,11 @@ public class HandsRaycast : MonoBehaviour {
 
 	}
 
+    void NeutralizeButtonState() // neutralize state of all buttons in when you leave
+    {
+        NeutralizeSliderState(slider1script);
+    }
+
 	void UpdateControlPanel () {
 		// looking at panel
 		// not looking at panel
@@ -115,11 +120,14 @@ public class HandsRaycast : MonoBehaviour {
 				// if you're pinching, don't turn the panel off quite yet
 				if (!(rightPinchDetectorScript.IsPinching || leftPinchDetectorScript.IsPinching) && turnPanelOffTimer >= PANEL_OFF_TIMER_CONSTANT) {
 					panelState = PANEL_OFF;
-				}
+
+                    NeutralizeButtonState();
+                }
 			}
 
 		} else if (panelState == PANEL_OFF) {
-			PanelContainer.SetActive (false);
+
+            PanelContainer.SetActive (false);
 
 			if (playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
 				turnPanelOffTimer = 0.0f;
@@ -139,11 +147,18 @@ public class HandsRaycast : MonoBehaviour {
 
 	}
 
-	void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
+    void NeutralizeSliderState(Slider slider)
+    {
+        slider.state = slider.NORMAL;
+        graphGenerator.showNodesOfDegreeGreaterThan(slider.currentValue);
+        slider.UnGrab();
+    }
+
+    void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
 
 		RaycastHit hit = new RaycastHit ();
 
-		if (slider.state != slider.DRAGGING && collider.Raycast (ray, out hit, 200.0f)) { // start a drag
+		if (slider.state != slider.DRAGGING && isActive && collider.Raycast (ray, out hit, 200.0f)) { // start a drag
 			slider.state = slider.DRAGGING;
 			slider.OnGrab ();
 			slider.handUsed = handedness;
@@ -182,10 +197,8 @@ public class HandsRaycast : MonoBehaviour {
 			}
 				
 			if (!isActive) { // no longer dragging
-				slider.state = slider.NORMAL;
-				graphGenerator.showNodesOfDegreeGreaterThan (slider.currentValue);
-				slider.UnGrab ();
-			}
+                NeutralizeSliderState(slider);
+            }
 
 		}
 
@@ -219,6 +232,8 @@ public class HandsRaycast : MonoBehaviour {
 		else{
 			state = stateL;
 		}
+
+        // maybe do something so these don't get registered multiple times at once
 
 		if (Input.GetKeyDown ("d")) {
 			print ("graphGenerator.detailingMode = true");
@@ -286,13 +301,11 @@ public class HandsRaycast : MonoBehaviour {
 				}
 			}
 
-			UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
+    		UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
 
 
 
-
-
-		} else { // not looking at panel
+        } else { // not looking at panel
 
 			graphGenerator.NodesAreDraggable (true);
 
