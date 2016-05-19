@@ -34,7 +34,7 @@ public class HandsRaycast : MonoBehaviour {
 	LineRenderer myLineRenderer;
 
 	public GameObject sceneGod;
-	GenerateRandomGraph graphGenerator;
+	GenerateGraph graphGenerator;
 
 	Node[] nodes;
 
@@ -72,7 +72,7 @@ public class HandsRaycast : MonoBehaviour {
 		myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 		myLineRenderer.enabled = false;
 
-		graphGenerator = sceneGod.GetComponent<GenerateRandomGraph> ();
+		graphGenerator = sceneGod.GetComponent<GenerateGraph> ();
 		nodes = graphGenerator.masterNodeList;
 
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();

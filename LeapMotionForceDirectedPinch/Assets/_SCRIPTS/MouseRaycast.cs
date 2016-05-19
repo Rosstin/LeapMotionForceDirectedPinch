@@ -21,12 +21,12 @@ public class MouseRaycast : MonoBehaviour {
 
 	public GameObject sceneGod;
 
-	GenerateRandomGraph myGraph;
+	GenerateGraph myGraph;
 
 	LineRenderer myLineRenderer;
 
 	void Start () {
-		myGraph = sceneGod.GetComponent<GenerateRandomGraph> ();
+		myGraph = sceneGod.GetComponent<GenerateGraph> ();
 
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;

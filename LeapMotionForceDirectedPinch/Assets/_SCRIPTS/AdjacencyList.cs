@@ -25,7 +25,7 @@ public class AdjacencyList : MonoBehaviour
 		return vertex;
 	}
 
-	public void AddEdge(int startKey, int endKey, GameObject container)
+	public void AddEdge(int startKey, int endKey, float weight, GameObject container)
 	{      
 		List<int> startVertex = _vertexDict.ContainsKey(startKey) ? _vertexDict[startKey] : null;
 		List<int> endVertex = _vertexDict.ContainsKey(endKey) ? _vertexDict[endKey] : null;
@@ -51,8 +51,9 @@ public class AdjacencyList : MonoBehaviour
 		lineToRender.transform.parent = container.transform;
 		LineRenderer myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 
-		if ( UnityEngine.Random.Range (0.0f, 1.0f) < 0.50f) {
+		if (weight > 2.00f) {
 			myLineRenderer.SetColors (Color.blue, Color.cyan);
+            myLineRenderer.SetWidth(0.50f, 0.50f);
 		} else {
 			myLineRenderer.SetColors (Color.red, Color.magenta);
 		}

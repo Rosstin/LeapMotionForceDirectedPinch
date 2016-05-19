@@ -6,7 +6,7 @@ using System.Collections.Generic;
 // TODO: improve speed/performance, only update a subset of the nodes each call
 // TODO: 
 
-public class GenerateRandomGraph : MonoBehaviour {
+public class GenerateGraph : MonoBehaviour {
 
 	public Camera playerCamera; //aka centereyeanchor
 
@@ -17,6 +17,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 	int NUMBER_NODES = 40;
 
 	int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
+
 
 	float NODE_SPREAD_X = 1.0f;
 	float NODE_SPREAD_Y = 0.8f;
@@ -30,15 +31,14 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	int currentIndex = 0;
 
-	//int highestNode = 0;
+	public int NodeDegree = 0; // only show nodes of degree greater than this value
+    int STARTING_NODE_DEGREE_FILTER = 15; // starting value for nodedegree
 
-	public int NodeDegree = 0;
+    float EXPLOSION_TIME_1 = 2.0f;  // after this time (in seconds) show only the selected node
+	float EXPLOSION_TIME_2 = 4.0f;  // after this time, show selected node and its relations
+	float EXPLOSION_TIME_3 = 14.0f; // after this time, show relations of relations of the selected node
 
-	float EXPLOSION_TIME_1 = 2.0f;
-	float EXPLOSION_TIME_2 = 4.0f;
-	float EXPLOSION_TIME_3 = 14.0f;
-
-	public bool detailingMode = false;
+	public bool detailingMode = false; // disable or enable the ability to explode a node
 
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
@@ -49,38 +49,39 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
-	//List<int> tier2Nodes = new List<int> ();
-
 	public Node[] masterNodeList;
 	int[] indicesToShowOrExplode;
-
 
 	// Use this for initialization
 	void Start () {
 
-		//nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject, new Vector3 (0.0f,0.0f,0.0f),Quaternion.identity) as GameObject;
+        //nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject, new Vector3 (0.0f,0.0f,0.0f),Quaternion.identity) as GameObject;
 
-		//generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
-		//generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
-		generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
-		//generateGraphRandomly();
-
-		RenderLinesOnce ();
-		HideAllLines();
-
-		nodeContainer.transform.position = nodeContainer.transform.position + new Vector3 (0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
-		nodeContainerOriginalPosition = nodeContainer.transform.position;
-
-		myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS> ();
-
-		showNodesOfDegreeGreaterThan (15);
-
-		//StartCoroutine ("ProcessNodesCoroutine");
+        //generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
+        //generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
+        generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
+        //generateGraphRandomly();
 
 
-	}
+        //StartCoroutine ("ProcessNodesCoroutine");
 
-	public void explodeSelectedNode(Node highlightedNode) {
+
+    }
+
+    public void postGraphGeneration()
+    {
+        RenderLinesOnce();
+        HideAllLines();
+
+        nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
+        nodeContainerOriginalPosition = nodeContainer.transform.position;
+
+        myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
+
+        showNodesOfDegreeGreaterThan(15);
+    }
+
+    public void explodeSelectedNode(Node highlightedNode) {
 		if (highlightedNode != null && detailingMode == true) {
 			float time = highlightedNode.nodeForce.timeSelected;
 
@@ -134,7 +135,6 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 
 	public void generateGraphFromCSV(string nodeAsset, string edgeAsset){
-		//print ("readCSVData");
 		TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
 		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
 		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
@@ -149,7 +149,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
 		// add nodes
-		for (int i = 1; (i < numberOfNodes+1) ; i++) { // check your integer stuff so you dont mess it up man
+		for (int i = 1; (i < numberOfNodes+1) ; i++) {
 			//print("i in add nodes: " + i);
 			// add vertexes
 			if (i != 0) { adjacencyList.AddVertex (i);}
@@ -192,18 +192,21 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 			int source = nameToID[(edgesGrid [0,i])]; // source
 			int target = nameToID[(edgesGrid [1,i])]; // target
+            float weight = float.Parse(edgesGrid [2,i]);
 
 			int s = (int) source;
 			int t = (int) target;
+            float w = weight;
 
-			addEdgeToAdjacencyListAfterValidation (s, t);
+			addEdgeToAdjacencyListAfterValidation (s, t, w);
 		}
 
+        postGraphGeneration();
 
-	}
+    }
 
 
-	void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
+    void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
 		int numNodes = masterNodeList.Length;
 		// add nodes
 		for (int i = 0; i < numNodes; i++) {
@@ -292,13 +295,15 @@ public class GenerateRandomGraph : MonoBehaviour {
 		for (int i = 0; i < NUMBER_NODES; i++) {
 			for (int j = 0; j < NUMBER_NODES; j++) {
 				if (Random.Range (0.00f, 1.00f) < CHANCE_OF_CONNECTION) {
-					addEdgeToAdjacencyListAfterValidation (i, j);
+					addEdgeToAdjacencyListAfterValidation (i, j, (Random.value * 6.00f));
 				}
 			}
 		}
+
+        postGraphGeneration();
 	}
 
-	void addEdgeToAdjacencyListAfterValidation(int source, int target){
+	void addEdgeToAdjacencyListAfterValidation(int source, int target, float weight){
 		int smaller = source;
 		int bigger = target;
 		if (target < source) {
@@ -307,7 +312,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 		}
 
 		if (adjacencyList.isAdjacent (smaller, bigger) == false) {
-			adjacencyList.AddEdge (smaller, bigger, nodeContainer);
+			adjacencyList.AddEdge (smaller, bigger, weight, nodeContainer);
 		}
 	}
 
