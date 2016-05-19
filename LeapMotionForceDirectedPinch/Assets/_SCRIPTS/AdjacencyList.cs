@@ -11,12 +11,26 @@ public class AdjacencyList : MonoBehaviour
 	// make a composite key for edges
 	public Dictionary<string, LineRenderer> _edgesToRender = new Dictionary<string, LineRenderer>();
 
+    int storedRootVertexKey;
+
 	public AdjacencyList(int rootVertexKey)
 	{
 		AddVertex(rootVertexKey);
-	}
+        storedRootVertexKey = rootVertexKey;
 
-	public List<int> AddVertex(int key)
+    }
+
+    public void Reinitialize()
+    {
+        _vertexList = new List<List<int>>();
+        _vertexDict = new Dictionary<int, List<int>>();
+
+        _edgesToRender = new Dictionary<string, LineRenderer>();
+
+        AddVertex(storedRootVertexKey);
+    }
+
+    public List<int> AddVertex(int key)
 	{
 		List<int> vertex = new List<int>();
 		_vertexList.Add(vertex);
@@ -52,8 +66,8 @@ public class AdjacencyList : MonoBehaviour
 		LineRenderer myLineRenderer = lineToRender.GetComponent<LineRenderer> ();
 
 		if (weight > 2.00f) {
-			myLineRenderer.SetColors (Color.blue, Color.cyan);
-            myLineRenderer.SetWidth(0.50f, 0.50f);
+			myLineRenderer.SetColors (Color.green, Color.blue);
+            myLineRenderer.SetWidth(0.30f, 0.30f);
 		} else {
 			myLineRenderer.SetColors (Color.red, Color.magenta);
 		}

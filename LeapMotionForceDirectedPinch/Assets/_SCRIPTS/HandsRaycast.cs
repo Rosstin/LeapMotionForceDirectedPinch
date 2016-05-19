@@ -36,7 +36,7 @@ public class HandsRaycast : MonoBehaviour {
 	public GameObject sceneGod;
 	GenerateGraph graphGenerator;
 
-	Node[] nodes;
+	//Node[] nodes;
 
 	int stateR;
 	public GameObject rightPinchDetector;
@@ -73,7 +73,6 @@ public class HandsRaycast : MonoBehaviour {
 		myLineRenderer.enabled = false;
 
 		graphGenerator = sceneGod.GetComponent<GenerateGraph> ();
-		nodes = graphGenerator.masterNodeList;
 
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
@@ -232,15 +231,18 @@ public class HandsRaycast : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown ("b")) {
+            graphGenerator.destroyOldGraph();
 			graphGenerator.generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
 		}
 
 		if (Input.GetKeyDown ("h")) {
-			graphGenerator.generateGraphFromCSV ("node_with_attribures_query_hillary", "edgelist_query_hillary");
+            graphGenerator.destroyOldGraph();
+            graphGenerator.generateGraphFromCSV ("node_with_attribures_query_hillary", "edgelist_query_hillary");
 		}
 
 		if (Input.GetKeyDown ("t")) {
-			graphGenerator.generateGraphFromCSV ("node_with_attribures_query_trump" ,"edgelist_query_trump");
+            graphGenerator.destroyOldGraph();
+            graphGenerator.generateGraphFromCSV ("node_with_attribures_query_trump" ,"edgelist_query_trump");
 		}
 
 
@@ -297,9 +299,9 @@ public class HandsRaycast : MonoBehaviour {
 			if (state != STATE_DRAGGING && isActive) { // can start a drag
 				state = STATE_DRAGGING;
 
-				for (int i = 0; i < nodes.Length; i++) {
-					if (nodes [i].nodeForce.degree > graphGenerator.NodeDegree) {
-						objectVector = Vector3.Normalize (nodes [i].gameObject.transform.position - playerCamera.transform.position);
+				for (int i = 0; i < graphGenerator.masterNodeList.Length; i++) {
+					if (graphGenerator.masterNodeList[i].nodeForce.degree > graphGenerator.NodeDegree) {
+						objectVector = Vector3.Normalize (graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
 						dotProduct = Vector3.Dot (heading, objectVector);
 
 						if (dotProduct > biggestDotProduct) { // dont select nodes that are not visible
@@ -314,19 +316,19 @@ public class HandsRaycast : MonoBehaviour {
 				float originalPinchDistance = 0.0f;
 
 				if (handedness == RIGHT) {
-					nodes [selectedNodeIndex].nodeForce.Selected ();
+                    graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
 					originalPinchDistance = originalPinchDistanceR;
 				} else {
-					nodes [selectedNodeIndex].nodeForce.Selected ();
+                    graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
 					originalPinchDistance = originalPinchDistanceL;
 				}
 
 				if (handedness == LEFT) {
-					highlightedObjectL = nodes [selectedNodeIndex];
+					highlightedObjectL = graphGenerator.masterNodeList[selectedNodeIndex];
 					highlightedObjectL.nodeForce.Selected ();
 					//Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 				} else {
-					highlightedObjectR = nodes [selectedNodeIndex];
+					highlightedObjectR = graphGenerator.masterNodeList[selectedNodeIndex];
 					highlightedObjectR.nodeForce.Selected ();
 					//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
 				}

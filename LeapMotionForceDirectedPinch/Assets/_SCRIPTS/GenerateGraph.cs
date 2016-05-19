@@ -45,7 +45,10 @@ public class GenerateGraph : MonoBehaviour {
 	public GameObject nodeContainer;
 	Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
 
-	public Vector3 nodeContainerOriginalPosition;
+    public Leap.Unity.PinchUtility.LeapPinchDetector pinchDetectorA;
+    public Leap.Unity.PinchUtility.LeapPinchDetector pinchDetectorB;
+
+    public Vector3 nodeContainerOriginalPosition;
 
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
@@ -55,16 +58,26 @@ public class GenerateGraph : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        //nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject, new Vector3 (0.0f,0.0f,0.0f),Quaternion.identity) as GameObject;
 
         //generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
         //generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
         generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
         //generateGraphRandomly();
 
+    }
 
-        //StartCoroutine ("ProcessNodesCoroutine");
+    public void preGraphGeneration()
+    {
+        nodeContainer = Instantiate(Resources.Load("NodeContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+        myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
+        myLeapRTS._pinchDetectorA = pinchDetectorA;
+        myLeapRTS._pinchDetectorB = pinchDetectorB;
 
+        nameToID = new Dictionary<string, int>();
+
+        currentIndex = 0;
+
+        adjacencyList.Reinitialize();
 
     }
 
@@ -76,7 +89,7 @@ public class GenerateGraph : MonoBehaviour {
         nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
         nodeContainerOriginalPosition = nodeContainer.transform.position;
 
-        myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
+        //myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>(); // doing this earlier in process
 
         showNodesOfDegreeGreaterThan(15);
     }
@@ -134,8 +147,24 @@ public class GenerateGraph : MonoBehaviour {
 	}
 
 
-	public void generateGraphFromCSV(string nodeAsset, string edgeAsset){
-		TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
+
+    public void destroyOldGraph() // use this to destroy the previous graph // should call generateGraph after this
+    {
+        int numberOfChildren = nodeContainer.transform.childCount;
+        print("nodeContainer.transform.childCount: " + nodeContainer.transform.childCount);
+
+        for( var i = numberOfChildren -1; i >=0; i--) // destroy all the children in the container (the nodes and edges)
+        {
+            Destroy(nodeContainer.transform.GetChild(i).gameObject);
+        }
+
+    }
+
+    public void generateGraphFromCSV(string nodeAsset, string edgeAsset){
+
+        preGraphGeneration();
+
+        TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
 		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
 		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
 
@@ -285,11 +314,13 @@ public class GenerateGraph : MonoBehaviour {
 
 
 	void generateGraphRandomly(){
-		masterNodeList = new Node[NUMBER_NODES];
+        preGraphGeneration();
+
+        masterNodeList = new Node[NUMBER_NODES];
 		indicesToShowOrExplode = new int[NUMBER_NODES];
 
-		// add nodes
-		randomlyPlaceNodes();
+        // add nodes
+        randomlyPlaceNodes();
 
 		// populate adjacency
 		for (int i = 0; i < NUMBER_NODES; i++) {
