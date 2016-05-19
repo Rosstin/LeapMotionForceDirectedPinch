@@ -83,9 +83,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		//Debug.Log ("group: " + group + "... r: " + r + "... g: " + g + "... b: " + b);
 
-		print (group%12);
-
-		newColor = colors[group%12];
+		newColor = colors[group%colors.Count];
 
 		color = newColor;
 	}
@@ -141,12 +139,12 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		colors.Add (new Color(1.0f, 0.0f, 0.0f, 1.0f));
 		colors.Add (new Color(1.0f, 128.0f/255.0f, 0.0f, 1.0f));
 		colors.Add (new Color(1.0f, 1.0f, 0.0f, 1.0f));
-		colors.Add (new Color(128.0f/255.0f, 1.0f, 0.0f, 1.0f));
-		colors.Add (new Color(0.0f, 1.0f, 0.0f, 1.0f));
-		colors.Add (new Color(0.0f, 1.0f, 128.0f/255.0f, 1.0f));
+		//colors.Add (new Color(128.0f/255.0f, 1.0f, 0.0f, 1.0f));
+		//colors.Add (new Color(0.0f, 1.0f, 0.0f, 1.0f));
+		//colors.Add (new Color(0.0f, 1.0f, 128.0f/255.0f, 1.0f));
 
-		colors.Add (new Color(0.0f, 1.0f, 1.0f, 1.0f));
-		colors.Add (new Color(0.0f, 0.5f, 1.0f, 1.0f));
+		//colors.Add (new Color(0.0f, 1.0f, 1.0f, 1.0f));
+		//colors.Add (new Color(0.0f, 0.5f, 1.0f, 1.0f));
 		colors.Add (new Color(0.0f, 0.0f, 1.0f, 1.0f));
 		colors.Add (new Color(0.5f, 0.0f, 1.0f, 1.0f));
 		colors.Add (new Color(1.0f, 0.0f, 1.0f, 1.0f));

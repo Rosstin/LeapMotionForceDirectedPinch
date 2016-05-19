@@ -36,7 +36,7 @@ public class GenerateRandomGraph : MonoBehaviour {
 
 	float EXPLOSION_TIME_1 = 2.0f;
 	float EXPLOSION_TIME_2 = 4.0f;
-	float EXPLOSION_TIME_3 = 20.0f;
+	float EXPLOSION_TIME_3 = 14.0f;
 
 	public bool detailingMode = false;
 
@@ -61,8 +61,8 @@ public class GenerateRandomGraph : MonoBehaviour {
 		//nodeContainer = Instantiate (Resources.Load("NodeContainer") as GameObject, new Vector3 (0.0f,0.0f,0.0f),Quaternion.identity) as GameObject;
 
 		//generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
-		generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
-		//generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
+		//generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
+		generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
 		//generateGraphRandomly();
 
 		RenderLinesOnce ();
@@ -104,11 +104,13 @@ public class GenerateRandomGraph : MonoBehaviour {
 				// hide all other nodes
 				hideNodes ();
 				highlightedNode.gameObject.SetActive (true);
-				//HideAllLines();
-			}
+                highlightedNode.nodeForce.ActivateText();
+
+                //HideAllLines();
+            }
 
 
-		}
+        }
 		// then... show lines and nodes based on connections
 
 

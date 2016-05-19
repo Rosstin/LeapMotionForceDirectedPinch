@@ -1,11 +1,11 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{BCB744EC-C3D4-5D8C-8DE8-1DC44FEFAA99}") = "LeapMotionForceDirectedPinch", "Assembly-CSharp-firstpass.csproj", "{B72EB0D7-2FAD-2AFB-7BE4-72B798D8848E}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeapMotionForceDirectedPinch.CSharp.Plugins", "LeapMotionForceDirectedPinch.CSharp.Plugins.csproj", "{8E0DB944-4727-3F59-A9C2-2AE7A071F517}"
 EndProject
-Project("{BCB744EC-C3D4-5D8C-8DE8-1DC44FEFAA99}") = "LeapMotionForceDirectedPinch", "Assembly-CSharp.csproj", "{32492ABD-D06C-2A12-5FFD-D88BF7C4D311}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeapMotionForceDirectedPinch.CSharp", "LeapMotionForceDirectedPinch.CSharp.csproj", "{433E3143-BC3E-8F05-95E8-E5D63F017013}"
 EndProject
-Project("{BCB744EC-C3D4-5D8C-8DE8-1DC44FEFAA99}") = "LeapMotionForceDirectedPinch", "Assembly-CSharp-Editor.csproj", "{0570CD51-986D-3580-6F13-44219C60F5BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeapMotionForceDirectedPinch.CSharp.Editor", "LeapMotionForceDirectedPinch.CSharp.Editor.csproj", "{B1FCD551-C70E-40E6-749F-C43FB221D95E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,23 +13,20 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B72EB0D7-2FAD-2AFB-7BE4-72B798D8848E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B72EB0D7-2FAD-2AFB-7BE4-72B798D8848E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B72EB0D7-2FAD-2AFB-7BE4-72B798D8848E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B72EB0D7-2FAD-2AFB-7BE4-72B798D8848E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32492ABD-D06C-2A12-5FFD-D88BF7C4D311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{32492ABD-D06C-2A12-5FFD-D88BF7C4D311}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{32492ABD-D06C-2A12-5FFD-D88BF7C4D311}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32492ABD-D06C-2A12-5FFD-D88BF7C4D311}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0570CD51-986D-3580-6F13-44219C60F5BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0570CD51-986D-3580-6F13-44219C60F5BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0570CD51-986D-3580-6F13-44219C60F5BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0570CD51-986D-3580-6F13-44219C60F5BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E0DB944-4727-3F59-A9C2-2AE7A071F517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E0DB944-4727-3F59-A9C2-2AE7A071F517}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E0DB944-4727-3F59-A9C2-2AE7A071F517}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E0DB944-4727-3F59-A9C2-2AE7A071F517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{433E3143-BC3E-8F05-95E8-E5D63F017013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{433E3143-BC3E-8F05-95E8-E5D63F017013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{433E3143-BC3E-8F05-95E8-E5D63F017013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{433E3143-BC3E-8F05-95E8-E5D63F017013}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1FCD551-C70E-40E6-749F-C43FB221D95E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1FCD551-C70E-40E6-749F-C43FB221D95E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1FCD551-C70E-40E6-749F-C43FB221D95E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1FCD551-C70E-40E6-749F-C43FB221D95E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-											GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal
