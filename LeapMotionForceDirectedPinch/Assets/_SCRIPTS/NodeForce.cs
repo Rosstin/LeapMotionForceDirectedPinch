@@ -21,7 +21,14 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public GameObject myTextMeshGameObject;
 	public TextMesh myTextMesh;
 
-	List <Color> colors;
+    public float x_3d;
+    public float y_3d;
+    public float z_3d;
+
+    public float x_2d;
+    public float y_2d;
+
+    List<Color> colors;
 
 	void Start () {
 		myRenderer = this.GetComponent<MeshRenderer> ();
@@ -50,6 +57,29 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 	void FixedUpdate () {
 	}
+
+    public void assumeNewDimensionalPosition(int dimensionality)
+    {
+        // wizardry with parents will need to be observed at some point
+        if(dimensionality == GenerateGraph.GRAPH_3D)
+        {
+            gameObject.transform.position =
+                new Vector3(
+                    x_3d,
+                    y_3d,
+                    z_3d + GenerateGraph.DISTANCE_FROM_FACE // i dont think this is correct, just a stopgap
+                );
+        }
+        else
+        {
+            gameObject.transform.position =
+                new Vector3(
+                    x_2d,
+                    y_2d,
+                    0.0f + GenerateGraph.DISTANCE_FROM_FACE // i dont think this is correct, just a stopgap
+                );
+        }
+    }
 
 	public void SetScale (float newScale) {
 		scale = newScale;

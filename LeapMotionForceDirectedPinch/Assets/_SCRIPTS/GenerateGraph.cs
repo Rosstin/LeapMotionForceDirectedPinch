@@ -23,7 +23,8 @@ public class GenerateGraph : MonoBehaviour {
 	float NODE_SPREAD_Y = 0.8f;
 	float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
 	float NODE_SPREAD_Z = 1.0f;
-	float DISTANCE_FROM_FACE = 10.0f;
+
+    public static float DISTANCE_FROM_FACE = 10.0f;
 
 	float GRAPH_SCALE_CONSTANT = 0.005f;
 
@@ -166,6 +167,9 @@ public class GenerateGraph : MonoBehaviour {
 
     public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality){
 
+
+        // reading the data takes for ever, but loading node position takes no time... you can probably preload the data somehow
+
         preGraphGeneration();
 
         TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
@@ -219,19 +223,26 @@ public class GenerateGraph : MonoBehaviour {
 
             Vector3 position;
 
+            float x_3d= float.Parse(myPositionsGrid[8, i]) * GRAPH_SCALE_CONSTANT;
+            float y_3d= float.Parse(myPositionsGrid[9, i]) * GRAPH_SCALE_CONSTANT;
+            float z_3d= float.Parse(myPositionsGrid[10, i]) * GRAPH_SCALE_CONSTANT;
+
+            float x_2d= float.Parse(myPositionsGrid[11, i]) * GRAPH_SCALE_CONSTANT;
+            float y_2d= float.Parse(myPositionsGrid[12, i]) * GRAPH_SCALE_CONSTANT;
+
             if (dimensionality == GRAPH_3D)
             {
                 position = new Vector3(
-                    float.Parse(myPositionsGrid[8, i]) * GRAPH_SCALE_CONSTANT,
-                    float.Parse(myPositionsGrid[9, i]) * GRAPH_SCALE_CONSTANT,
-                    float.Parse(myPositionsGrid[10, i]) * GRAPH_SCALE_CONSTANT
+                    x_3d,
+                    y_3d,
+                    z_3d
                 );
             }
             else
             {
                 position = new Vector3(
-                    float.Parse(myPositionsGrid[11, i]) * GRAPH_SCALE_CONSTANT,
-                    float.Parse(myPositionsGrid[12, i]) * GRAPH_SCALE_CONSTANT,
+                    x_2d,
+                    y_3d,
                     0.0f
                 );
             }
@@ -243,6 +254,14 @@ public class GenerateGraph : MonoBehaviour {
                     Quaternion.identity) as GameObject;
 
             NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
+
+            nodeScript.x_3d = x_3d;
+            nodeScript.y_3d = y_3d;
+            nodeScript.z_3d = z_3d;
+
+            nodeScript.x_2d = x_2d;
+            nodeScript.y_2d = y_2d;
+
             nodeScript.SetText(myPositionsGrid[1, i]);
 
             nodeScript.degree = int.Parse(myPositionsGrid[2, i]);
@@ -301,7 +320,17 @@ public class GenerateGraph : MonoBehaviour {
 		}
 	}
 
-	void hideLabels(){
+    public void changeNodeDimensionality(int dimensionality)
+    {
+        // you should check to make sure that the new dimensionality is different
+        for (int i = 0; i < masterNodeList.Length; i++)
+        {
+            masterNodeList[i].nodeForce.assumeNewDimensionalPosition(dimensionality);
+        }
+    }
+
+
+    void hideLabels(){
 		for (int i = 0; i < masterNodeList.Length; i++) {
 			masterNodeList [i].nodeForce.DeactivateText();
 		}

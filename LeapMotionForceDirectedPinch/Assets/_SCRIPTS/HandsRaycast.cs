@@ -245,7 +245,19 @@ public class HandsRaycast : MonoBehaviour {
 			graphGenerator.detailingMode = false;
 		}
 
+        if(Input.GetKeyDown("2"))
+        {
+            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
+            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
+        }
 
+        if (Input.GetKeyDown("3"))
+        {
+            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D)");
+            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
+        }
+
+        /*
         if (Input.GetKeyDown("2"))
         {
             print("graphGenerator.generateGraphFromCSV as GRAPH_2D");
@@ -259,6 +271,7 @@ public class HandsRaycast : MonoBehaviour {
             graphGenerator.destroyOldGraph();
             graphGenerator.generateGraphFromCSV("b3_node", "b3_edgelist", GenerateGraph.GRAPH_3D);
         }
+        */
 
 
         if (panelState == PANEL_ON) {
