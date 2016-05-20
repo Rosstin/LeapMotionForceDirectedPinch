@@ -27,6 +27,9 @@ public class GenerateGraph : MonoBehaviour {
 
 	float GRAPH_SCALE_CONSTANT = 0.005f;
 
+    int GRAPH_3D = 100;
+    int GRAPH_2D = 101;
+
 	int NODE_LIMIT = 200;
 
 	int currentIndex = 0;
@@ -58,10 +61,11 @@ public class GenerateGraph : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+        //generate2DGraphFromCSV();
 
         //generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
         //generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
-        generateGraphFromCSV("node_with_attribures_query_trump", "edgelist_query_trump");
+        generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_2D);
         //generateGraphRandomly();
 
     }
@@ -160,7 +164,7 @@ public class GenerateGraph : MonoBehaviour {
 
     }
 
-    public void generateGraphFromCSV(string nodeAsset, string edgeAsset){
+    public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality){
 
         preGraphGeneration();
 
@@ -177,43 +181,10 @@ public class GenerateGraph : MonoBehaviour {
 
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
-		// add nodes
-		for (int i = 1; (i < numberOfNodes+1) ; i++) {
-			//print("i in add nodes: " + i);
-			// add vertexes
-			if (i != 0) { adjacencyList.AddVertex (i);}
+        parseGraph(positionsGrid, dimensionality);
 
-			string label = positionsGrid [0, i];
-			Vector3 position = 
-				new Vector3 (
-					float.Parse (positionsGrid [8, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [9, i]) * GRAPH_SCALE_CONSTANT,
-					float.Parse (positionsGrid [10, i]) * GRAPH_SCALE_CONSTANT
-				);
-
-			GameObject myNodeInstance = 
-				Instantiate (Resources.Load("Node") as GameObject,
-					position,
-					Quaternion.identity) as GameObject;
-
-			NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
-			nodeScript.SetText (positionsGrid [1, i]);
-
-			nodeScript.degree = int.Parse(positionsGrid [2, i]);
-
-			nodeScript.SetScaleFromDegree (int.Parse(positionsGrid [2, i]));
-
-			myNodeInstance.transform.parent = nodeContainer.transform;
-
-			masterNodeList [i-1] = new Node (myNodeInstance, i-1); 
-
-			masterNodeList [i - 1].nodeForce.SetColorByGroup (int.Parse(positionsGrid [3, i]));
-
-			nameToID.Add (label, i-1);
-		}
-
-		// add edges
-		for (int i = 1; i < numberOfEdges; i++) {
+        // add edges
+        for (int i = 1; i < numberOfEdges; i++) {
 
 			//Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
 
@@ -234,6 +205,60 @@ public class GenerateGraph : MonoBehaviour {
 
     }
 
+    void parseGraph(string[,] myPositionsGrid, int dimensionality)
+    {
+        int numberOfNodes = myPositionsGrid.GetUpperBound(1) - 1;
+
+        // add nodes
+        for (int i = 1; (i < numberOfNodes + 1); i++)
+        {
+            //print("i in add nodes: " + i);
+            // add vertexes
+
+            if (i != 0) { adjacencyList.AddVertex(i); }
+
+            Vector3 position;
+
+            if (dimensionality == GRAPH_3D)
+            {
+                position = new Vector3(
+                    float.Parse(myPositionsGrid[8, i]) * GRAPH_SCALE_CONSTANT,
+                    float.Parse(myPositionsGrid[9, i]) * GRAPH_SCALE_CONSTANT,
+                    float.Parse(myPositionsGrid[10, i]) * GRAPH_SCALE_CONSTANT
+                );
+            }
+            else
+            {
+                position = new Vector3(
+                    float.Parse(myPositionsGrid[11, i]) * GRAPH_SCALE_CONSTANT,
+                    float.Parse(myPositionsGrid[12, i]) * GRAPH_SCALE_CONSTANT,
+                    0.0f
+                );
+            }
+            string label = myPositionsGrid[0, i];
+
+            GameObject myNodeInstance =
+                Instantiate(Resources.Load("Node") as GameObject,
+                    position,
+                    Quaternion.identity) as GameObject;
+
+            NodeForce nodeScript = myNodeInstance.GetComponent<NodeForce>();
+            nodeScript.SetText(myPositionsGrid[1, i]);
+
+            nodeScript.degree = int.Parse(myPositionsGrid[2, i]);
+
+            nodeScript.SetScaleFromDegree(int.Parse(myPositionsGrid[2, i]));
+
+            myNodeInstance.transform.parent = nodeContainer.transform;
+
+            masterNodeList[i - 1] = new Node(myNodeInstance, i - 1);
+
+            masterNodeList[i - 1].nodeForce.SetColorByGroup(int.Parse(myPositionsGrid[3, i]));
+
+            nameToID.Add(label, i - 1);
+        }
+
+    }
 
     void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
 		int numNodes = masterNodeList.Length;

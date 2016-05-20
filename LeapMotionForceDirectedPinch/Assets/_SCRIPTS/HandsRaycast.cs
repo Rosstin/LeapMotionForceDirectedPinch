@@ -245,24 +245,6 @@ public class HandsRaycast : MonoBehaviour {
 			graphGenerator.detailingMode = false;
 		}
 
-		if (Input.GetKeyDown ("b")) {
-            graphGenerator.destroyOldGraph();
-			graphGenerator.generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
-		}
-
-		if (Input.GetKeyDown ("h")) {
-            graphGenerator.destroyOldGraph();
-            graphGenerator.generateGraphFromCSV ("node_with_attribures_query_hillary", "edgelist_query_hillary");
-		}
-
-		if (Input.GetKeyDown ("t")) {
-            graphGenerator.destroyOldGraph();
-            graphGenerator.generateGraphFromCSV ("node_with_attribures_query_trump" ,"edgelist_query_trump");
-		}
-
-
-
-
 		if (panelState == PANEL_ON) {
 
 			// do panel actions
