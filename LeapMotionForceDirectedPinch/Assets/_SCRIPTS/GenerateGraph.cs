@@ -24,7 +24,7 @@ public class GenerateGraph : MonoBehaviour {
 	float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
 	float NODE_SPREAD_Z = 1.0f;
 
-    public static float DISTANCE_FROM_FACE = 10.0f;
+    public static float DISTANCE_FROM_FACE = 17.0f;
 
 	float GRAPH_SCALE_CONSTANT = 0.005f;
 
@@ -322,10 +322,12 @@ public class GenerateGraph : MonoBehaviour {
 
     public void changeNodeDimensionality(int dimensionality)
     {
+        print("changeNodeDimensionality(int dimensionality)");
         // you should check to make sure that the new dimensionality is different
         for (int i = 0; i < masterNodeList.Length; i++)
         {
-            masterNodeList[i].nodeForce.assumeNewDimensionalPosition(dimensionality);
+            //masterNodeList[i].nodeForce.assumeNewDimensionalPosition(dimensionality);
+            masterNodeList[i].nodeForce.crawlTowardsNewPosition(dimensionality);
         }
     }
 
@@ -358,7 +360,7 @@ public class GenerateGraph : MonoBehaviour {
 				masterNodeList [index].gameObject.SetActive (true);
 				masterNodeList [index].nodeForce.ActivateText ();
 				masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
-				showLinesBetween (index, mainIndex);
+                showLinesBetween(index, mainIndex, true);
 			}
 
 			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
@@ -527,7 +529,7 @@ public class GenerateGraph : MonoBehaviour {
 		}
 	}
 
-	void showLinesBetween(int i, int j){ 
+	void showLinesBetween(int i, int j, bool correctPosition){ 
 		if (adjacencyList.isAdjacent (i, j)) {
 			int smaller = j;
 			int bigger = i;
@@ -541,15 +543,24 @@ public class GenerateGraph : MonoBehaviour {
 
 			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
 			myLineRenderer.enabled = true;
-		} else {
+
+            if (correctPosition)
+            {
+                myLineRenderer.SetPosition(0, masterNodeList[smaller].gameObject.transform.localPosition);
+                myLineRenderer.SetPosition(1, masterNodeList[bigger].gameObject.transform.localPosition);
+            }
+
+        } else {
 			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
 		}
 	}
 
+    
 
 
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
 
 		//nodeContainer.transform.Rotate (0, Time.deltaTime*10, 0);
 

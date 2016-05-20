@@ -24,9 +24,18 @@ public class NodeForce : MonoBehaviour { // place this script on the node
     public float x_3d;
     public float y_3d;
     public float z_3d;
+    public Vector3 endPosition_3d;
 
     public float x_2d;
     public float y_2d;
+    public Vector3 endPosition_2d;
+
+    int crawlstate = 0;
+    static int NORMAL = 0;
+    static int CRAWL_TOWARDS_3D = 3;
+    static int CRAWL_TOWARDS_2D = 2;
+
+    static float CRAWL_SPEED = 4.0f;
 
     List<Color> colors;
 
@@ -50,17 +59,50 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
+        if (crawlstate != NORMAL)
+        {
+            Crawl();
+        }
 	}
 
-	void FixedUpdate () {
+    void Crawl()
+    {
+        if (crawlstate == CRAWL_TOWARDS_3D)
+        {
+            Vector3 local_endPosition_3d = this.transform.parent.transform.position - endPosition_3d;
+            float step = CRAWL_SPEED * Time.deltaTime;
+            gameObject.transform.position = Vector3.MoveTowards(transform.position, local_endPosition_3d, step);
+
+            if (local_endPosition_3d == gameObject.transform.position)
+            {
+                crawlstate = NORMAL;
+            }
+
+        }
+        else if (crawlstate == CRAWL_TOWARDS_2D)
+        {
+            Vector3 local_endPosition_2d = this.transform.parent.transform.position - endPosition_2d;
+            float step = CRAWL_SPEED * Time.deltaTime;
+            gameObject.transform.position = Vector3.MoveTowards(transform.position, local_endPosition_2d, step);
+            if (local_endPosition_2d == gameObject.transform.position)
+            {
+                crawlstate = NORMAL;
+            }
+
+        }
+
+    }
+
+    void FixedUpdate () {
 	}
 
+
+    /*
     public void assumeNewDimensionalPosition(int dimensionality)
     {
-        // wizardry with parents will need to be observed at some point
         if(dimensionality == GenerateGraph.GRAPH_3D)
         {
             gameObject.transform.position =
@@ -78,6 +120,35 @@ public class NodeForce : MonoBehaviour { // place this script on the node
                     y_2d,
                     0.0f + GenerateGraph.DISTANCE_FROM_FACE // i dont think this is correct, just a stopgap
                 );
+        }
+    }
+    */
+
+    public void crawlTowardsNewPosition(int dimensionality)
+    {
+
+        // recalculate edges
+        // initial position and final position are calculated the same way
+        // wizardry with parents will need to be observed at some point
+
+        if (dimensionality == GenerateGraph.GRAPH_3D)
+        {
+            endPosition_3d = new Vector3(
+                    x_3d,
+                    y_3d,
+                    z_3d
+                );
+            crawlstate = CRAWL_TOWARDS_3D;
+
+        }
+        else
+        {
+            endPosition_2d = new Vector3(
+                    x_2d,
+                    y_2d,
+                    0.0f 
+                );
+            crawlstate = CRAWL_TOWARDS_2D;
         }
     }
 

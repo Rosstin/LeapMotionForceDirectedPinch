@@ -245,6 +245,7 @@ public class HandsRaycast : MonoBehaviour {
 			graphGenerator.detailingMode = false;
 		}
 
+
         if(Input.GetKeyDown("2"))
         {
             print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
