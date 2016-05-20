@@ -346,7 +346,7 @@ public class HandsRaycast : MonoBehaviour {
 
                 }
 
-                graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
+                //graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
 
                 if (handedness == LEFT) {
 					if (highlightedObjectL != null) {

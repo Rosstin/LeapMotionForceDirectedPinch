@@ -18,7 +18,6 @@ public class GenerateGraph : MonoBehaviour {
 
 	int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
 
-
 	float NODE_SPREAD_X = 1.0f;
 	float NODE_SPREAD_Y = 0.8f;
 	float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
@@ -31,16 +30,19 @@ public class GenerateGraph : MonoBehaviour {
     public static int GRAPH_3D = 100;
     public static int GRAPH_2D = 101;
 
-	int NODE_LIMIT = 200;
+    public static int DATA_MNIST = 200;
+    public static int DATA_TWITTER = 201;
+
+    int NODE_LIMIT = 200;
 
 	int currentIndex = 0;
 
 	public int NodeDegree = 0; // only show nodes of degree greater than this value
-    int STARTING_NODE_DEGREE_FILTER = 15; // starting value for nodedegree
+    public static int STARTING_NODE_DEGREE_FILTER = 3; // starting value for nodedegree
 
-    float EXPLOSION_TIME_1 = 2.0f;  // after this time (in seconds) show only the selected node
-	float EXPLOSION_TIME_2 = 4.0f;  // after this time, show selected node and its relations
-	float EXPLOSION_TIME_3 = 14.0f; // after this time, show relations of relations of the selected node
+    static float EXPLOSION_TIME_1 = 3.0f;  // after this time (in seconds) show only the selected node
+	static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
+	static float EXPLOSION_TIME_3 = 12.0f; // after this time, show relations of relations of the selected node
 
 	public bool detailingMode = false; // disable or enable the ability to explode a node
 
@@ -66,7 +68,7 @@ public class GenerateGraph : MonoBehaviour {
 
         //generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
         //generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
-        generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_2D);
+        generateGraphFromCSV("nodelist_MNIST", "edgelist_MNIST", GRAPH_2D, DATA_MNIST);
         //generateGraphRandomly();
 
     }
@@ -96,7 +98,7 @@ public class GenerateGraph : MonoBehaviour {
 
         //myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>(); // doing this earlier in process
 
-        showNodesOfDegreeGreaterThan(15);
+        showNodesOfDegreeGreaterThan(STARTING_NODE_DEGREE_FILTER);
     }
 
     public void explodeSelectedNode(Node highlightedNode) {
@@ -165,7 +167,7 @@ public class GenerateGraph : MonoBehaviour {
 
     }
 
-    public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality){
+    public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality, int type){
 
 
         // reading the data takes for ever, but loading node position takes no time... you can probably preload the data somehow
@@ -185,7 +187,7 @@ public class GenerateGraph : MonoBehaviour {
 
 		print ("masterNodeList.Length: " + masterNodeList.Length);
 
-        parseGraph(positionsGrid, dimensionality);
+        parseGraph(positionsGrid, dimensionality, type);
 
         // add edges
         for (int i = 1; i < numberOfEdges; i++) {
@@ -209,26 +211,35 @@ public class GenerateGraph : MonoBehaviour {
 
     }
 
-    void parseGraph(string[,] myPositionsGrid, int dimensionality)
+    void parseGraph(string[,] myPositionsGrid, int dimensionality, int type)
     {
         int numberOfNodes = myPositionsGrid.GetUpperBound(1) - 1;
 
         // add nodes
         for (int i = 1; (i < numberOfNodes + 1); i++)
         {
-            //print("i in add nodes: " + i);
-            // add vertexes
 
             if (i != 0) { adjacencyList.AddVertex(i); }
 
             Vector3 position;
 
-            float x_3d= float.Parse(myPositionsGrid[8, i]) * GRAPH_SCALE_CONSTANT;
-            float y_3d= float.Parse(myPositionsGrid[9, i]) * GRAPH_SCALE_CONSTANT;
-            float z_3d= float.Parse(myPositionsGrid[10, i]) * GRAPH_SCALE_CONSTANT;
+            int startIndexCoordinates;
 
-            float x_2d= float.Parse(myPositionsGrid[11, i]) * GRAPH_SCALE_CONSTANT;
-            float y_2d= float.Parse(myPositionsGrid[12, i]) * GRAPH_SCALE_CONSTANT;
+            if (type == DATA_MNIST)
+            {
+                startIndexCoordinates = 3;
+            }
+            else
+            {
+                startIndexCoordinates = 8;
+            }
+
+            float x_3d= float.Parse(myPositionsGrid[startIndexCoordinates, i]) * GRAPH_SCALE_CONSTANT;
+            float y_3d= float.Parse(myPositionsGrid[startIndexCoordinates+1, i]) * GRAPH_SCALE_CONSTANT;
+            float z_3d= float.Parse(myPositionsGrid[startIndexCoordinates+2, i]) * GRAPH_SCALE_CONSTANT;
+
+            float x_2d= float.Parse(myPositionsGrid[startIndexCoordinates+3, i]) * GRAPH_SCALE_CONSTANT;
+            float y_2d= float.Parse(myPositionsGrid[startIndexCoordinates+4, i]) * GRAPH_SCALE_CONSTANT;
 
             if (dimensionality == GRAPH_3D)
             {
@@ -266,13 +277,20 @@ public class GenerateGraph : MonoBehaviour {
 
             nodeScript.degree = int.Parse(myPositionsGrid[2, i]);
 
-            nodeScript.SetScaleFromDegree(int.Parse(myPositionsGrid[2, i]));
+            nodeScript.SetScaleFromDegree(nodeScript.degree);
 
             myNodeInstance.transform.parent = nodeContainer.transform;
 
             masterNodeList[i - 1] = new Node(myNodeInstance, i - 1);
 
-            masterNodeList[i - 1].nodeForce.SetColorByGroup(int.Parse(myPositionsGrid[3, i]));
+            if (type==DATA_TWITTER)
+            { 
+                masterNodeList[i - 1].nodeForce.SetColorByGroup(int.Parse(myPositionsGrid[3, i]));
+            }
+            else if (type==DATA_MNIST)
+            {
+                masterNodeList[i - 1].nodeForce.SetColorByGroup((int)float.Parse(myPositionsGrid[1, i]));
+            }
 
             nameToID.Add(label, i - 1);
         }

@@ -67,7 +67,7 @@ public class AdjacencyList : MonoBehaviour
 
 		if (weight > 2.00f) {
 			myLineRenderer.SetColors (Color.green, Color.blue);
-            myLineRenderer.SetWidth(0.30f, 0.30f);
+            myLineRenderer.SetWidth(0.15f, 0.15f);
 		} else {
 			myLineRenderer.SetColors (Color.red, Color.magenta);
 		}

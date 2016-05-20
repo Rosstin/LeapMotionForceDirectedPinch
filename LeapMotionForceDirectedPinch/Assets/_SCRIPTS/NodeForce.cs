@@ -245,14 +245,20 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 		colors.Add (new Color(1.0f, 0.0f, 0.0f, 1.0f));
 		colors.Add (new Color(1.0f, 128.0f/255.0f, 0.0f, 1.0f));
-		colors.Add (new Color(1.0f, 1.0f, 0.0f, 1.0f));
-		//colors.Add (new Color(128.0f/255.0f, 1.0f, 0.0f, 1.0f));
-		//colors.Add (new Color(0.0f, 1.0f, 0.0f, 1.0f));
-		//colors.Add (new Color(0.0f, 1.0f, 128.0f/255.0f, 1.0f));
+        //colors.Add (new Color(1.0f, 1.0f, 0.0f, 1.0f));
+        colors.Add(new Color(1.0f, 1.0f, 1.0f, 1.0f));
 
-		//colors.Add (new Color(0.0f, 1.0f, 1.0f, 1.0f));
-		//colors.Add (new Color(0.0f, 0.5f, 1.0f, 1.0f));
-		colors.Add (new Color(0.0f, 0.0f, 1.0f, 1.0f));
+        colors.Add(new Color(0.0f, 0.0f, 0.0f, 1.0f));
+
+        colors.Add(new Color(1.0f, 204.0f/255.0f, 204.0f / 255.0f, 1.0f ));
+
+        //colors.Add (new Color(128.0f/255.0f, 1.0f, 0.0f, 1.0f));
+        //colors.Add (new Color(0.0f, 1.0f, 0.0f, 1.0f));
+        //colors.Add (new Color(0.0f, 1.0f, 128.0f/255.0f, 1.0f));
+
+        //colors.Add (new Color(0.0f, 1.0f, 1.0f, 1.0f));
+        //colors.Add (new Color(0.0f, 0.5f, 1.0f, 1.0f));
+        colors.Add (new Color(0.0f, 0.0f, 1.0f, 1.0f));
 		colors.Add (new Color(0.5f, 0.0f, 1.0f, 1.0f));
 		colors.Add (new Color(1.0f, 0.0f, 1.0f, 1.0f));
 		colors.Add (new Color(1.0f, 0.0f, 0.5f, 1.0f));
