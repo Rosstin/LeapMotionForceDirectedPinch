@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using Leap;
 using Leap.Unity.PinchUtility;
+using Leap.Unity;
 
 public class HandsRaycast : MonoBehaviour {
 
@@ -14,7 +15,12 @@ public class HandsRaycast : MonoBehaviour {
 	public GameObject PanelContainer;
 	// an object with an array of all buttons should be included 
 
-	float SLIDER_MOVE_SPEED = 0.004f;
+    public GameObject rightCapsuleHandObject;
+    CapsuleHand rightCapsuleHandScript;
+    public GameObject leftCapsuleHandObject;
+    CapsuleHand leftCapsuleHandScript;
+
+    float SLIDER_MOVE_SPEED = 0.004f;
 
 	// VIEWPANEL
 	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 10.0f;
@@ -77,7 +83,10 @@ public class HandsRaycast : MonoBehaviour {
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 
-		button1Collider = button1.GetComponent<Collider> ();
+        rightCapsuleHandScript = rightCapsuleHandObject.GetComponent<CapsuleHand>();
+        leftCapsuleHandScript = leftCapsuleHandObject.GetComponent<CapsuleHand>();
+
+        button1Collider = button1.GetComponent<Collider> ();
 		slider1Collider = slider1.GetComponent<Collider> ();
 		slider1script = slider1.GetComponent<Slider> ();
 
@@ -87,10 +96,10 @@ public class HandsRaycast : MonoBehaviour {
 	void FixedUpdate () {
 		UpdateControlPanel ();
 
-		HandlePinches (leftPinchDetectorScript, LEFT);
-		HandlePinches (rightPinchDetectorScript, RIGHT);
+		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
+		HandlePinches (rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
 
-		if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
+        if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
 			graphGenerator.explodeSelectedNode (highlightedObjectL);
 		} 
 
@@ -201,21 +210,16 @@ public class HandsRaycast : MonoBehaviour {
             }
 
 		}
-
-
-
-
-
-
 	}
 
-	void HandlePinches(LeapPinchDetector detector, int handedness) {
+	void HandlePinches(CapsuleHand hand, LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
 
-		// GET POSITION OF EVENT
-		Vector3 p = detector.Position;
+        // GET POSITION OF EVENT
+        //Vector3 p = detector.Position;
+        Vector3 p = hand.thumbTip.transform.position;
 		// camera to pinch vector
 		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
 
@@ -223,6 +227,7 @@ public class HandsRaycast : MonoBehaviour {
 		Vector3 objectVector;
 		float biggestDotProduct= 0.0f;
 		int selectedNodeIndex = 0;
+        int hoveredNodeIndex = 0;
 		float dotProduct;
 
 		int state = -1;
@@ -233,47 +238,7 @@ public class HandsRaycast : MonoBehaviour {
 			state = stateL;
 		}
 
-        // maybe do something so these don't get registered multiple times at once
-
-		if (Input.GetKeyDown ("d")) {
-			print ("graphGenerator.detailingMode = true");
-			graphGenerator.detailingMode = true;
-		}
-
-		if (Input.GetKeyDown ("f")) {
-			print ("graphGenerator.detailingMode = false");
-			graphGenerator.detailingMode = false;
-		}
-
-
-        if(Input.GetKeyDown("2"))
-        {
-            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
-            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
-        }
-
-        if (Input.GetKeyDown("3"))
-        {
-            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D)");
-            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
-        }
-
-        /*
-        if (Input.GetKeyDown("2"))
-        {
-            print("graphGenerator.generateGraphFromCSV as GRAPH_2D");
-            graphGenerator.destroyOldGraph();
-            graphGenerator.generateGraphFromCSV("b3_node", "b3_edgelist", GenerateGraph.GRAPH_2D);
-        }
-
-        if (Input.GetKeyDown("3"))
-        {
-            print("graphGenerator.generateGraphFromCSV as GenerateGraph.GRAPH_3D");
-            graphGenerator.destroyOldGraph();
-            graphGenerator.generateGraphFromCSV("b3_node", "b3_edgelist", GenerateGraph.GRAPH_3D);
-        }
-        */
-
+        CheckDebugKeyboardActions();
 
         if (panelState == PANEL_ON) {
 
@@ -283,16 +248,10 @@ public class HandsRaycast : MonoBehaviour {
 			RaycastHit hit = new RaycastHit ();
 			Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
 
-			//myLineRenderer.SetVertexCount (2);
-			//myLineRenderer.SetPosition (0, p);
-			//myLineRenderer.SetPosition (1, endRayPosition);
-			//myLineRenderer.enabled = true;
-
 			Ray myRay = new Ray (playerCamera.transform.position, heading);
 
 			if ( button1Collider.Raycast (myRay, out hit, 200.0f)) { // if you hit something
 
-				//Debug.Log("Hit something.");
 				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button //don't really need this anymore
 					//Debug.Log("Hit Clickable.");
 
@@ -307,9 +266,6 @@ public class HandsRaycast : MonoBehaviour {
 					else {
 						hit.transform.gameObject.GetComponent<ButtonActivate> ().UnHit ();
 					}
-
-
-
 				}
 			}
 
@@ -358,8 +314,7 @@ public class HandsRaycast : MonoBehaviour {
 					//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
 				}
 			}
-
-			if (state == STATE_DRAGGING) { // already dragging
+			else if (state == STATE_DRAGGING) { // already dragging
 
 				if (handedness == LEFT) {
 					if (highlightedObjectL != null) {
@@ -370,15 +325,30 @@ public class HandsRaycast : MonoBehaviour {
 						highlightedObjectR.nodeForce.timeSelected += Time.deltaTime;
 					}
 				}
-
-
-
 			}
 
 			if (!isActive) { // if you let go you're not dragging
 				state = STATE_NORMAL;
 
-				if (handedness == LEFT) {
+                for (int i = 0; i < graphGenerator.masterNodeList.Length; i++)
+                {
+                    if (graphGenerator.masterNodeList[i].nodeForce.degree > graphGenerator.NodeDegree)
+                    {
+                        objectVector = Vector3.Normalize(graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
+                        dotProduct = Vector3.Dot(heading, objectVector);
+
+                        if (dotProduct > biggestDotProduct) // should be "if visible" instead
+                        { // dont select nodes that are not visible
+                            biggestDotProduct = dotProduct;
+                            hoveredNodeIndex = i;
+                        }
+                    }
+
+                }
+
+                graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
+
+                if (handedness == LEFT) {
 					if (highlightedObjectL != null) {
 						//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 						highlightedObjectL.nodeForce.Unselected ();
@@ -406,7 +376,34 @@ public class HandsRaycast : MonoBehaviour {
 	}
 
 
+    void CheckDebugKeyboardActions()
+    {
+        if (Input.GetKeyDown("d"))
+        {
+            print("graphGenerator.detailingMode = true");
+            graphGenerator.detailingMode = true;
+        }
 
+        if (Input.GetKeyDown("f"))
+        {
+            print("graphGenerator.detailingMode = false");
+            graphGenerator.detailingMode = false;
+        }
+
+
+        if (Input.GetKeyDown("2"))
+        {
+            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
+            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
+        }
+
+        if (Input.GetKeyDown("3"))
+        {
+            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D)");
+            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
+        }
+
+    }
 
 
 

@@ -8,7 +8,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 	public float mass = 1.0f;
 	private float scale = 0.10f;
 	public Color color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-	public Color selectedColor = Color.green;
+	public Color selectedColor = new Color(0.0f, 1.0f, 0.3f, 1.0f);
+    public Color hoveredColor = Color.green;
 
 	public int degree;
 
@@ -197,7 +198,12 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 		this.myRenderer.material.color = selectedColor;
 	}
 
-	public void Unselected() {
+    public void Hovered()
+    {
+        this.myRenderer.material.color = hoveredColor;
+    }
+
+    public void Unselected() {
 		this.myRenderer.material.color = color;
 	}
 

@@ -39,7 +39,9 @@ namespace Leap.Unity{
   
     private Transform armFrontLeft, armFrontRight, armBackLeft, armBackRight;
     private Hand hand_;
-  
+
+    public Transform thumbTip;
+
     public override ModelType HandModelType {
       get {
         return ModelType.Graphics;
@@ -192,7 +194,15 @@ namespace Leap.Unity{
         for (int j = 0; j < 4; j++) {
           int key = getFingerJointIndex((int)finger.Type, j);
           _jointSpheres[key] = createSphere("Joint", SPHERE_RADIUS);
-        }
+
+            if (j == 3 && i == 0)
+            { // make the thumb finger tip black
+                _jointSpheres[key].GetComponent<MeshRenderer>().material.color = Color.black;
+                thumbTip = _jointSpheres[key];
+            }
+
+
+          }
       }
   
       mockThumbJointSphere = createSphere("MockJoint", SPHERE_RADIUS);

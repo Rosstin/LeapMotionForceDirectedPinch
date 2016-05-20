@@ -152,10 +152,18 @@ MonoBehaviour:
   mass: 1
   color: {r: 0, g: 0, b: 0, a: 0}
   selectedColor: {r: 0, g: 1, b: 0, a: 1}
+  hoveredColor: {r: 0, g: 1, b: 0, a: 1}
   degree: 0
   timeSelected: 0
   myTextMeshGameObject: {fileID: 0}
   myTextMesh: {fileID: 0}
+  x_3d: 0
+  y_3d: 0
+  z_3d: 0
+  endPosition_3d: {x: 0, y: 0, z: 0}
+  x_2d: 0
+  y_2d: 0
+  endPosition_2d: {x: 0, y: 0, z: 0}
 --- !u!1 &160957721
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,6 +806,10 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
+--- !u!1 &739400965 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 188576, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+  m_PrefabInternal: {fileID: 1781939139}
 --- !u!1 &900574211
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,6 +977,10 @@ Transform:
   - {fileID: 634930392}
   m_Father: {fileID: 900574212}
   m_RootOrder: 2
+--- !u!1 &1180669329 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 188576, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+  m_PrefabInternal: {fileID: 1759863750}
 --- !u!1 &1353564654
 GameObject:
   m_ObjectHideFlags: 0
@@ -3194,6 +3210,8 @@ MonoBehaviour:
   button1: {fileID: 634930387}
   slider1: {fileID: 2113356680}
   PanelContainer: {fileID: 900574211}
+  rightCapsuleHandObject: {fileID: 739400965}
+  leftCapsuleHandObject: {fileID: 1180669329}
   playerCamera: {fileID: 2098797249}
   sceneGod: {fileID: 1993002016}
   rightPinchDetector: {fileID: 525701292}

@@ -46,7 +46,7 @@ public class GenerateGraph : MonoBehaviour {
 
 	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
-	public GameObject nodeContainer;
+    [Tooltip("Don't put anything here in-editor.")] public GameObject nodeContainer; //DON'T put a nodecontainer object here in-editor
 	Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
 
     public Leap.Unity.PinchUtility.LeapPinchDetector pinchDetectorA;
