@@ -27,8 +27,8 @@ public class GenerateGraph : MonoBehaviour {
 
 	float GRAPH_SCALE_CONSTANT = 0.005f;
 
-    int GRAPH_3D = 100;
-    int GRAPH_2D = 101;
+    public static int GRAPH_3D = 100;
+    public static int GRAPH_2D = 101;
 
 	int NODE_LIMIT = 200;
 
