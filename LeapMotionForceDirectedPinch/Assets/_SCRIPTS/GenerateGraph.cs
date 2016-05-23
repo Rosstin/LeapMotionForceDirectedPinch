@@ -66,9 +66,8 @@ public class GenerateGraph : MonoBehaviour {
 
         //generate2DGraphFromCSV();
 
-        //generateGraphFromCSV("node_with_attribures_query_bernie", "edgelist_query_bernie");
-        //generateGraphFromCSV("node_with_attribures_query_hillary", "edgelist_query_hillary");
-        generateGraphFromCSV("nodelist_MNIST", "edgelist_MNIST", GRAPH_2D, DATA_MNIST);
+        generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
+        //generateGraphFromCSV("nodelist_MNIST", "edgelist_MNIST", GRAPH_2D, DATA_MNIST);
         //generateGraphRandomly();
 
     }

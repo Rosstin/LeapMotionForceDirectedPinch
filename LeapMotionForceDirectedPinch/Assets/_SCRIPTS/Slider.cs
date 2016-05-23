@@ -17,10 +17,13 @@ public class Slider : MonoBehaviour {
 	public int handUsed;
 
 	public int maxValue = 30;
-	public int minValue = 0;3
+	public int minValue = 0;
 	public int currentValue;
 
-    //static float STARTING_PERCENT_DEGREE_FILTER = 0.10f;
+    public string displayString = "Value is: ";
+    public string sliderType;
+
+    public float STARTING_PERCENT_DEGREE_FILTER = 0.30f;
 
 	private MeshRenderer myRenderer;
 
@@ -30,7 +33,7 @@ public class Slider : MonoBehaviour {
 		this.myRenderer.material.color = Color.blue;
 
 		textScript = label.GetComponent<TextMesh> ();
-		slider.transform.localPosition = new Vector3 (min.transform.localPosition.x, slider.transform.localPosition.y, slider.transform.localPosition.z );
+		slider.transform.localPosition = new Vector3 ( (STARTING_PERCENT_DEGREE_FILTER * (max.transform.localPosition.x - min.transform.localPosition.x))+ min.transform.localPosition.x, slider.transform.localPosition.y, slider.transform.localPosition.z );
 
 		UpdateBarValue ();
 
@@ -58,7 +61,7 @@ public class Slider : MonoBehaviour {
 
 		currentValue = (int) floatValue;
 
-		textScript.text = "Show degree > " + currentValue;
+		textScript.text = displayString + currentValue;
 
 		if (currentValue != lastValue) {
 			return true; // value changed

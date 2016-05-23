@@ -9,10 +9,17 @@ public class HandsRaycast : MonoBehaviour {
 
 	public GameObject button1;
 	Collider button1Collider;
+
 	public GameObject slider1;
 	Collider slider1Collider;
 	Slider slider1script;
-	public GameObject PanelContainer;
+
+    public GameObject sliderFollowers;
+    Collider sliderFollowersCollider;
+    Slider sliderFollowersScript;
+
+
+    public GameObject PanelContainer;
     // an object with an array of all buttons should be included 
 
     public GameObject infravisionQuad;
@@ -88,14 +95,17 @@ public class HandsRaycast : MonoBehaviour {
         rightCapsuleHandScript = rightCapsuleHandObject.GetComponent<CapsuleHand>();
         leftCapsuleHandScript = leftCapsuleHandObject.GetComponent<CapsuleHand>();
 
-        button1Collider = button1.GetComponent<Collider> ();
-		slider1Collider = slider1.GetComponent<Collider> ();
+        //button1Collider = button1.GetComponent<Collider> ();
+
+        slider1Collider = slider1.GetComponent<Collider> ();
 		slider1script = slider1.GetComponent<Slider> ();
 
+        sliderFollowersCollider = sliderFollowers.GetComponent<Collider>();
+        sliderFollowersScript = sliderFollowers.GetComponent<Slider>();
 
-	}
+    }
 
-	void FixedUpdate () {
+    void FixedUpdate () {
 		UpdateControlPanel ();
 
 		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
@@ -114,9 +124,10 @@ public class HandsRaycast : MonoBehaviour {
     void NeutralizeButtonState() // neutralize state of all buttons in when you leave
     {
         NeutralizeSliderState(slider1script);
+        NeutralizeSliderState(sliderFollowersScript);
     }
 
-	void UpdateControlPanel () {
+    void UpdateControlPanel () {
 		// looking at panel
 		// not looking at panel
 
@@ -161,8 +172,21 @@ public class HandsRaycast : MonoBehaviour {
     void NeutralizeSliderState(Slider slider)
     {
         slider.state = slider.NORMAL;
-        graphGenerator.showNodesOfDegreeGreaterThan(slider.currentValue);
+        performSliderAction(slider.sliderType, slider.currentValue);
         slider.UnGrab();
+    }
+
+    void performSliderAction(string sliderType, int value)
+    {
+        if(sliderType == "degree") // todo should be a constant string stored elsewhere
+        {
+            graphGenerator.showNodesOfDegreeGreaterThan(value);
+        }
+        else if(sliderType == "followers")
+        {
+            //graphGenerator.showNodesWithFollowersGreaterThan(slider.currentValue);
+        }
+
     }
 
     void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
@@ -238,6 +262,7 @@ public class HandsRaycast : MonoBehaviour {
 
 			Ray myRay = new Ray (playerCamera.transform.position, heading);
 
+            /*
 			if ( button1Collider.Raycast (myRay, out hit, 200.0f)) { // if you hit something
 
 				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button //don't really need this anymore
@@ -256,10 +281,10 @@ public class HandsRaycast : MonoBehaviour {
 					}
 				}
 			}
+            */
 
     		UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
-
-
+            //UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
         } else { // not looking at panel
 
