@@ -79,7 +79,7 @@ public class MouseRaycast : MonoBehaviour {
 
 					Debug.Log("Hit Clickable.");
 					hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
-					myGraph.showNodesOfDegreeGreaterThan (22);
+					myGraph.showLegalNodesBasedOnFilterSettings (); //todo broken based on other changes
 				}
 			}
 

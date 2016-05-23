@@ -180,11 +180,13 @@ public class HandsRaycast : MonoBehaviour {
     {
         if(sliderType == "degree") // todo should be a constant string stored elsewhere
         {
-            graphGenerator.showNodesOfDegreeGreaterThan(value);
+            graphGenerator.NodeDegree = value;
+            graphGenerator.showLegalNodesBasedOnFilterSettings();
         }
         else if(sliderType == "followers")
         {
-            //graphGenerator.showNodesWithFollowersGreaterThan(slider.currentValue);
+            graphGenerator.FollowerCount = value;
+            graphGenerator.showLegalNodesBasedOnFilterSettings();
         }
 
     }
@@ -215,7 +217,7 @@ public class HandsRaycast : MonoBehaviour {
 				//Debug.Log("ontarget");
 			}
 			if (slider.UpdateBarValue ()) { // value changed
-				graphGenerator.showNodesOfDegreeGreaterThan (slider.currentValue);
+                performSliderAction(slider.sliderType, slider.currentValue);
 			}
 			if (!isActive) { // no longer dragging
                 NeutralizeSliderState(slider);
@@ -284,7 +286,7 @@ public class HandsRaycast : MonoBehaviour {
             */
 
     		UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
-            //UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
+            UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
         } else { // not looking at panel
 

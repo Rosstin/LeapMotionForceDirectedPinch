@@ -132,6 +132,7 @@ MonoBehaviour:
   selectedColor: {r: 0, g: 1, b: 0, a: 1}
   hoveredColor: {r: 0, g: 1, b: 0, a: 1}
   degree: 0
+  followerCount: 0
   timeSelected: 0
   myTextMeshGameObject: {fileID: 0}
   myTextMesh: {fileID: 0}
@@ -1359,10 +1360,10 @@ MonoBehaviour:
   NORMAL: 0
   DRAGGING: 1
   handUsed: 0
-  maxValue: 30
+  maxValue: 500
   minValue: 0
   currentValue: 0
-  displayString: 'Value is: '
+  displayString: 'Followers > '
   sliderType: followers
   STARTING_PERCENT_DEGREE_FILTER: 0.3
 --- !u!23 &964752844
@@ -1462,7 +1463,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button1: {fileID: 1163223449}
   slider1: {fileID: 1443115709}
-  sliderFollowers: {fileID: 0}
+  sliderFollowers: {fileID: 964752841}
   PanelContainer: {fileID: 1670493147}
   infravisionQuad: {fileID: 1828834668}
   rightCapsuleHandObject: {fileID: 1951949094}
@@ -1484,6 +1485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 2146700580}
   NodeDegree: 0
+  FollowerCount: 3
   detailingMode: 1
   nodeContainer: {fileID: 0}
   pinchDetectorA: {fileID: 119141760}

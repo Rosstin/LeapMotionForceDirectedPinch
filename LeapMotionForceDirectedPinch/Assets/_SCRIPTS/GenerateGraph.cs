@@ -37,8 +37,11 @@ public class GenerateGraph : MonoBehaviour {
 
 	int currentIndex = 0;
 
-	public int NodeDegree = 0; // only show nodes of degree greater than this value
-    public static int STARTING_NODE_DEGREE_FILTER = 3; // starting value for nodedegree
+	public int NodeDegree = 3; // only show nodes of degree greater than this value
+    //public static int STARTING_NODE_DEGREE_FILTER = 3; // starting value for nodedegree //todo doesn't work so remove or change
+
+    public int FollowerCount = 3;
+    //public static int STARTING_NODE_FOLLOWER_COUNT = 3; // starting value for nodedegree
 
     static float EXPLOSION_TIME_1 = 3.0f;  // after this time (in seconds) show only the selected node
 	static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
@@ -95,9 +98,7 @@ public class GenerateGraph : MonoBehaviour {
         nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
         nodeContainerOriginalPosition = nodeContainer.transform.position;
 
-        //myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>(); // doing this earlier in process
-
-        showNodesOfDegreeGreaterThan(STARTING_NODE_DEGREE_FILTER);
+        showLegalNodesBasedOnFilterSettings() ;
     }
 
     public void explodeSelectedNode(Node highlightedNode) {
@@ -145,7 +146,7 @@ public class GenerateGraph : MonoBehaviour {
 	}
 
 	public void unselectNode(){
-		showNodesOfDegreeGreaterThan (NodeDegree);
+        showLegalNodesBasedOnFilterSettings();
 
 		hideLabels ();
 
@@ -283,8 +284,9 @@ public class GenerateGraph : MonoBehaviour {
             masterNodeList[i - 1] = new Node(myNodeInstance, i - 1);
 
             if (type==DATA_TWITTER)
-            { 
+            {
                 masterNodeList[i - 1].nodeForce.SetColorByGroup(int.Parse(myPositionsGrid[3, i]));
+                masterNodeList[i - 1].nodeForce.followerCount = (int) float.Parse(myPositionsGrid[4, i]);
             }
             else if (type==DATA_MNIST)
             {
@@ -354,25 +356,27 @@ public class GenerateGraph : MonoBehaviour {
 			masterNodeList [i].nodeForce.DeactivateText();
 		}
 	}
+    
+    public void showLegalNodesBasedOnFilterSettings()
+    {
 
-	public void showNodesOfDegreeGreaterThan(int myDegree){
+        for (int i = 0; i < masterNodeList.Length; i++)
+        {
+            if (masterNodeList[i].nodeForce.degree > NodeDegree && masterNodeList[i].nodeForce.followerCount > FollowerCount)
+            {
+                masterNodeList[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                masterNodeList[i].gameObject.SetActive(false);
+            }
+        }
+    }
 
-		NodeDegree = myDegree;
-
-		for (int i = 0; i < masterNodeList.Length; i++) {
-			if (masterNodeList [i].nodeForce.degree >= myDegree) {
-				masterNodeList [i].gameObject.SetActive (true);
-			} else {
-				masterNodeList [i].gameObject.SetActive (false);
-			}
-		}
-	}
-
-
-	void showConnectedNodes(List<int> indices, int mainIndex){
+    void showConnectedNodes(List<int> indices, int mainIndex){
 		foreach (int index in indices) {
 
-			if (masterNodeList [index].nodeForce.degree > NodeDegree) {
+			if (masterNodeList [index].nodeForce.degree > NodeDegree && masterNodeList[index].nodeForce.followerCount > FollowerCount) { // todo change this to not be copypasta
 
 				masterNodeList [index].gameObject.SetActive (true);
 				masterNodeList [index].nodeForce.ActivateText ();

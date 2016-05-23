@@ -12,6 +12,7 @@ public class NodeForce : MonoBehaviour { // place this script on the node
     public Color hoveredColor = Color.green;
 
 	public int degree;
+    public int followerCount;
 
 	public float timeSelected = 0.0f;
 
