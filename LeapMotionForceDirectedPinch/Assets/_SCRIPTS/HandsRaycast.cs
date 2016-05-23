@@ -13,7 +13,9 @@ public class HandsRaycast : MonoBehaviour {
 	Collider slider1Collider;
 	Slider slider1script;
 	public GameObject PanelContainer;
-	// an object with an array of all buttons should be included 
+    // an object with an array of all buttons should be included 
+
+    public GameObject infravisionQuad;
 
     public GameObject rightCapsuleHandObject;
     CapsuleHand rightCapsuleHandScript;
@@ -182,29 +184,15 @@ public class HandsRaycast : MonoBehaviour {
 			float dir = Vector3.Dot (perp, playerCamera.transform.up);
 
 			if (dir > 0f) {
-				// left?
-				//Debug.Log("left");
-
 				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x + SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
-
-
-
 			} else if (dir < 0f) {
-				// right?
-				//Debug.Log("right");
-
 				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x - SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
-
-
 			} else {
-				// ontarget?
-				Debug.Log("ontarget");
+				//Debug.Log("ontarget");
 			}
-
 			if (slider.UpdateBarValue ()) { // value changed
 				graphGenerator.showNodesOfDegreeGreaterThan (slider.currentValue);
 			}
-				
 			if (!isActive) { // no longer dragging
                 NeutralizeSliderState(slider);
             }
@@ -378,6 +366,20 @@ public class HandsRaycast : MonoBehaviour {
 
     void CheckDebugKeyboardActions()
     {
+
+        if (Input.GetKeyDown("space"))
+        {
+            print("infravision toggled on");
+            infravisionQuad.SetActive(true);
+        }
+
+        if (Input.GetKeyDown("1"))
+        {
+            print("infravision toggled off");
+            infravisionQuad.SetActive(false);
+        }
+
+
         if (Input.GetKeyDown("d"))
         {
             print("graphGenerator.detailingMode = true");

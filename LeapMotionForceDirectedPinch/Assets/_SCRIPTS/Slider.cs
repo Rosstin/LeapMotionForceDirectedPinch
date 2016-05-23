@@ -17,10 +17,10 @@ public class Slider : MonoBehaviour {
 	public int handUsed;
 
 	public int maxValue = 30;
-	public int minValue = 0;
+	public int minValue = 0;3
 	public int currentValue;
 
-    static float STARTING_PERCENT_DEGREE_FILTER = 0.10f;
+    //static float STARTING_PERCENT_DEGREE_FILTER = 0.10f;
 
 	private MeshRenderer myRenderer;
 
@@ -30,7 +30,7 @@ public class Slider : MonoBehaviour {
 		this.myRenderer.material.color = Color.blue;
 
 		textScript = label.GetComponent<TextMesh> ();
-		slider.transform.localPosition = new Vector3 ((min.transform.localPosition.x+max.transform.localPosition.x)* STARTING_PERCENT_DEGREE_FILTER, slider.transform.localPosition.y, slider.transform.localPosition.z );
+		slider.transform.localPosition = new Vector3 (min.transform.localPosition.x, slider.transform.localPosition.y, slider.transform.localPosition.z );
 
 		UpdateBarValue ();
 
