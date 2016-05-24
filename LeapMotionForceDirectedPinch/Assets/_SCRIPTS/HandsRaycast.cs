@@ -157,7 +157,6 @@ public class HandsRaycast : MonoBehaviour {
 		// looking at panel
 		// not looking at panel
 
-
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
 
@@ -358,7 +357,7 @@ public class HandsRaycast : MonoBehaviour {
 				state = STATE_DRAGGING;
 
 				for (int i = 0; i < graphGenerator.masterNodeList.Length; i++) {
-					if (graphGenerator.masterNodeList[i].nodeForce.degree > graphGenerator.NodeDegree) {
+					if (graphGenerator.isLegalNode(graphGenerator.masterNodeList[i])) {
 						objectVector = Vector3.Normalize (graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
 						dotProduct = Vector3.Dot (heading, objectVector);
 
@@ -409,7 +408,7 @@ public class HandsRaycast : MonoBehaviour {
 
                 for (int i = 0; i < graphGenerator.masterNodeList.Length; i++)
                 {
-                    if (graphGenerator.masterNodeList[i].nodeForce.degree > graphGenerator.NodeDegree)
+                    if (graphGenerator.isLegalNode(graphGenerator.masterNodeList[i]))
                     {
                         objectVector = Vector3.Normalize(graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
                         dotProduct = Vector3.Dot(heading, objectVector);

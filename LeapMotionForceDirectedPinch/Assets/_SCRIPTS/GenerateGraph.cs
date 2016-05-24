@@ -78,8 +78,6 @@ public class GenerateGraph : MonoBehaviour {
 
         //generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
 
-
-
         nodeFileForCoroutine = "b3_node";
         edgeFileForCoroutine = "b3_edgelist";
         graphTypeForCoroutine = GRAPH_3D;
@@ -112,8 +110,9 @@ public class GenerateGraph : MonoBehaviour {
     public void postGraphGeneration()
     {
         
-        RenderLinesOnce();
-        HideAllLines();
+        // unnecessary because we are doing this on-demand
+        // RenderLinesOnce();
+        // HideAllLines();
 
         nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
         nodeContainerOriginalPosition = nodeContainer.transform.position;
@@ -154,16 +153,6 @@ public class GenerateGraph : MonoBehaviour {
 
 
         }
-		// then... show lines and nodes based on connections
-
-
-
-		// first, hide all other nodes
-
-		// then, draw the edges connecting this node to others
-		// then, draw the edges connecting those nodes to others
-
-		// coroutine?
 
 	}
 
@@ -227,6 +216,7 @@ public class GenerateGraph : MonoBehaviour {
         postGraphGeneration();
         print("finished postGraphGeneration");
         yield return null;
+
     }
 
 
@@ -396,7 +386,6 @@ public class GenerateGraph : MonoBehaviour {
         // you should check to make sure that the new dimensionality is different
         for (int i = 0; i < masterNodeList.Length; i++)
         {
-            //masterNodeList[i].nodeForce.assumeNewDimensionalPosition(dimensionality);
             masterNodeList[i].nodeForce.crawlTowardsNewPosition(dimensionality);
         }
     }
@@ -408,12 +397,24 @@ public class GenerateGraph : MonoBehaviour {
 		}
 	}
     
+    public bool isLegalNode(Node node)
+    {
+        if(node.nodeForce.degree > NodeDegree && node.nodeForce.followerCount > FollowerCount)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public void showLegalNodesBasedOnFilterSettings()
     {
 
         for (int i = 0; i < masterNodeList.Length; i++)
         {
-            if (masterNodeList[i].nodeForce.degree > NodeDegree && masterNodeList[i].nodeForce.followerCount > FollowerCount)
+            if (isLegalNode(masterNodeList[i]))
             {
                 masterNodeList[i].gameObject.SetActive(true);
             }
@@ -427,7 +428,7 @@ public class GenerateGraph : MonoBehaviour {
     void showConnectedNodes(List<int> indices, int mainIndex){
 		foreach (int index in indices) {
 
-			if (masterNodeList [index].nodeForce.degree > NodeDegree && masterNodeList[index].nodeForce.followerCount > FollowerCount) { // todo change this to not be copypasta
+			if (isLegalNode(masterNodeList[index])) { // todo change this to not be copypasta
 
 				masterNodeList [index].gameObject.SetActive (true);
 				masterNodeList [index].nodeForce.ActivateText ();
