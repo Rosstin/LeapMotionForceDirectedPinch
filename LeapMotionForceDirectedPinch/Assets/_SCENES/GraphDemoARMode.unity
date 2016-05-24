@@ -1487,6 +1487,7 @@ MonoBehaviour:
   NodeDegree: 0
   FollowerCount: 3
   detailingMode: 1
+  interactionReady: 0
   nodeContainer: {fileID: 0}
   pinchDetectorA: {fileID: 119141760}
   pinchDetectorB: {fileID: 1690052492}

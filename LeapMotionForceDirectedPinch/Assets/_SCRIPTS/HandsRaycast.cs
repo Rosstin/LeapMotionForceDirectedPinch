@@ -119,9 +119,11 @@ public class HandsRaycast : MonoBehaviour {
 
     void FixedUpdate () {
 
-        if (graphGenerator.interactionReady) { 
+        if (graphGenerator.interactionReady) {
 
-		    UpdateControlPanel ();
+            CheckDebugKeyboardActions();
+
+            UpdateControlPanel();
 
             if(leftCapsuleHandScript.thumbTip != null)
             { 
@@ -312,8 +314,6 @@ public class HandsRaycast : MonoBehaviour {
 		else{
 			state = stateL;
 		}
-
-        CheckDebugKeyboardActions();
 
         if (panelState == PANEL_ON) {
 

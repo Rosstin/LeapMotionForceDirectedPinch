@@ -78,10 +78,10 @@ public class GenerateGraph : MonoBehaviour {
 
         //generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
 
-        nodeFileForCoroutine = "b3_node";
-        edgeFileForCoroutine = "b3_edgelist";
+        nodeFileForCoroutine = "mnist_node_image";
+        edgeFileForCoroutine = "mnist_edge";
         graphTypeForCoroutine = GRAPH_3D;
-        dataTypeForCoroutine = DATA_TWITTER;
+        dataTypeForCoroutine = DATA_MNIST;
 
         StartCoroutine("generateGraphFromCSVCoroutine");
 
@@ -253,6 +253,8 @@ public class GenerateGraph : MonoBehaviour {
         string[,] myPositionsGrid = CSVReader.SplitCsvGrid(positionsText.text);
         int numberOfNodes = myPositionsGrid.GetUpperBound(1) - 1;
 
+        print("numberOfNodes... "+ numberOfNodes);
+
         masterNodeList = new Node[numberOfNodes];
         indicesToShowOrExplode = new int[numberOfNodes];
 
@@ -268,6 +270,7 @@ public class GenerateGraph : MonoBehaviour {
 
             if (type == DATA_MNIST)
             {
+                print("type == DATA_MNIST");
                 startIndexCoordinates = 3;
             }
             else
@@ -399,7 +402,11 @@ public class GenerateGraph : MonoBehaviour {
     
     public bool isLegalNode(Node node)
     {
-        if(node.nodeForce.degree > NodeDegree && node.nodeForce.followerCount > FollowerCount)
+        if( dataTypeForCoroutine == DATA_TWITTER && ( node.nodeForce.degree > NodeDegree && node.nodeForce.followerCount > FollowerCount))
+        {
+            return true;
+        }
+        else if (dataTypeForCoroutine == DATA_MNIST && (node.nodeForce.degree > NodeDegree ) )
         {
             return true;
         }
