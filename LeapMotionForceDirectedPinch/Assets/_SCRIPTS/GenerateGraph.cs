@@ -73,8 +73,10 @@ public class GenerateGraph : MonoBehaviour {
 	public Node[] masterNodeList;
 	int[] indicesToShowOrExplode;
 
-	// Use this for initialization
-	void Start () {
+    GameObject voxelCanvasContainer;
+
+    // Use this for initialization
+    void Start () {
 
         //generate2DGraphFromCSV();
 
@@ -97,6 +99,8 @@ public class GenerateGraph : MonoBehaviour {
     {
         interactionReady = false;
         nodeContainer = Instantiate(Resources.Load("NodeContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+        voxelCanvasContainer = Instantiate(Resources.Load("VoxelCanvasContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
         myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
         myLeapRTS._pinchDetectorA = pinchDetectorA;
         myLeapRTS._pinchDetectorB = pinchDetectorB;
@@ -106,6 +110,7 @@ public class GenerateGraph : MonoBehaviour {
         currentIndex = 0;
 
         adjacencyList.Reinitialize();
+
 
     }
 
@@ -119,6 +124,10 @@ public class GenerateGraph : MonoBehaviour {
         nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
         nodeContainerOriginalPosition = nodeContainer.transform.position;
 
+        voxelCanvasContainer.transform.parent = nodeContainer.transform;
+
+        voxelCanvasContainer.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
         showLegalNodesBasedOnFilterSettings() ;
 
         interactionReady = true;
@@ -130,20 +139,28 @@ public class GenerateGraph : MonoBehaviour {
         float edgewidth = model.GetComponent<Renderer>().bounds.size.x;
         model.SetActive(false);
 
+        GameObject voxelCanvas = Instantiate(Resources.Load("VoxelCanvas") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
         for (int i = 0; i < MNIST_IMAGE_SIZE; i++)
         {
             for (int j = 0; j < MNIST_IMAGE_SIZE; j++)
             {
                 GameObject currentVoxel = Instantiate(Resources.Load("Voxel") as GameObject,
                     new Vector3(
-                        myNode.gameObject.transform.position.x + j * edgewidth,
-                        myNode.gameObject.transform.position.y + (MNIST_IMAGE_SIZE-1-i) * edgewidth,
-                        myNode.gameObject.transform.position.z),
+                        0.0f + j * edgewidth,
+                        0.0f + (MNIST_IMAGE_SIZE-1-i) * edgewidth,
+                        0.0f),
                     Quaternion.identity) as GameObject;
 
                 currentVoxel.GetComponent<Voxel>().setArbitraryBWColor(myNode.nodeForce.image[i,j]);
+
+                currentVoxel.transform.parent = voxelCanvas.transform;
             }
         }
+
+        voxelCanvas.transform.parent = voxelCanvasContainer.transform;
+
+        voxelCanvas.transform.localPosition = myNode.gameObject.transform.localPosition;
 
         // put the voxel data into a voxel container
         // put the voxel container into the nodecontainer
@@ -213,6 +230,8 @@ public class GenerateGraph : MonoBehaviour {
         {
             Destroy(nodeContainer.transform.GetChild(i).gameObject);
         }
+
+        // todo destroy the voxel container too
 
     }
 
