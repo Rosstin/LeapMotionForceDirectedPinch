@@ -136,8 +136,8 @@ public class GenerateGraph : MonoBehaviour {
             {
                 GameObject currentVoxel = Instantiate(Resources.Load("Voxel") as GameObject,
                     new Vector3(
-                        myNode.gameObject.transform.position.x + i * edgewidth,
-                        myNode.gameObject.transform.position.y + j * edgewidth,
+                        myNode.gameObject.transform.position.x + j * edgewidth,
+                        myNode.gameObject.transform.position.y + (MNIST_IMAGE_SIZE-1-i) * edgewidth,
                         myNode.gameObject.transform.position.z),
                     Quaternion.identity) as GameObject;
 
