@@ -41,6 +41,8 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
     List<Color> colors;
 
+    public float[,] image = new float[GenerateGraph.MNIST_IMAGE_SIZE, GenerateGraph.MNIST_IMAGE_SIZE];
+
 	void Start () {
 		myRenderer = this.GetComponent<MeshRenderer> ();
 		myTextMesh = myTextMeshGameObject.GetComponent<TextMesh> ();

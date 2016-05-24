@@ -38,6 +38,8 @@ public class GenerateGraph : MonoBehaviour {
     public static int DATA_MNIST = 200;
     public static int DATA_TWITTER = 201;
 
+    public static int MNIST_IMAGE_SIZE = 28;
+
     int NODE_LIMIT = 200;
 
 	int currentIndex = 0;
@@ -122,13 +124,49 @@ public class GenerateGraph : MonoBehaviour {
         interactionReady = true;
     }
 
+    public void generateVoxelCanvasForHighlightedNode(Node myNode)
+    {
+        GameObject model = Instantiate(Resources.Load("Voxel") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+        float edgewidth = model.GetComponent<Renderer>().bounds.size.x;
+        model.SetActive(false);
+
+        for (int i = 0; i < MNIST_IMAGE_SIZE; i++)
+        {
+            for (int j = 0; j < MNIST_IMAGE_SIZE; j++)
+            {
+                GameObject currentVoxel = Instantiate(Resources.Load("Voxel") as GameObject,
+                    new Vector3(
+                        myNode.gameObject.transform.position.x + i * edgewidth,
+                        myNode.gameObject.transform.position.y + j * edgewidth,
+                        myNode.gameObject.transform.position.z),
+                    Quaternion.identity) as GameObject;
+
+                currentVoxel.GetComponent<Voxel>().setArbitraryBWColor(myNode.nodeForce.image[i,j]);
+            }
+        }
+
+        // put the voxel data into a voxel container
+        // put the voxel container into the nodecontainer
+        // destroy the voxel container and all its children when you're done
+
+    }
+
     public void explodeSelectedNode(Node highlightedNode) {
 		if (highlightedNode != null && detailingMode == true) {
 			float time = highlightedNode.nodeForce.timeSelected;
 
 			// show more connections over time // only do these once!
 
-			if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
+            if(dataTypeForCoroutine == DATA_MNIST && (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1)))
+            {
+                hideNodes();
+                highlightedNode.gameObject.SetActive(true);
+                highlightedNode.nodeForce.ActivateText();
+
+                generateVoxelCanvasForHighlightedNode(highlightedNode);
+            }
+
+            else if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
 
 				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
 
@@ -253,8 +291,6 @@ public class GenerateGraph : MonoBehaviour {
         string[,] myPositionsGrid = CSVReader.SplitCsvGrid(positionsText.text);
         int numberOfNodes = myPositionsGrid.GetUpperBound(1) - 1;
 
-        print("numberOfNodes... "+ numberOfNodes);
-
         masterNodeList = new Node[numberOfNodes];
         indicesToShowOrExplode = new int[numberOfNodes];
 
@@ -270,7 +306,6 @@ public class GenerateGraph : MonoBehaviour {
 
             if (type == DATA_MNIST)
             {
-                print("type == DATA_MNIST");
                 startIndexCoordinates = 3;
             }
             else
@@ -335,6 +370,19 @@ public class GenerateGraph : MonoBehaviour {
             else if (type==DATA_MNIST)
             {
                 masterNodeList[i - 1].nodeForce.SetColorByGroup((int)float.Parse(myPositionsGrid[1, i]));
+            }
+
+            // populate an array for the mnist image
+            if (type == DATA_MNIST)
+            {
+                for(int q = 0; q < MNIST_IMAGE_SIZE; q++)
+                {
+                    for (int r = 0; r < MNIST_IMAGE_SIZE; r++)
+                    {
+                        //print("q: " + q + "... r: " + r);
+                        masterNodeList[i-1].nodeForce.image[q,r] = float.Parse(myPositionsGrid[startIndexCoordinates + 5 + q*MNIST_IMAGE_SIZE+r, i]);
+                    }
+                }
             }
 
             nameToID.Add(label, i - 1);

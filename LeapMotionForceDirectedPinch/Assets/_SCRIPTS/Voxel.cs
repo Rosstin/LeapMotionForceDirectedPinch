@@ -38,7 +38,7 @@ public class Voxel : MonoBehaviour {
     public void setArbitraryBWColor(float value)
     {
         assignRendererIfNull();
-        this.myRenderer.material.color = new Color(value, value, value, 1.0f);
+        this.myRenderer.material.color = new Color(1.0f-value, 1.0f-value, 1.0f-value, 1.0f);
     }
 
 }
