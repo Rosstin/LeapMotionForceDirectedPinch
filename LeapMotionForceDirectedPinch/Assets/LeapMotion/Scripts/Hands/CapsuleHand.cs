@@ -38,9 +38,9 @@ namespace Leap.Unity{
     private List<Transform> _sphereBTransforms;
   
     private Transform armFrontLeft, armFrontRight, armBackLeft, armBackRight;
-    private Hand hand_;
+    [Tooltip("Don't put anything here in-editor.")] public Hand hand_;
 
-    public Transform thumbTip;
+    [Tooltip("Don't put anything here in-editor.")] public Transform thumbTip;
 
     public override ModelType HandModelType {
       get {

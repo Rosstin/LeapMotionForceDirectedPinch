@@ -174,6 +174,8 @@ public class GenerateGraph : MonoBehaviour {
 
         preGraphGeneration();
 
+
+
         TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
 		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
 		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
@@ -593,7 +595,21 @@ public class GenerateGraph : MonoBehaviour {
 	}
 
 
-	IEnumerator ProcessNodesCoroutine() {
+    IEnumerator GenerateGraphCoroutine()
+    {
+        while (true)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                ProcessNodes();
+            }
+            yield return null;
+        }
+    }
+
+
+
+    IEnumerator ProcessNodesCoroutine() {
 		while (true) {
 			for (int j = 0; j < 2; j++) {
 				ProcessNodes ();

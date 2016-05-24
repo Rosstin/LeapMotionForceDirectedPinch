@@ -51,6 +51,18 @@ public class HandsRaycast : MonoBehaviour {
 	public GameObject sceneGod;
 	GenerateGraph graphGenerator;
 
+    // handles two-handed action of palm proximity
+    int palmState = 0;
+    static public int PALM_STATE_NORMAL = 0;
+    static public int PALM_STATE_GROUP_SELECTED = 501;
+
+    float palmSelectionTime = 0.0f;
+    float palmDeselectionTime = 0.0f;
+    public static float PALM_SELECTION_TIME_THRESHHOLD = 1.0f;
+    public static float PALM_DESELECTION_TIME_THRESHHOLD = 2.0f;
+
+    public static float TWO_HAND_PROXIMITY_CONSTANT = 0.10f;
+
 	//Node[] nodes;
 
 	int stateR;
@@ -110,6 +122,8 @@ public class HandsRaycast : MonoBehaviour {
 
 		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
 		HandlePinches (rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
+
+        HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
 
         if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
 			graphGenerator.explodeSelectedNode (highlightedObjectL);
@@ -201,7 +215,6 @@ public class HandsRaycast : MonoBehaviour {
 			slider.handUsed = handedness;
 
 			// do things related to starting a drag
-
 		}
 
 		if (slider.state == slider.DRAGGING && slider.handUsed == handedness) {
@@ -226,7 +239,42 @@ public class HandsRaycast : MonoBehaviour {
 		}
 	}
 
-	void HandlePinches(CapsuleHand hand, LeapPinchDetector detector, int handedness) {
+    void HandleTwoHandedActions(CapsuleHand lHand, LeapPinchDetector lDetector, CapsuleHand rHand, LeapPinchDetector rDetector)
+    {
+        float palmDistance = lHand.hand_.PalmPosition.DistanceTo(rHand.hand_.PalmPosition);
+        if (palmState == PALM_STATE_GROUP_SELECTED)
+        {
+
+            if(palmDistance > TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
+            {
+                palmDeselectionTime += Time.deltaTime;
+                if(palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD)
+                {
+                    print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
+
+                    palmState = PALM_STATE_NORMAL;
+                    palmSelectionTime = 0.0f;
+                }
+            }
+        }
+
+        else if(palmState == PALM_STATE_NORMAL)
+        {
+            if (palmDistance < TWO_HAND_PROXIMITY_CONSTANT)
+            {
+                palmSelectionTime += Time.deltaTime;
+                if(palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD)
+                {
+                    print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
+
+                    palmState = PALM_STATE_GROUP_SELECTED;
+                    palmDeselectionTime = 0.0f;
+                }
+            }
+        }
+    }
+
+    void HandlePinches(CapsuleHand hand, LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
@@ -234,6 +282,7 @@ public class HandsRaycast : MonoBehaviour {
         // GET POSITION OF EVENT
         //Vector3 p = detector.Position;
         Vector3 p = hand.thumbTip.transform.position;
+
 		// camera to pinch vector
 		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
 
