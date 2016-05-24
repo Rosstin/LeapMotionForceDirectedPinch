@@ -10,7 +10,12 @@ public class GenerateGraph : MonoBehaviour {
 
 	public Camera playerCamera; //aka centereyeanchor
 
-	float CHARGE_CONSTANT = 0.5f;
+    string nodeFileForCoroutine;
+    string edgeFileForCoroutine;
+    int graphTypeForCoroutine;
+    int dataTypeForCoroutine;
+
+    float CHARGE_CONSTANT = 0.5f;
 	float SPRING_CONSTANT = 4.0f;
 
 	float CHANCE_OF_CONNECTION = 0.09f;
@@ -47,9 +52,11 @@ public class GenerateGraph : MonoBehaviour {
 	static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
 	static float EXPLOSION_TIME_3 = 12.0f; // after this time, show relations of relations of the selected node
 
-	public bool detailingMode = false; // disable or enable the ability to explode a node
+    [Tooltip("Don't put anything here in-editor.")] public bool detailingMode = false; // disable or enable the ability to explode a node
 
-	Dictionary<string, int> nameToID = new Dictionary<string, int> ();
+    [Tooltip("Don't put anything here in-editor.")] public bool interactionReady = false;
+
+    Dictionary<string, int> nameToID = new Dictionary<string, int> ();
 
     [Tooltip("Don't put anything here in-editor.")] public GameObject nodeContainer; //DON'T put a nodecontainer object here in-editor
 	Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
@@ -69,7 +76,18 @@ public class GenerateGraph : MonoBehaviour {
 
         //generate2DGraphFromCSV();
 
-        generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
+        //generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
+
+
+
+        nodeFileForCoroutine = "b3_node";
+        edgeFileForCoroutine = "b3_edgelist";
+        graphTypeForCoroutine = GRAPH_3D;
+        dataTypeForCoroutine = DATA_TWITTER;
+
+        StartCoroutine("generateGraphFromCSVCoroutine");
+
+        //generateGraphFromCSVCoroutine("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
         //generateGraphFromCSV("nodelist_MNIST", "edgelist_MNIST", GRAPH_2D, DATA_MNIST);
         //generateGraphRandomly();
 
@@ -77,6 +95,7 @@ public class GenerateGraph : MonoBehaviour {
 
     public void preGraphGeneration()
     {
+        interactionReady = false;
         nodeContainer = Instantiate(Resources.Load("NodeContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
         myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
         myLeapRTS._pinchDetectorA = pinchDetectorA;
@@ -92,6 +111,7 @@ public class GenerateGraph : MonoBehaviour {
 
     public void postGraphGeneration()
     {
+        
         RenderLinesOnce();
         HideAllLines();
 
@@ -99,6 +119,8 @@ public class GenerateGraph : MonoBehaviour {
         nodeContainerOriginalPosition = nodeContainer.transform.position;
 
         showLegalNodesBasedOnFilterSettings() ;
+
+        interactionReady = true;
     }
 
     public void explodeSelectedNode(Node highlightedNode) {
@@ -168,54 +190,81 @@ public class GenerateGraph : MonoBehaviour {
     }
 
     public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality, int type){
-
-
         // reading the data takes for ever, but loading node position takes no time... you can probably preload the data somehow
 
         preGraphGeneration();
+        //print("finished preGraphGeneration");
 
+        parseGraph(nodeAsset, dimensionality, type);
+        //print("finished parseGraph");
 
-
-        TextAsset edgesText = Resources.Load (edgeAsset) as TextAsset;
-		string[,] edgesGrid = CSVReader.SplitCsvGrid (edgesText.text);
-		int numberOfEdges = edgesGrid.GetUpperBound(1)-1;
-
-		TextAsset positionsText = Resources.Load (nodeAsset) as TextAsset;
-		string[,] positionsGrid = CSVReader.SplitCsvGrid (positionsText.text);
-		int numberOfNodes = positionsGrid.GetUpperBound(1)-1;
-
-		masterNodeList = new Node[numberOfNodes];
-		indicesToShowOrExplode = new int[numberOfNodes];
-
-		print ("masterNodeList.Length: " + masterNodeList.Length);
-
-        parseGraph(positionsGrid, dimensionality, type);
-
-        // add edges
-        for (int i = 1; i < numberOfEdges; i++) {
-
-			//Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
-
-			//print ("edgesGrid [0, i]: " + edgesGrid [0, i] + "... edgesGrid [1,i]: " + edgesGrid [1,i] );
-
-			int source = nameToID[(edgesGrid [0,i])]; // source
-			int target = nameToID[(edgesGrid [1,i])]; // target
-            float weight = float.Parse(edgesGrid [2,i]);
-
-			int s = (int) source;
-			int t = (int) target;
-            float w = weight;
-
-			addEdgeToAdjacencyListAfterValidation (s, t, w);
-		}
+        parseEdges(edgeAsset);
+        //print("finished parseEdges");
 
         postGraphGeneration();
+        //print("finished postGraphGeneration");
 
     }
 
-    void parseGraph(string[,] myPositionsGrid, int dimensionality, int type)
+    IEnumerator generateGraphFromCSVCoroutine()
     {
+        print("pre preGraphGeneration");
+        preGraphGeneration();
+        print("finished preGraphGeneration");
+        yield return null;
+
+        print("pre parseGraph");
+        parseGraph(nodeFileForCoroutine, graphTypeForCoroutine, dataTypeForCoroutine);
+        print("finished parseGraph");
+        yield return null;
+
+        print("pre parseEdges");
+        parseEdges(edgeFileForCoroutine);
+        print("finished parseEdges");
+        yield return null;
+
+        print("pre postGraphGeneration");
+        postGraphGeneration();
+        print("finished postGraphGeneration");
+        yield return null;
+    }
+
+
+    void parseEdges(string edgeAsset)
+    {
+        TextAsset edgesText = Resources.Load(edgeAsset) as TextAsset;
+        string[,] edgesGrid = CSVReader.SplitCsvGrid(edgesText.text);
+        int numberOfEdges = edgesGrid.GetUpperBound(1) - 1;
+
+        // add edges
+        for (int i = 1; i < numberOfEdges; i++)
+        {
+
+            //Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
+
+            //print ("edgesGrid [0, i]: " + edgesGrid [0, i] + "... edgesGrid [1,i]: " + edgesGrid [1,i] );
+
+            int source = nameToID[(edgesGrid[0, i])]; // source
+            int target = nameToID[(edgesGrid[1, i])]; // target
+            float weight = float.Parse(edgesGrid[2, i]);
+
+            int s = (int)source;
+            int t = (int)target;
+            float w = weight;
+
+            addEdgeToAdjacencyListAfterValidation(s, t, w);
+        }
+    }
+
+    void parseGraph(string nodeAsset, int dimensionality, int type)
+    {
+
+        TextAsset positionsText = Resources.Load(nodeAsset) as TextAsset;
+        string[,] myPositionsGrid = CSVReader.SplitCsvGrid(positionsText.text);
         int numberOfNodes = myPositionsGrid.GetUpperBound(1) - 1;
+
+        masterNodeList = new Node[numberOfNodes];
+        indicesToShowOrExplode = new int[numberOfNodes];
 
         // add nodes
         for (int i = 1; (i < numberOfNodes + 1); i++)
@@ -593,21 +642,6 @@ public class GenerateGraph : MonoBehaviour {
 		//ProcessNodes ();
 
 	}
-
-
-    IEnumerator GenerateGraphCoroutine()
-    {
-        while (true)
-        {
-            for (int j = 0; j < 2; j++)
-            {
-                ProcessNodes();
-            }
-            yield return null;
-        }
-    }
-
-
 
     IEnumerator ProcessNodesCoroutine() {
 		while (true) {

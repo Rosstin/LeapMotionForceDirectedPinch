@@ -118,22 +118,34 @@ public class HandsRaycast : MonoBehaviour {
     }
 
     void FixedUpdate () {
-		UpdateControlPanel ();
 
-		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
-		HandlePinches (rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
+        if (graphGenerator.interactionReady) { 
 
-        HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
+		    UpdateControlPanel ();
 
-        if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
-			graphGenerator.explodeSelectedNode (highlightedObjectL);
-		} 
+            if(leftCapsuleHandScript.thumbTip != null)
+            { 
+    		    HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
+            }
+            if (rightCapsuleHandScript.thumbTip != null)
+            {
+                HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
+            }
 
-		if (stateR == STATE_DRAGGING) {
-			graphGenerator.explodeSelectedNode (highlightedObjectR);
-		}
+            if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
+                HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
+            }
 
-	}
+            if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
+			    graphGenerator.explodeSelectedNode (highlightedObjectL);
+		    } 
+
+		    if (stateR == STATE_DRAGGING) {
+			    graphGenerator.explodeSelectedNode (highlightedObjectR);
+		    }
+        }
+
+    }
 
     void NeutralizeButtonState() // neutralize state of all buttons in when you leave
     {
@@ -281,6 +293,7 @@ public class HandsRaycast : MonoBehaviour {
 
         // GET POSITION OF EVENT
         //Vector3 p = detector.Position;
+
         Vector3 p = hand.thumbTip.transform.position;
 
 		// camera to pinch vector
