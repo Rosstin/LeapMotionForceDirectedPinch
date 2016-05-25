@@ -126,13 +126,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af03d2861c91ba64a89712883f1368b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  charge: 1
-  mass: 1
   color: {r: 0, g: 0, b: 0, a: 0}
   selectedColor: {r: 0, g: 1, b: 0, a: 1}
   hoveredColor: {r: 0, g: 1, b: 0, a: 1}
   degree: 0
   followerCount: 0
+  group: 0
   timeSelected: 0
   myTextMeshGameObject: {fileID: 0}
   myTextMesh: {fileID: 0}
@@ -143,6 +142,8 @@ MonoBehaviour:
   x_2d: 0
   y_2d: 0
   endPosition_2d: {x: 0, y: 0, z: 0}
+  charge: 1
+  mass: 1
 --- !u!114 &69823797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3436,7 +3437,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 492502, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: ModelCollection.Array.data[0]

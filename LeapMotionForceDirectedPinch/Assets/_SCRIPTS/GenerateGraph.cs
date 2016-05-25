@@ -68,7 +68,7 @@ public class GenerateGraph : MonoBehaviour {
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
 	public Node[] masterNodeList;
-    public Dictionary<int, GameObject> nodeGroups;
+    public Dictionary<int, NodeGroup> nodeGroups;
 	int[] indicesToShowOrExplode;
 
     GameObject voxelCanvasContainer;
@@ -100,7 +100,7 @@ public class GenerateGraph : MonoBehaviour {
         nodeContainer = Instantiate(Resources.Load("NodeContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
         voxelCanvasContainer = Instantiate(Resources.Load("VoxelCanvasContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
 
-        nodeGroups = new Dictionary<int, GameObject>();
+        nodeGroups = new Dictionary<int, NodeGroup>();
 
         myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
         myLeapRTS._pinchDetectorA = pinchDetectorA;
@@ -129,7 +129,9 @@ public class GenerateGraph : MonoBehaviour {
 
         voxelCanvasContainer.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
 
-        showLegalNodesBasedOnFilterSettings() ;
+        showLegalNodesBasedOnFilterSettings();
+
+        changeNodeDimensionality(graphTypeForCoroutine);
 
         interactionReady = true;
     }
@@ -157,6 +159,14 @@ public class GenerateGraph : MonoBehaviour {
         print("finished preGraphGeneration");
         yield return null;
 
+        if (metadataFileForCoroutine != "none")
+        {
+            print("pre parseMetadata");
+            parseMetadata(metadataFileForCoroutine);
+            print("finished parseMetadata");
+            yield return null;
+        }
+
         print("pre parseGraph");
         parseGraph(nodeFileForCoroutine, graphTypeForCoroutine, dataTypeForCoroutine);
         print("finished parseGraph");
@@ -167,13 +177,6 @@ public class GenerateGraph : MonoBehaviour {
         print("finished parseEdges");
         yield return null;
 
-        if (metadataFileForCoroutine != "none")
-        {
-            print("pre parseMetadata");
-            parseMetadata(metadataFileForCoroutine);
-            print("finished parseMetadata");
-            yield return null;
-        }
 
         print("pre postGraphGeneration");
         postGraphGeneration();
@@ -297,27 +300,30 @@ public class GenerateGraph : MonoBehaviour {
 
 
 
-            GameObject nodeGroup;
+            NodeGroup nodeGroupWrapperObject;
             // if this is a new key, make a new group
             if(!nodeGroups.ContainsKey(masterNodeList[i - 1].nodeForce.group))
             {
-                // add the group
-                // we should think about the transform/parent thing here
-                nodeGroup = Instantiate(Resources.Load("NodeGroupContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
-                nodeGroup.transform.parent = nodeContainer.transform;
+                GameObject nodeGroupObject = Instantiate(Resources.Load("NodeGroupContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
+                nodeGroupWrapperObject = new NodeGroup(nodeGroupObject);
+
+                nodeGroupWrapperObject.nodeGroupContainerScript.groupNumber = masterNodeList[i - 1].nodeForce.group;
+
+                nodeGroupWrapperObject.gameObject.transform.parent = nodeContainer.transform;
 
                 nodeGroups.Add(
                     masterNodeList[i - 1].nodeForce.group,
-                    nodeGroup
+                    nodeGroupWrapperObject
                     );
             }
             else // give access to the existing group
             {
-                nodeGroup = nodeGroups[masterNodeList[i - 1].nodeForce.group];
+                nodeGroupWrapperObject = nodeGroups[masterNodeList[i - 1].nodeForce.group];
             }
             masterNodeList[i - 1].nodeForce.SetColorByGroup(masterNodeList[i - 1].nodeForce.group);
 
-            masterNodeList[i - 1].gameObject.transform.parent = nodeGroup.transform; // not sure if this is gonna work right, off the bat
+            masterNodeList[i - 1].gameObject.transform.parent = nodeGroupWrapperObject.gameObject.transform; // not sure if this is gonna work right, off the bat
 
             // populate an array for the mnist image
             if (type == DATA_MNIST)
@@ -342,31 +348,90 @@ public class GenerateGraph : MonoBehaviour {
         TextAsset metaText = Resources.Load(metaAsset) as TextAsset;
         string[,] metaGrid = CSVReader.SplitCsvGrid(metaText.text);
         int numberOfGroups = metaGrid.GetUpperBound(1) - 1;
+
+        for (int i = 1; (i < numberOfGroups + 1); i++)
+        {
+
+            // add the group
+
+            GameObject nodeGroupObject = Instantiate(Resources.Load("NodeGroupContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
+            NodeGroup nodeGroupWrapperObject = new NodeGroup(nodeGroupObject);
+
+            int currentGroupNumber = (int)float.Parse(metaGrid[0, i]);
+
+            nodeGroupWrapperObject.nodeGroupContainerScript.groupNumber = currentGroupNumber;
+
+            nodeGroupWrapperObject.gameObject.transform.parent = nodeContainer.transform;
+
+            // give the group its centroid
+
+
+            float x_3d = float.Parse(metaGrid[1, i]) * GRAPH_SCALE_CONSTANT;
+            float y_3d = float.Parse(metaGrid[2, i]) * GRAPH_SCALE_CONSTANT;
+            float z_3d = float.Parse(metaGrid[3, i]) * GRAPH_SCALE_CONSTANT;
+
+            GameObject centroidGameObject = 
+                Instantiate(Resources.Load("GroupCentroid") as GameObject,
+                    new Vector3(
+                        x_3d,
+                        y_3d,
+                        z_3d
+                    ),
+                    Quaternion.identity)
+                as GameObject;
+
+            centroidGameObject.transform.parent = nodeGroupWrapperObject.gameObject.transform;
+
+            GroupCentroidReferences groupCentroidReferenceObject = new GroupCentroidReferences(centroidGameObject);
+
+            nodeGroupWrapperObject.nodeGroupContainerScript.centroid = groupCentroidReferenceObject;
+
+            groupCentroidReferenceObject.groupCentroidScript.x_3d = x_3d;
+            groupCentroidReferenceObject.groupCentroidScript.y_3d = y_3d;
+            groupCentroidReferenceObject.groupCentroidScript.z_3d = z_3d;
+
+            nodeGroups.Add(
+                currentGroupNumber,
+                nodeGroupWrapperObject
+                );
+
+            groupCentroidReferenceObject.groupCentroidScript.SetColorByGroup(currentGroupNumber);
+
+        }
+
+        // put a centroid object in every group
+        // give a reference to the centroid object to the group?
+        // give the centroid object a reference to the group?
+        // centroid color should match group color
+
+
+
+    }
+
+    void randomlyPlaceNodes()
+    { //also adds vertexes to adjacencylist
+        int numNodes = masterNodeList.Length;
+        // add nodes
+        for (int i = 0; i < numNodes; i++)
+        {
+
+            // add vertexes
+            if (i != 0) { adjacencyList.AddVertex(i); }
+
+            GameObject myNodeInstance =
+                Instantiate(Resources.Load("Node") as GameObject,
+                    new Vector3(Random.Range(-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range(-NODE_SPREAD_Y, NODE_SPREAD_Y), Random.Range(-NODE_SPREAD_Z, NODE_SPREAD_Z)),
+                    Quaternion.identity) as GameObject;
+
+            myNodeInstance.transform.parent = nodeContainer.transform;
+
+            masterNodeList[i] = new Node(myNodeInstance, i);
+        }
     }
 
 
-    void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
-		int numNodes = masterNodeList.Length;
-		// add nodes
-		for (int i = 0; i < numNodes; i++) {
-
-			// add vertexes
-			if (i != 0) { adjacencyList.AddVertex (i);}
-
-			GameObject myNodeInstance = 
-				Instantiate (Resources.Load("Node") as GameObject,
-					new Vector3 (Random.Range (-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range (-NODE_SPREAD_Y, NODE_SPREAD_Y), Random.Range (-NODE_SPREAD_Z, NODE_SPREAD_Z)),
-					Quaternion.identity) as GameObject;
-
-			myNodeInstance.transform.parent = nodeContainer.transform;
-
-			masterNodeList [i] = new Node (myNodeInstance, i); 
-
-
-		}
-	}
-
-	public void NodesAreDraggable(bool draggable){
+    public void NodesAreDraggable(bool draggable){
 		if (draggable) {
 			myLeapRTS.enabled = true;
 		} else {
@@ -394,6 +459,13 @@ public class GenerateGraph : MonoBehaviour {
         {
             masterNodeList[i].nodeForce.crawlTowardsNewPosition(dimensionality);
         }
+
+        foreach(int key in nodeGroups.Keys)
+        {
+            nodeGroups[key].nodeGroupContainerScript.centroid.groupCentroidScript.crawlTowardsNewPosition(dimensionality);
+        }
+
+
     }
 
 
