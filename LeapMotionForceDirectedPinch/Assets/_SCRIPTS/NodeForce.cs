@@ -13,8 +13,9 @@ public class NodeForce : MonoBehaviour { // place this script on the node
 
 	public int degree;
     public int followerCount;
+    public int group;
 
-	public float timeSelected = 0.0f;
+    public float timeSelected = 0.0f;
 
 	bool selected = false;
 

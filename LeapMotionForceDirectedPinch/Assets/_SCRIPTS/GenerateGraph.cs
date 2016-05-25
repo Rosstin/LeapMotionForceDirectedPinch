@@ -2,16 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-// TODO: read in the data
-// TODO: improve speed/performance, only update a subset of the nodes each call
-// TODO: 
-
 public class GenerateGraph : MonoBehaviour {
 
 	public Camera playerCamera; //aka centereyeanchor
 
     string nodeFileForCoroutine;
     string edgeFileForCoroutine;
+    string metadataFileForCoroutine = "none";
     int graphTypeForCoroutine;
     int dataTypeForCoroutine;
 
@@ -71,6 +68,7 @@ public class GenerateGraph : MonoBehaviour {
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
 	public Node[] masterNodeList;
+    public Dictionary<string, GameObject> nodeGroups;
 	int[] indicesToShowOrExplode;
 
     GameObject voxelCanvasContainer;
@@ -84,6 +82,7 @@ public class GenerateGraph : MonoBehaviour {
 
         nodeFileForCoroutine = "mnist_node_image";
         edgeFileForCoroutine = "mnist_edge";
+        metadataFileForCoroutine = "mnist_metadata";
         graphTypeForCoroutine = GRAPH_3D;
         dataTypeForCoroutine = DATA_MNIST;
 
@@ -133,103 +132,6 @@ public class GenerateGraph : MonoBehaviour {
         interactionReady = true;
     }
 
-    public void generateVoxelCanvasForHighlightedNode(Node myNode)
-    {
-        GameObject model = Instantiate(Resources.Load("Voxel") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
-        float edgewidth = model.GetComponent<Renderer>().bounds.size.x;
-        model.SetActive(false);
-
-        GameObject voxelCanvas = Instantiate(Resources.Load("VoxelCanvas") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
-
-        for (int i = 0; i < MNIST_IMAGE_SIZE; i++)
-        {
-            for (int j = 0; j < MNIST_IMAGE_SIZE; j++)
-            {
-                GameObject currentVoxel = Instantiate(Resources.Load("Voxel") as GameObject,
-                    new Vector3(
-                        0.0f + j * edgewidth,
-                        0.0f + (MNIST_IMAGE_SIZE-1-i) * edgewidth,
-                        0.0f),
-                    Quaternion.identity) as GameObject;
-
-                currentVoxel.GetComponent<Voxel>().setArbitraryBWColor(myNode.nodeForce.image[i,j]);
-
-                currentVoxel.transform.parent = voxelCanvas.transform;
-            }
-        }
-
-        voxelCanvas.transform.parent = voxelCanvasContainer.transform;
-
-        voxelCanvas.transform.localPosition = myNode.gameObject.transform.localPosition;
-
-
-    }
-
-    public void explodeSelectedNode(Node highlightedNode) {
-		if (highlightedNode != null && detailingMode == true) {
-			float time = highlightedNode.nodeForce.timeSelected;
-
-			// show more connections over time // only do these once!
-
-            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
-
-				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
-
-				foreach (int subIndex in myList) {
-					showConnectedNodes (adjacencyList.GetEdgesForVertex (subIndex), subIndex);
-				}
-
-			}
-			else if (time >= EXPLOSION_TIME_2 && ((time - Time.deltaTime) < EXPLOSION_TIME_2)) {
-                // a list of vertices... show every vertex here
-
-                showConnectedNodes(adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
-
-
-			} else if (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1)) {
-
-                // hide all other nodes
-                hideNodes();
-                highlightedNode.gameObject.SetActive(true);
-                highlightedNode.nodeForce.ActivateText();
-
-                if (dataTypeForCoroutine == DATA_MNIST)
-                {
-                    generateVoxelCanvasForHighlightedNode(highlightedNode);
-                }
-            }
-
-
-        }
-
-	}
-
-	public void unselectNode(){
-        showLegalNodesBasedOnFilterSettings();
-
-        destroyVoxelCanvases();
-
-		hideLabels ();
-
-		HideAllLines (); 
-	}
-
-    void destroyVoxelCanvases()
-    {
-        int numberOfChildren = voxelCanvasContainer.transform.childCount;
-
-        for( var i = numberOfChildren-1; i >=0; i--)
-        {
-            GameObject voxelCanvas = voxelCanvasContainer.transform.GetChild(i).gameObject;
-            int numberOfVoxels = voxelCanvas.transform.childCount;
-            for(var j = numberOfVoxels-1; j >=0; j--)
-            {
-                Destroy(voxelCanvas.transform.GetChild(i).gameObject);
-            }
-            Destroy(voxelCanvas);
-        }
-
-    }
 
 
 
@@ -244,23 +146,6 @@ public class GenerateGraph : MonoBehaviour {
         }
 
         // todo destroy the voxel container too
-
-    }
-
-    public void generateGraphFromCSV(string nodeAsset, string edgeAsset, int dimensionality, int type){
-        // reading the data takes for ever, but loading node position takes no time... you can probably preload the data somehow
-
-        preGraphGeneration();
-        //print("finished preGraphGeneration");
-
-        parseGraph(nodeAsset, dimensionality, type);
-        //print("finished parseGraph");
-
-        parseEdges(edgeAsset);
-        //print("finished parseEdges");
-
-        postGraphGeneration();
-        //print("finished postGraphGeneration");
 
     }
 
@@ -280,6 +165,14 @@ public class GenerateGraph : MonoBehaviour {
         parseEdges(edgeFileForCoroutine);
         print("finished parseEdges");
         yield return null;
+
+        if (metadataFileForCoroutine != "none")
+        {
+            print("pre parseMetadata");
+            parseMetadata(metadataFileForCoroutine);
+            print("finished parseMetadata");
+            yield return null;
+        }
 
         print("pre postGraphGeneration");
         postGraphGeneration();
@@ -389,19 +282,21 @@ public class GenerateGraph : MonoBehaviour {
 
             nodeScript.SetScaleFromDegree(nodeScript.degree);
 
-            myNodeInstance.transform.parent = nodeContainer.transform;
-
             masterNodeList[i - 1] = new Node(myNodeInstance, i - 1);
 
             if (type==DATA_TWITTER)
             {
-                masterNodeList[i - 1].nodeForce.SetColorByGroup(int.Parse(myPositionsGrid[3, i]));
+                masterNodeList[i - 1].nodeForce.group = int.Parse(myPositionsGrid[3, i]);
                 masterNodeList[i - 1].nodeForce.followerCount = (int) float.Parse(myPositionsGrid[4, i]);
             }
             else if (type==DATA_MNIST)
             {
-                masterNodeList[i - 1].nodeForce.SetColorByGroup((int)float.Parse(myPositionsGrid[1, i]));
+                masterNodeList[i - 1].nodeForce.group = (int)float.Parse(myPositionsGrid[1, i]);
             }
+
+            masterNodeList[i - 1].nodeForce.SetColorByGroup(masterNodeList[i - 1].nodeForce.group);
+
+            myNodeInstance.transform.parent = nodeContainer.transform;
 
             // populate an array for the mnist image
             if (type == DATA_MNIST)
@@ -420,6 +315,14 @@ public class GenerateGraph : MonoBehaviour {
         }
 
     }
+
+    void parseMetadata(string metaAsset)
+    {
+        TextAsset metaText = Resources.Load(metaAsset) as TextAsset;
+        string[,] metaGrid = CSVReader.SplitCsvGrid(metaText.text);
+        int numberOfGroups = metaGrid.GetUpperBound(1) - 1;
+    }
+
 
     void randomlyPlaceNodes(){ //also adds vertexes to adjacencylist
 		int numNodes = masterNodeList.Length;
@@ -724,17 +627,6 @@ public class GenerateGraph : MonoBehaviour {
 
 
 
-    // Update is called once per frame
-    void Update () {
-
-		//nodeContainer.transform.Rotate (0, Time.deltaTime*10, 0);
-
-		// update only one per frame? don't update every node every frame
-		// render lines
-
-		//ProcessNodes ();
-
-	}
 
     IEnumerator ProcessNodesCoroutine() {
 		while (true) {
@@ -764,6 +656,8 @@ public class GenerateGraph : MonoBehaviour {
 
 	}
 
+
+    // todo: this is a terrible, slow method. avoid using it
 	void RenderLinesOnce () { 
 		for(int i = 0; i < masterNodeList.Length-1; i++){
 			for (int j = 0; j < masterNodeList.Length-1; j++) {
@@ -779,6 +673,113 @@ public class GenerateGraph : MonoBehaviour {
 			item.Value.enabled = false;
 		}
 	}
+
+    public void generateVoxelCanvasForHighlightedNode(Node myNode)
+    {
+        GameObject model = Instantiate(Resources.Load("Voxel") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+        float edgewidth = model.GetComponent<Renderer>().bounds.size.x;
+        model.SetActive(false);
+
+        GameObject voxelCanvas = Instantiate(Resources.Load("VoxelCanvas") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
+        for (int i = 0; i < MNIST_IMAGE_SIZE; i++)
+        {
+            for (int j = 0; j < MNIST_IMAGE_SIZE; j++)
+            {
+                GameObject currentVoxel = Instantiate(Resources.Load("Voxel") as GameObject,
+                    new Vector3(
+                        0.0f + j * edgewidth,
+                        0.0f + (MNIST_IMAGE_SIZE - 1 - i) * edgewidth,
+                        0.0f),
+                    Quaternion.identity) as GameObject;
+
+                currentVoxel.GetComponent<Voxel>().setArbitraryBWColor(myNode.nodeForce.image[i, j]);
+
+                currentVoxel.transform.parent = voxelCanvas.transform;
+            }
+        }
+
+        voxelCanvas.transform.parent = voxelCanvasContainer.transform;
+
+        voxelCanvas.transform.localPosition = myNode.gameObject.transform.localPosition;
+
+
+    }
+
+    public void explodeSelectedNode(Node highlightedNode)
+    {
+        if (highlightedNode != null && detailingMode == true)
+        {
+            float time = highlightedNode.nodeForce.timeSelected;
+
+            // show more connections over time // only do these once!
+
+            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3))
+            {
+
+                List<int> myList = adjacencyList.GetEdgesForVertex(highlightedNode.index);
+
+                foreach (int subIndex in myList)
+                {
+                    showConnectedNodes(adjacencyList.GetEdgesForVertex(subIndex), subIndex);
+                }
+
+            }
+            else if (time >= EXPLOSION_TIME_2 && ((time - Time.deltaTime) < EXPLOSION_TIME_2))
+            {
+                // a list of vertices... show every vertex here
+
+                showConnectedNodes(adjacencyList.GetEdgesForVertex(highlightedNode.index), highlightedNode.index);
+
+
+            }
+            else if (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1))
+            {
+
+                // hide all other nodes
+                hideNodes();
+                highlightedNode.gameObject.SetActive(true);
+                highlightedNode.nodeForce.ActivateText();
+
+                if (dataTypeForCoroutine == DATA_MNIST)
+                {
+                    generateVoxelCanvasForHighlightedNode(highlightedNode);
+                }
+            }
+
+
+        }
+
+    }
+
+    public void unselectNode()
+    {
+        showLegalNodesBasedOnFilterSettings();
+
+        destroyVoxelCanvases();
+
+        hideLabels();
+
+        HideAllLines();
+    }
+
+    void destroyVoxelCanvases()
+    {
+        int numberOfChildren = voxelCanvasContainer.transform.childCount;
+
+        for (var i = numberOfChildren - 1; i >= 0; i--)
+        {
+            GameObject voxelCanvas = voxelCanvasContainer.transform.GetChild(i).gameObject;
+            int numberOfVoxels = voxelCanvas.transform.childCount;
+            for (var j = numberOfVoxels - 1; j >= 0; j--)
+            {
+                Destroy(voxelCanvas.transform.GetChild(i).gameObject);
+            }
+            Destroy(voxelCanvas);
+        }
+
+    }
+
 
 
 
