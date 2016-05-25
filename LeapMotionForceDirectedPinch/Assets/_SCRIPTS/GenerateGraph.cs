@@ -68,7 +68,7 @@ public class GenerateGraph : MonoBehaviour {
 	AdjacencyList adjacencyList = new AdjacencyList(0);
 
 	public Node[] masterNodeList;
-    public Dictionary<string, GameObject> nodeGroups;
+    public Dictionary<int, GameObject> nodeGroups;
 	int[] indicesToShowOrExplode;
 
     GameObject voxelCanvasContainer;
@@ -99,6 +99,8 @@ public class GenerateGraph : MonoBehaviour {
         interactionReady = false;
         nodeContainer = Instantiate(Resources.Load("NodeContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
         voxelCanvasContainer = Instantiate(Resources.Load("VoxelCanvasContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+
+        nodeGroups = new Dictionary<int, GameObject>();
 
         myLeapRTS = nodeContainer.GetComponent<Leap.Unity.PinchUtility.LeapRTS>();
         myLeapRTS._pinchDetectorA = pinchDetectorA;
@@ -132,21 +134,20 @@ public class GenerateGraph : MonoBehaviour {
         interactionReady = true;
     }
 
-
-
-
     public void destroyOldGraph() // use this to destroy the previous graph // should call generateGraph after this
     {
         int numberOfChildren = nodeContainer.transform.childCount;
-        print("nodeContainer.transform.childCount: " + nodeContainer.transform.childCount);
 
         for( var i = numberOfChildren -1; i >=0; i--) // destroy all the children in the container (the nodes and edges)
         {
-            Destroy(nodeContainer.transform.GetChild(i).gameObject);
+            GameObject nodeGroupContainer = nodeContainer.transform.GetChild(i).gameObject;
+            int numberOfNodes = nodeGroupContainer.transform.childCount;
+            for(var j = numberOfNodes-1; j>=0; j--)
+            {
+                Destroy(nodeGroupContainer.transform.GetChild(i).gameObject);
+            }
+            Destroy(nodeGroupContainer);
         }
-
-        // todo destroy the voxel container too
-
     }
 
     IEnumerator generateGraphFromCSVCoroutine()
@@ -294,9 +295,29 @@ public class GenerateGraph : MonoBehaviour {
                 masterNodeList[i - 1].nodeForce.group = (int)float.Parse(myPositionsGrid[1, i]);
             }
 
+
+
+            GameObject nodeGroup;
+            // if this is a new key, make a new group
+            if(!nodeGroups.ContainsKey(masterNodeList[i - 1].nodeForce.group))
+            {
+                // add the group
+                // we should think about the transform/parent thing here
+                nodeGroup = Instantiate(Resources.Load("NodeGroupContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
+                nodeGroup.transform.parent = nodeContainer.transform;
+
+                nodeGroups.Add(
+                    masterNodeList[i - 1].nodeForce.group,
+                    nodeGroup
+                    );
+            }
+            else // give access to the existing group
+            {
+                nodeGroup = nodeGroups[masterNodeList[i - 1].nodeForce.group];
+            }
             masterNodeList[i - 1].nodeForce.SetColorByGroup(masterNodeList[i - 1].nodeForce.group);
 
-            myNodeInstance.transform.parent = nodeContainer.transform;
+            masterNodeList[i - 1].gameObject.transform.parent = nodeGroup.transform; // not sure if this is gonna work right, off the bat
 
             // populate an array for the mnist image
             if (type == DATA_MNIST)
@@ -678,7 +699,7 @@ public class GenerateGraph : MonoBehaviour {
     {
         GameObject model = Instantiate(Resources.Load("Voxel") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
         float edgewidth = model.GetComponent<Renderer>().bounds.size.x;
-        model.SetActive(false);
+        Destroy(model);
 
         GameObject voxelCanvas = Instantiate(Resources.Load("VoxelCanvas") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
 
