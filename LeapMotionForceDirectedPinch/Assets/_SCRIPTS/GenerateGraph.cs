@@ -162,9 +162,6 @@ public class GenerateGraph : MonoBehaviour {
 
         voxelCanvas.transform.localPosition = myNode.gameObject.transform.localPosition;
 
-        // put the voxel data into a voxel container
-        // put the voxel container into the nodecontainer
-        // destroy the voxel container and all its children when you're done
 
     }
 
@@ -174,16 +171,7 @@ public class GenerateGraph : MonoBehaviour {
 
 			// show more connections over time // only do these once!
 
-            if(dataTypeForCoroutine == DATA_MNIST && (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1)))
-            {
-                hideNodes();
-                highlightedNode.gameObject.SetActive(true);
-                highlightedNode.nodeForce.ActivateText();
-
-                generateVoxelCanvasForHighlightedNode(highlightedNode);
-            }
-
-            else if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
+            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3)) {
 
 				List<int> myList = adjacencyList.GetEdgesForVertex (highlightedNode.index);
 
@@ -193,17 +181,22 @@ public class GenerateGraph : MonoBehaviour {
 
 			}
 			else if (time >= EXPLOSION_TIME_2 && ((time - Time.deltaTime) < EXPLOSION_TIME_2)) {
-				// a list of vertices... show every vertex here
-				showConnectedNodes (adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
+                // a list of vertices... show every vertex here
+
+                showConnectedNodes(adjacencyList.GetEdgesForVertex (highlightedNode.index), highlightedNode.index);
 
 
 			} else if (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1)) {
-				// hide all other nodes
-				hideNodes ();
-				highlightedNode.gameObject.SetActive (true);
+
+                // hide all other nodes
+                hideNodes();
+                highlightedNode.gameObject.SetActive(true);
                 highlightedNode.nodeForce.ActivateText();
 
-                //HideAllLines();
+                if (dataTypeForCoroutine == DATA_MNIST)
+                {
+                    generateVoxelCanvasForHighlightedNode(highlightedNode);
+                }
             }
 
 
@@ -214,10 +207,29 @@ public class GenerateGraph : MonoBehaviour {
 	public void unselectNode(){
         showLegalNodesBasedOnFilterSettings();
 
+        destroyVoxelCanvases();
+
 		hideLabels ();
 
 		HideAllLines (); 
 	}
+
+    void destroyVoxelCanvases()
+    {
+        int numberOfChildren = voxelCanvasContainer.transform.childCount;
+
+        for( var i = numberOfChildren-1; i >=0; i--)
+        {
+            GameObject voxelCanvas = voxelCanvasContainer.transform.GetChild(i).gameObject;
+            int numberOfVoxels = voxelCanvas.transform.childCount;
+            for(var j = numberOfVoxels-1; j >=0; j--)
+            {
+                Destroy(voxelCanvas.transform.GetChild(i).gameObject);
+            }
+            Destroy(voxelCanvas);
+        }
+
+    }
 
 
 
@@ -508,6 +520,12 @@ public class GenerateGraph : MonoBehaviour {
 				masterNodeList [index].nodeForce.ActivateText ();
 				masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
                 showLinesBetween(index, mainIndex, true);
+
+                if(dataTypeForCoroutine == DATA_MNIST)
+                {
+                    generateVoxelCanvasForHighlightedNode(masterNodeList[index]);
+                }
+
 			}
 
 			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
