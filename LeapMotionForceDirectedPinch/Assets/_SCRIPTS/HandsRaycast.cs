@@ -55,6 +55,7 @@ public class HandsRaycast : MonoBehaviour {
     int palmState = 0;
     static public int PALM_STATE_NORMAL = 0;
     static public int PALM_STATE_GROUP_SELECTED = 501;
+    int selectedKey;
 
     float palmSelectionTime = 0.0f;
     float palmDeselectionTime = 0.0f;
@@ -117,6 +118,23 @@ public class HandsRaycast : MonoBehaviour {
 
     }
 
+    void isHandFist(CapsuleHand handScript, int handedness)
+    {
+        //print("finger0extended: " + handScript.hand_.Fingers[0].IsExtended); // the thumb
+
+        if(!handScript.hand_.Fingers[1].IsExtended && !handScript.hand_.Fingers[2].IsExtended && !handScript.hand_.Fingers[3].IsExtended && !handScript.hand_.Fingers[4].IsExtended)
+        {
+            if(handedness == LEFT) { 
+                print("left hand is fist");
+            }
+            else if (handedness == RIGHT)
+            {
+                print("right hand is fist");
+            }
+        }
+
+    }
+
     void FixedUpdate () {
 
         if (graphGenerator.interactionReady) {
@@ -125,7 +143,10 @@ public class HandsRaycast : MonoBehaviour {
 
             UpdateControlPanel();
 
-            if(leftCapsuleHandScript.thumbTip != null)
+            isHandFist(leftCapsuleHandScript, LEFT);
+            isHandFist(rightCapsuleHandScript, RIGHT);
+
+            if (leftCapsuleHandScript.thumbTip != null)
             { 
     		    HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
             }
@@ -258,12 +279,18 @@ public class HandsRaycast : MonoBehaviour {
         if (palmState == PALM_STATE_GROUP_SELECTED)
         {
 
-            if(palmDistance > TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
+
+
+
+            if (palmDistance > TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
             {
                 palmDeselectionTime += Time.deltaTime;
                 if(palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD)
                 {
                     print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
+
+                    //print("infravision toggled off");
+                    //infravisionQuad.SetActive(false);
 
                     palmState = PALM_STATE_NORMAL;
                     palmSelectionTime = 0.0f;
@@ -279,6 +306,37 @@ public class HandsRaycast : MonoBehaviour {
                 if(palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD)
                 {
                     print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
+
+                    // do a raycast against the centroids
+                    // first, find the point between the two palms
+                    Vector3 p = Vector3.Lerp(lHand.hand_.PalmPosition.ToVector3(), rHand.hand_.PalmPosition.ToVector3(), 0.5f);
+
+                    Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
+                    Vector3 objectVector;
+                    float dotProduct;
+                    float biggestDotProduct = 0.0f;
+
+                    // now raycast versus the face
+
+                    foreach (int key in graphGenerator.nodeGroups.Keys) // todo should check legality once that is implemented
+                    {
+                        objectVector = Vector3.Normalize(graphGenerator.nodeGroups[key].nodeGroupContainerScript.centroid.gameObject.transform.position - playerCamera.transform.position);
+
+                        dotProduct = Vector3.Dot(heading, objectVector);
+
+                        //print("dotProduct: " + dotProduct);
+
+                        if (dotProduct > biggestDotProduct) // should be "if visible" instead
+                        { // dont select nodes that are not visible
+                            biggestDotProduct = dotProduct;
+                            selectedKey = key;
+                        }
+                    }
+
+                    graphGenerator.nodeGroups[selectedKey].nodeGroupContainerScript.centroid.groupCentroidScript.Selected();
+
+                    //print("infravision toggled on");
+                    //infravisionQuad.SetActive(true);
 
                     palmState = PALM_STATE_GROUP_SELECTED;
                     palmDeselectionTime = 0.0f;
@@ -467,6 +525,18 @@ public class HandsRaycast : MonoBehaviour {
             infravisionQuad.SetActive(false);
         }
 
+
+        if (Input.GetKeyDown("c"))
+        {
+            print("show centroids");
+            graphGenerator.showCentroids();
+        }
+
+        if (Input.GetKeyDown("x"))
+        {
+            print("hide centroids");
+            graphGenerator.hideCentroids();
+        }
 
         if (Input.GetKeyDown("d"))
         {

@@ -469,6 +469,23 @@ public class GenerateGraph : MonoBehaviour {
     }
 
 
+    // todo: don't break when we dont have centroids
+    public void hideCentroids()
+    {
+        foreach (int key in nodeGroups.Keys)
+        {
+            nodeGroups[key].nodeGroupContainerScript.centroid.gameObject.SetActive(false);
+        }
+    }
+
+    public void showCentroids()
+    {
+        foreach (int key in nodeGroups.Keys)
+        {
+            nodeGroups[key].nodeGroupContainerScript.centroid.gameObject.SetActive(true);
+        }
+    }
+
     void hideLabels(){
 		for (int i = 0; i < masterNodeList.Length; i++) {
 			masterNodeList [i].nodeForce.DeactivateText();
