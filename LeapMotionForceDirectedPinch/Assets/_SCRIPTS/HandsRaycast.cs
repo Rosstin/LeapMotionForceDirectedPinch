@@ -18,9 +18,8 @@ public class HandsRaycast : MonoBehaviour {
     Collider sliderFollowersCollider;
     Slider sliderFollowersScript;
 
-
     public GameObject PanelContainer;
-    // an object with an array of all buttons should be included 
+    //todo: an object with an array of all buttons should be included 
 
     public GameObject infravisionQuad;
 
@@ -289,6 +288,8 @@ public class HandsRaycast : MonoBehaviour {
                 {
                     print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
 
+                    //graphGenerator.hideCentroids();
+
                     //print("infravision toggled off");
                     //infravisionQuad.SetActive(false);
 
@@ -306,6 +307,8 @@ public class HandsRaycast : MonoBehaviour {
                 if(palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD)
                 {
                     print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
+
+                    //graphGenerator.showCentroids();
 
                     // do a raycast against the centroids
                     // first, find the point between the two palms

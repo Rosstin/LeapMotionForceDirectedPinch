@@ -2,9 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GenerateGraph : MonoBehaviour {
+public class GenerateGraph : MonoBehaviour
+{
 
-	public Camera playerCamera; //aka centereyeanchor
+    public Camera playerCamera; //aka centereyeanchor
 
     string nodeFileForCoroutine;
     string edgeFileForCoroutine;
@@ -13,21 +14,21 @@ public class GenerateGraph : MonoBehaviour {
     int dataTypeForCoroutine;
 
     float CHARGE_CONSTANT = 0.5f;
-	float SPRING_CONSTANT = 4.0f;
+    float SPRING_CONSTANT = 4.0f;
 
-	float CHANCE_OF_CONNECTION = 0.09f;
-	int NUMBER_NODES = 40;
+    float CHANCE_OF_CONNECTION = 0.09f;
+    int NUMBER_NODES = 40;
 
-	int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
+    int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
 
-	float NODE_SPREAD_X = 1.0f;
-	float NODE_SPREAD_Y = 0.8f;
-	float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
-	float NODE_SPREAD_Z = 1.0f;
+    float NODE_SPREAD_X = 1.0f;
+    float NODE_SPREAD_Y = 0.8f;
+    float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
+    float NODE_SPREAD_Z = 1.0f;
 
     public static float DISTANCE_FROM_FACE = 17.0f;
 
-	float GRAPH_SCALE_CONSTANT = 0.005f;
+    float GRAPH_SCALE_CONSTANT = 0.005f;
 
     public static int GRAPH_3D = 100;
     public static int GRAPH_2D = 101;
@@ -39,42 +40,46 @@ public class GenerateGraph : MonoBehaviour {
 
     int NODE_LIMIT = 200;
 
-	int currentIndex = 0;
+    int currentIndex = 0;
 
-	public int NodeDegree = 3; // only show nodes of degree greater than this value
+    public int NodeDegree = 3; // only show nodes of degree greater than this value
     //public static int STARTING_NODE_DEGREE_FILTER = 3; // starting value for nodedegree //todo doesn't work so remove or change
 
     public int FollowerCount = 3;
     //public static int STARTING_NODE_FOLLOWER_COUNT = 3; // starting value for nodedegree
 
     static float EXPLOSION_TIME_1 = 3.0f;  // after this time (in seconds) show only the selected node
-	static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
-	static float EXPLOSION_TIME_3 = 12.0f; // after this time, show relations of relations of the selected node
+    static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
+    static float EXPLOSION_TIME_3 = 12.0f; // after this time, show relations of relations of the selected node
 
-    [Tooltip("Don't put anything here in-editor.")] public bool detailingMode = false; // disable or enable the ability to explode a node
+    [Tooltip("Don't put anything here in-editor.")]
+    public bool detailingMode = false; // disable or enable the ability to explode a node
 
-    [Tooltip("Don't put anything here in-editor.")] public bool interactionReady = false;
+    [Tooltip("Don't put anything here in-editor.")]
+    public bool interactionReady = false;
 
-    Dictionary<string, int> nameToID = new Dictionary<string, int> ();
+    Dictionary<string, int> nameToID = new Dictionary<string, int>();
 
-    [Tooltip("Don't put anything here in-editor.")] public GameObject nodeContainer; //DON'T put a nodecontainer object here in-editor
-	Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
+    [Tooltip("Don't put anything here in-editor.")]
+    public GameObject nodeContainer; //DON'T put a nodecontainer object here in-editor
+    Leap.Unity.PinchUtility.LeapRTS myLeapRTS;
 
     public Leap.Unity.PinchUtility.LeapPinchDetector pinchDetectorA;
     public Leap.Unity.PinchUtility.LeapPinchDetector pinchDetectorB;
 
     public Vector3 nodeContainerOriginalPosition;
 
-	AdjacencyList adjacencyList = new AdjacencyList(0);
+    AdjacencyList adjacencyList = new AdjacencyList(0);
 
-	public Node[] masterNodeList;
+    public Node[] masterNodeList;
     public Dictionary<int, NodeGroup> nodeGroups;
-	int[] indicesToShowOrExplode;
+    int[] indicesToShowOrExplode;
 
     GameObject voxelCanvasContainer;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
 
         //generate2DGraphFromCSV();
 
@@ -83,8 +88,16 @@ public class GenerateGraph : MonoBehaviour {
         nodeFileForCoroutine = "mnist_node_image";
         edgeFileForCoroutine = "mnist_edge";
         metadataFileForCoroutine = "mnist_metadata";
-        graphTypeForCoroutine = GRAPH_3D;
+        graphTypeForCoroutine = GRAPH_2D;
         dataTypeForCoroutine = DATA_MNIST;
+
+        /*
+        nodeFileForCoroutine = "20160531_b_nodelist";
+        edgeFileForCoroutine = "20160531_b_edgelist";
+        metadataFileForCoroutine = "20160531_b_metadata";
+        graphTypeForCoroutine = GRAPH_2D;
+        dataTypeForCoroutine = DATA_TWITTER;
+        */
 
         StartCoroutine("generateGraphFromCSVCoroutine");
 
@@ -117,7 +130,6 @@ public class GenerateGraph : MonoBehaviour {
 
     public void postGraphGeneration()
     {
-        
         // unnecessary because we are doing this on-demand
         // RenderLinesOnce();
         // HideAllLines();
@@ -133,18 +145,21 @@ public class GenerateGraph : MonoBehaviour {
 
         changeNodeDimensionality(graphTypeForCoroutine);
 
+        hideCentroids();
+
         interactionReady = true;
+
     }
 
     public void destroyOldGraph() // use this to destroy the previous graph // should call generateGraph after this
     {
         int numberOfChildren = nodeContainer.transform.childCount;
 
-        for( var i = numberOfChildren -1; i >=0; i--) // destroy all the children in the container (the nodes and edges)
+        for (var i = numberOfChildren - 1; i >= 0; i--) // destroy all the children in the container (the nodes and edges)
         {
             GameObject nodeGroupContainer = nodeContainer.transform.GetChild(i).gameObject;
             int numberOfNodes = nodeGroupContainer.transform.childCount;
-            for(var j = numberOfNodes-1; j>=0; j--)
+            for (var j = numberOfNodes - 1; j >= 0; j--)
             {
                 Destroy(nodeGroupContainer.transform.GetChild(i).gameObject);
             }
@@ -241,12 +256,12 @@ public class GenerateGraph : MonoBehaviour {
                 startIndexCoordinates = 8;
             }
 
-            float x_3d= float.Parse(myPositionsGrid[startIndexCoordinates, i]) * GRAPH_SCALE_CONSTANT;
-            float y_3d= float.Parse(myPositionsGrid[startIndexCoordinates+1, i]) * GRAPH_SCALE_CONSTANT;
-            float z_3d= float.Parse(myPositionsGrid[startIndexCoordinates+2, i]) * GRAPH_SCALE_CONSTANT;
+            float x_3d = float.Parse(myPositionsGrid[startIndexCoordinates, i]) * GRAPH_SCALE_CONSTANT;
+            float y_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 1, i]) * GRAPH_SCALE_CONSTANT;
+            float z_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 2, i]) * GRAPH_SCALE_CONSTANT;
 
-            float x_2d= float.Parse(myPositionsGrid[startIndexCoordinates+3, i]) * GRAPH_SCALE_CONSTANT;
-            float y_2d= float.Parse(myPositionsGrid[startIndexCoordinates+4, i]) * GRAPH_SCALE_CONSTANT;
+            float x_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 3, i]) * GRAPH_SCALE_CONSTANT;
+            float y_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 4, i]) * GRAPH_SCALE_CONSTANT;
 
             if (dimensionality == GRAPH_3D)
             {
@@ -288,12 +303,12 @@ public class GenerateGraph : MonoBehaviour {
 
             masterNodeList[i - 1] = new Node(myNodeInstance, i - 1);
 
-            if (type==DATA_TWITTER)
+            if (type == DATA_TWITTER)
             {
                 masterNodeList[i - 1].nodeForce.group = int.Parse(myPositionsGrid[3, i]);
-                masterNodeList[i - 1].nodeForce.followerCount = (int) float.Parse(myPositionsGrid[4, i]);
+                masterNodeList[i - 1].nodeForce.followerCount = (int)float.Parse(myPositionsGrid[4, i]);
             }
-            else if (type==DATA_MNIST)
+            else if (type == DATA_MNIST)
             {
                 masterNodeList[i - 1].nodeForce.group = (int)float.Parse(myPositionsGrid[1, i]);
             }
@@ -302,7 +317,7 @@ public class GenerateGraph : MonoBehaviour {
 
             NodeGroup nodeGroupWrapperObject;
             // if this is a new key, make a new group
-            if(!nodeGroups.ContainsKey(masterNodeList[i - 1].nodeForce.group))
+            if (!nodeGroups.ContainsKey(masterNodeList[i - 1].nodeForce.group))
             {
                 GameObject nodeGroupObject = Instantiate(Resources.Load("NodeGroupContainer") as GameObject, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity) as GameObject;
 
@@ -328,12 +343,12 @@ public class GenerateGraph : MonoBehaviour {
             // populate an array for the mnist image
             if (type == DATA_MNIST)
             {
-                for(int q = 0; q < MNIST_IMAGE_SIZE; q++)
+                for (int q = 0; q < MNIST_IMAGE_SIZE; q++)
                 {
                     for (int r = 0; r < MNIST_IMAGE_SIZE; r++)
                     {
                         //print("q: " + q + "... r: " + r);
-                        masterNodeList[i-1].nodeForce.image[q,r] = float.Parse(myPositionsGrid[startIndexCoordinates + 5 + q*MNIST_IMAGE_SIZE+r, i]);
+                        masterNodeList[i - 1].nodeForce.image[q, r] = float.Parse(myPositionsGrid[startIndexCoordinates + 5 + q * MNIST_IMAGE_SIZE + r, i]);
                     }
                 }
             }
@@ -371,7 +386,7 @@ public class GenerateGraph : MonoBehaviour {
             float y_3d = float.Parse(metaGrid[2, i]) * GRAPH_SCALE_CONSTANT;
             float z_3d = float.Parse(metaGrid[3, i]) * GRAPH_SCALE_CONSTANT;
 
-            GameObject centroidGameObject = 
+            GameObject centroidGameObject =
                 Instantiate(Resources.Load("GroupCentroid") as GameObject,
                     new Vector3(
                         x_3d,
@@ -431,25 +446,33 @@ public class GenerateGraph : MonoBehaviour {
     }
 
 
-    public void NodesAreDraggable(bool draggable){
-		if (draggable) {
-			myLeapRTS.enabled = true;
-		} else {
-			myLeapRTS.enabled = false;
-		}
-	}
+    public void NodesAreDraggable(bool draggable)
+    {
+        if (draggable)
+        {
+            myLeapRTS.enabled = true;
+        }
+        else
+        {
+            myLeapRTS.enabled = false;
+        }
+    }
 
-	void hideNodes(){
-		for (int i = 0; i < masterNodeList.Length; i++) {
-			masterNodeList [i].gameObject.SetActive (false);
-		}
-	}
+    void hideNodes()
+    {
+        for (int i = 0; i < masterNodeList.Length; i++)
+        {
+            masterNodeList[i].gameObject.SetActive(false);
+        }
+    }
 
-	void showNodes(){
-		for (int i = 0; i < masterNodeList.Length; i++) {
-			masterNodeList [i].gameObject.SetActive (true);
-		}
-	}
+    void showNodes()
+    {
+        for (int i = 0; i < masterNodeList.Length; i++)
+        {
+            masterNodeList[i].gameObject.SetActive(true);
+        }
+    }
 
     public void changeNodeDimensionality(int dimensionality)
     {
@@ -460,7 +483,7 @@ public class GenerateGraph : MonoBehaviour {
             masterNodeList[i].nodeForce.crawlTowardsNewPosition(dimensionality);
         }
 
-        foreach(int key in nodeGroups.Keys)
+        foreach (int key in nodeGroups.Keys)
         {
             nodeGroups[key].nodeGroupContainerScript.centroid.groupCentroidScript.crawlTowardsNewPosition(dimensionality);
         }
@@ -486,19 +509,21 @@ public class GenerateGraph : MonoBehaviour {
         }
     }
 
-    void hideLabels(){
-		for (int i = 0; i < masterNodeList.Length; i++) {
-			masterNodeList [i].nodeForce.DeactivateText();
-		}
-	}
-    
+    void hideLabels()
+    {
+        for (int i = 0; i < masterNodeList.Length; i++)
+        {
+            masterNodeList[i].nodeForce.DeactivateText();
+        }
+    }
+
     public bool isLegalNode(Node node)
     {
-        if( dataTypeForCoroutine == DATA_TWITTER && ( node.nodeForce.degree > NodeDegree && node.nodeForce.followerCount > FollowerCount))
+        if (dataTypeForCoroutine == DATA_TWITTER && (node.nodeForce.degree > NodeDegree && node.nodeForce.followerCount > FollowerCount))
         {
             return true;
         }
-        else if (dataTypeForCoroutine == DATA_MNIST && (node.nodeForce.degree > NodeDegree ) )
+        else if (dataTypeForCoroutine == DATA_MNIST && (node.nodeForce.degree > NodeDegree))
         {
             return true;
         }
@@ -524,203 +549,238 @@ public class GenerateGraph : MonoBehaviour {
         }
     }
 
-    void showConnectedNodes(List<int> indices, int mainIndex){
-		foreach (int index in indices) {
+    void showConnectedNodes(List<int> indices, int mainIndex)
+    {
+        foreach (int index in indices)
+        {
 
-			if (isLegalNode(masterNodeList[index])) { // todo change this to not be copypasta
+            if (isLegalNode(masterNodeList[index]))
+            { // todo change this to not be copypasta
 
-				masterNodeList [index].gameObject.SetActive (true);
-				masterNodeList [index].nodeForce.ActivateText ();
-				masterNodeList [index].nodeForce.TextFaceCamera (playerCamera.transform);
+                masterNodeList[index].gameObject.SetActive(true);
+                masterNodeList[index].nodeForce.ActivateText();
+                masterNodeList[index].nodeForce.TextFaceCamera(playerCamera.transform);
                 showLinesBetween(index, mainIndex, true);
 
-                if(dataTypeForCoroutine == DATA_MNIST)
+                if (dataTypeForCoroutine == DATA_MNIST)
                 {
                     generateVoxelCanvasForHighlightedNode(masterNodeList[index]);
                 }
 
-			}
+            }
 
-			//Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
-		}
-	}
+            //Debug.Log ("index: " + index + "... mainIndex: " + mainIndex + "... adjacencyList.isAdjacent (index, mainIndex): " + adjacencyList.isAdjacent (index, mainIndex));
+        }
+    }
 
 
 
-	void generateGraphRandomly(){
+    void generateGraphRandomly()
+    {
         preGraphGeneration();
 
         masterNodeList = new Node[NUMBER_NODES];
-		indicesToShowOrExplode = new int[NUMBER_NODES];
+        indicesToShowOrExplode = new int[NUMBER_NODES];
 
         // add nodes
         randomlyPlaceNodes();
 
-		// populate adjacency
-		for (int i = 0; i < NUMBER_NODES; i++) {
-			for (int j = 0; j < NUMBER_NODES; j++) {
-				if (Random.Range (0.00f, 1.00f) < CHANCE_OF_CONNECTION) {
-					addEdgeToAdjacencyListAfterValidation (i, j, (Random.value * 6.00f));
-				}
-			}
-		}
+        // populate adjacency
+        for (int i = 0; i < NUMBER_NODES; i++)
+        {
+            for (int j = 0; j < NUMBER_NODES; j++)
+            {
+                if (Random.Range(0.00f, 1.00f) < CHANCE_OF_CONNECTION)
+                {
+                    addEdgeToAdjacencyListAfterValidation(i, j, (Random.value * 6.00f));
+                }
+            }
+        }
 
         postGraphGeneration();
-	}
+    }
 
-	void addEdgeToAdjacencyListAfterValidation(int source, int target, float weight){
-		int smaller = source;
-		int bigger = target;
-		if (target < source) {
-			smaller = target;
-			bigger = source;
-		}
+    void addEdgeToAdjacencyListAfterValidation(int source, int target, float weight)
+    {
+        int smaller = source;
+        int bigger = target;
+        if (target < source)
+        {
+            smaller = target;
+            bigger = source;
+        }
 
-		if (adjacencyList.isAdjacent (smaller, bigger) == false) {
-			adjacencyList.AddEdge (smaller, bigger, weight, nodeContainer);
-		}
-	}
+        if (adjacencyList.isAdjacent(smaller, bigger) == false)
+        {
+            adjacencyList.AddEdge(smaller, bigger, weight, nodeContainer);
+        }
+    }
 
-	void applyForcesBetweenTwoNodes(int i, int j){ // and render the lines
-		// apply force
-		// there should only be one interaction for each
-		// force = constant * absolute(myNodes[i].charge * myNodes[j].charge)/square(distance(myNodes[i], myNodes[j]))
+    void applyForcesBetweenTwoNodes(int i, int j)
+    { // and render the lines
+      // apply force
+      // there should only be one interaction for each
+      // force = constant * absolute(myNodes[i].charge * myNodes[j].charge)/square(distance(myNodes[i], myNodes[j]))
 
-		//print("applyForcesBetweenTwoNodes(int i, int j).. i: " + i + " j: "+ j );
+        //print("applyForcesBetweenTwoNodes(int i, int j).. i: " + i + " j: "+ j );
 
-		// CALC REPULSIVE FORCE
-		float distance = Vector3.Distance (masterNodeList [i].gameObject.transform.localPosition, masterNodeList [j].gameObject.transform.localPosition); 
+        // CALC REPULSIVE FORCE
+        float distance = Vector3.Distance(masterNodeList[i].gameObject.transform.localPosition, masterNodeList[j].gameObject.transform.localPosition);
 
-		float chargeForce = (CHARGE_CONSTANT) * ((masterNodeList [i].nodeForce.charge * masterNodeList [j].nodeForce.charge) / (distance * distance));
+        float chargeForce = (CHARGE_CONSTANT) * ((masterNodeList[i].nodeForce.charge * masterNodeList[j].nodeForce.charge) / (distance * distance));
 
-		float springForce = 0;
-		if (adjacencyList.isAdjacent (i, j)) {
-			// print ("Number " + i + " and number " + j + " are adjacent.");
-			springForce = (SPRING_CONSTANT) * (distance);
-			// draw a line between the points if it exists
+        float springForce = 0;
+        if (adjacencyList.isAdjacent(i, j))
+        {
+            // print ("Number " + i + " and number " + j + " are adjacent.");
+            springForce = (SPRING_CONSTANT) * (distance);
+            // draw a line between the points if it exists
 
-			int smaller = j;
-			int bigger = i;
-			if (i < j) {
-				smaller = i;
-				bigger = j;
-			}
+            int smaller = j;
+            int bigger = i;
+            if (i < j)
+            {
+                smaller = i;
+                bigger = j;
+            }
 
-			string key = "" + smaller + "." + bigger;
-			//print ("key: " + key);
+            string key = "" + smaller + "." + bigger;
+            //print ("key: " + key);
 
-			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
-			myLineRenderer.SetVertexCount (2);
-			myLineRenderer.SetPosition (0, masterNodeList [smaller].gameObject.transform.position);
-			myLineRenderer.SetPosition (1, masterNodeList [bigger].gameObject.transform.position);
-			myLineRenderer.enabled = true;
-		} else {
-			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
-		}
+            LineRenderer myLineRenderer = adjacencyList._edgesToRender[key];
+            myLineRenderer.SetVertexCount(2);
+            myLineRenderer.SetPosition(0, masterNodeList[smaller].gameObject.transform.position);
+            myLineRenderer.SetPosition(1, masterNodeList[bigger].gameObject.transform.position);
+            myLineRenderer.enabled = true;
+        }
+        else
+        {
+            //print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+        }
 
-		float totalForce = chargeForce - springForce; //only if they're in the same direction
+        float totalForce = chargeForce - springForce; //only if they're in the same direction
 
-		float accel = totalForce / masterNodeList [i].nodeForce.mass;
-		float distanceChange = /* v0*t */ 0.5f * (accel) * (Time.deltaTime) * (Time.deltaTime);
+        float accel = totalForce / masterNodeList[i].nodeForce.mass;
+        float distanceChange = /* v0*t */
+                0.5f * (accel) * (Time.deltaTime) * (Time.deltaTime);
 
-		Vector3 direction = masterNodeList [i].gameObject.transform.localPosition - masterNodeList [j].gameObject.transform.localPosition;
+        Vector3 direction = masterNodeList[i].gameObject.transform.localPosition - masterNodeList[j].gameObject.transform.localPosition;
 
-		// apply it
+        // apply it
 
-		Vector3 newPositionForI = masterNodeList [i].gameObject.transform.localPosition + direction.normalized * distanceChange;
+        Vector3 newPositionForI = masterNodeList[i].gameObject.transform.localPosition + direction.normalized * distanceChange;
 
-		//if (i == 0) {Debug.Log ("new position for I before constraint: " + newPositionForI);}
+        //if (i == 0) {Debug.Log ("new position for I before constraint: " + newPositionForI);}
 
-		//TODO have to redo the math for these if we're going to move the thing around
+        //TODO have to redo the math for these if we're going to move the thing around
 
-		// now it's a local position so this should work again
-		if (newPositionForI.x > NODE_SPREAD_X) {
-			newPositionForI.x = NODE_SPREAD_X;
-		}
+        // now it's a local position so this should work again
+        if (newPositionForI.x > NODE_SPREAD_X)
+        {
+            newPositionForI.x = NODE_SPREAD_X;
+        }
 
-		if (newPositionForI.x < -NODE_SPREAD_X) {
-			newPositionForI.x = -NODE_SPREAD_X;
-		}
+        if (newPositionForI.x < -NODE_SPREAD_X)
+        {
+            newPositionForI.x = -NODE_SPREAD_X;
+        }
 
-		if (newPositionForI.y > NODE_SPREAD_Y) {
-			newPositionForI.y = NODE_SPREAD_Y;
-		}
+        if (newPositionForI.y > NODE_SPREAD_Y)
+        {
+            newPositionForI.y = NODE_SPREAD_Y;
+        }
 
-		if (newPositionForI.y < -NODE_SPREAD_Y ) {
-			newPositionForI.y = -NODE_SPREAD_Y ;
-		}
+        if (newPositionForI.y < -NODE_SPREAD_Y)
+        {
+            newPositionForI.y = -NODE_SPREAD_Y;
+        }
 
-		if (newPositionForI.z > NODE_SPREAD_Z ) {
-			newPositionForI.z = NODE_SPREAD_Z ;
-		}
+        if (newPositionForI.z > NODE_SPREAD_Z)
+        {
+            newPositionForI.z = NODE_SPREAD_Z;
+        }
 
-		if (newPositionForI.z < -NODE_SPREAD_Z ) {
-			newPositionForI.z = -NODE_SPREAD_Z ;
-		}
+        if (newPositionForI.z < -NODE_SPREAD_Z)
+        {
+            newPositionForI.z = -NODE_SPREAD_Z;
+        }
 
-		//if (i == 0) {Debug.Log ("new position for I after constraint: " + newPositionForI);}
+        //if (i == 0) {Debug.Log ("new position for I after constraint: " + newPositionForI);}
 
-		masterNodeList [i].gameObject.transform.localPosition = newPositionForI;
+        masterNodeList[i].gameObject.transform.localPosition = newPositionForI;
 
-		// put in something to dampen it and stop calculations after it settles down
-		// TODO
-	}
+        // put in something to dampen it and stop calculations after it settles down
+        // TODO
+    }
 
-	void renderLinesBetween(int i, int j){ 
-		if (adjacencyList.isAdjacent (i, j)) {
-			int smaller = j;
-			int bigger = i;
-			if (i < j) {
-				smaller = i;
-				bigger = j;
-			}
+    void renderLinesBetween(int i, int j)
+    {
+        if (adjacencyList.isAdjacent(i, j))
+        {
+            int smaller = j;
+            int bigger = i;
+            if (i < j)
+            {
+                smaller = i;
+                bigger = j;
+            }
 
-			string key = "" + smaller + "." + bigger;
-			//print ("key: " + key);
+            string key = "" + smaller + "." + bigger;
+            //print ("key: " + key);
 
-			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
-			myLineRenderer.SetVertexCount (2);
-			myLineRenderer.SetPosition (0, masterNodeList [smaller].gameObject.transform.position);
-			myLineRenderer.SetPosition (1, masterNodeList [bigger].gameObject.transform.position);
-			myLineRenderer.enabled = true;
-		} else {
-			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
-		}
-	}
+            LineRenderer myLineRenderer = adjacencyList._edgesToRender[key];
+            myLineRenderer.SetVertexCount(2);
+            myLineRenderer.SetPosition(0, masterNodeList[smaller].gameObject.transform.position);
+            myLineRenderer.SetPosition(1, masterNodeList[bigger].gameObject.transform.position);
+            myLineRenderer.enabled = true;
+        }
+        else
+        {
+            //print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+        }
+    }
 
-	void hideLinesBetween(int i, int j){ 
-		if (adjacencyList.isAdjacent (i, j)) {
-			int smaller = j;
-			int bigger = i;
-			if (i < j) {
-				smaller = i;
-				bigger = j;
-			}
+    void hideLinesBetween(int i, int j)
+    {
+        if (adjacencyList.isAdjacent(i, j))
+        {
+            int smaller = j;
+            int bigger = i;
+            if (i < j)
+            {
+                smaller = i;
+                bigger = j;
+            }
 
-			string key = "" + smaller + "." + bigger;
-			//print ("key: " + key);
+            string key = "" + smaller + "." + bigger;
+            //print ("key: " + key);
 
-			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
-			myLineRenderer.enabled = false;
-		} else {
-			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
-		}
-	}
+            LineRenderer myLineRenderer = adjacencyList._edgesToRender[key];
+            myLineRenderer.enabled = false;
+        }
+        else
+        {
+            //print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+        }
+    }
 
-	void showLinesBetween(int i, int j, bool correctPosition){ 
-		if (adjacencyList.isAdjacent (i, j)) {
-			int smaller = j;
-			int bigger = i;
-			if (i < j) {
-				smaller = i;
-				bigger = j;
-			}
+    void showLinesBetween(int i, int j, bool correctPosition)
+    {
+        if (adjacencyList.isAdjacent(i, j))
+        {
+            int smaller = j;
+            int bigger = i;
+            if (i < j)
+            {
+                smaller = i;
+                bigger = j;
+            }
 
-			string key = "" + smaller + "." + bigger;
-			//Debug.Log ("key: " + key);
+            string key = "" + smaller + "." + bigger;
+            //Debug.Log ("key: " + key);
 
-			LineRenderer myLineRenderer = adjacencyList._edgesToRender [key];
-			myLineRenderer.enabled = true;
+            LineRenderer myLineRenderer = adjacencyList._edgesToRender[key];
+            myLineRenderer.enabled = true;
 
             if (correctPosition)
             {
@@ -728,61 +788,77 @@ public class GenerateGraph : MonoBehaviour {
                 myLineRenderer.SetPosition(1, masterNodeList[bigger].gameObject.transform.localPosition);
             }
 
-        } else {
-			//print ("Number " + i + " and number " + j + " NOT ADJACENT.");
-		}
-	}
-
-    
-
-
+        }
+        else
+        {
+            //print ("Number " + i + " and number " + j + " NOT ADJACENT.");
+        }
+    }
 
 
-    IEnumerator ProcessNodesCoroutine() {
-		while (true) {
-			for (int j = 0; j < 2; j++) {
-				ProcessNodes ();
-			}
-			yield return null;
-		}
-	}
 
-	void ProcessNodes () {
 
-		int nodesProcessedThisFrame = 0;
-		while( nodesProcessedThisFrame < NODES_PROCESSED_PER_FRAME){
-			nodesProcessedThisFrame += 1;
-			currentIndex += 1;
-			if (currentIndex >= masterNodeList.Length) {
-				currentIndex = 0;
-			}
-			int i = currentIndex;
-			for (int j = 0; j < masterNodeList.Length; j++) {
-				if (i != j) {
-					applyForcesBetweenTwoNodes (i, j);
-				}
-			}
-		}
 
-	}
+
+    IEnumerator ProcessNodesCoroutine()
+    {
+        while (true)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                ProcessNodes();
+            }
+            yield return null;
+        }
+    }
+
+    void ProcessNodes()
+    {
+
+        int nodesProcessedThisFrame = 0;
+        while (nodesProcessedThisFrame < NODES_PROCESSED_PER_FRAME)
+        {
+            nodesProcessedThisFrame += 1;
+            currentIndex += 1;
+            if (currentIndex >= masterNodeList.Length)
+            {
+                currentIndex = 0;
+            }
+            int i = currentIndex;
+            for (int j = 0; j < masterNodeList.Length; j++)
+            {
+                if (i != j)
+                {
+                    applyForcesBetweenTwoNodes(i, j);
+                }
+            }
+        }
+
+    }
 
 
     // todo: this is a terrible, slow method. avoid using it
-	void RenderLinesOnce () { 
-		for(int i = 0; i < masterNodeList.Length-1; i++){
-			for (int j = 0; j < masterNodeList.Length-1; j++) {
-				if (i != j) {
-					renderLinesBetween (i, j);
-				}
-			}
-		}
-	}
+    void RenderLinesOnce()
+    {
+        for (int i = 0; i < masterNodeList.Length - 1; i++)
+        {
+            for (int j = 0; j < masterNodeList.Length - 1; j++)
+            {
+                if (i != j)
+                {
+                    renderLinesBetween(i, j);
+                }
+            }
+        }
+    }
 
-	void HideAllLines () { 
-		foreach (KeyValuePair<string, LineRenderer> item in adjacencyList._edgesToRender) {
-			item.Value.enabled = false;
-		}
-	}
+    void HideAllLines()
+    {
+        foreach (KeyValuePair<string, LineRenderer> item in adjacencyList._edgesToRender)
+        {
+            item.Value.enabled = false;
+        }
+    }
 
     public void generateVoxelCanvasForHighlightedNode(Node myNode)
     {

@@ -24,7 +24,7 @@ public class GroupCentroid : Nodelike {
         // centroids only in 3D currently
         if (dimensionality == GenerateGraph.GRAPH_3D)
         {
-            this.gameObject.SetActive(true);
+            //this.gameObject.SetActive(true);
             base.crawlTowardsNewPosition(dimensionality);
         }
         else
