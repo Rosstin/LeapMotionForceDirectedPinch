@@ -7,8 +7,9 @@ using Leap.Unity;
 
 public class HandsRaycast : MonoBehaviour {
 
-	public GameObject button1;
-	Collider button1Collider;
+	public GameObject toggle3DGameObject;
+	Collider toggle3DCollider;
+    ToggleLeap toggle3Dscript;
 
 	public GameObject slider1;
 	Collider slider1Collider;
@@ -107,7 +108,8 @@ public class HandsRaycast : MonoBehaviour {
         rightCapsuleHandScript = rightCapsuleHandObject.GetComponent<CapsuleHand>();
         leftCapsuleHandScript = leftCapsuleHandObject.GetComponent<CapsuleHand>();
 
-        //button1Collider = button1.GetComponent<Collider> ();
+        toggle3DCollider = toggle3DGameObject.GetComponent<Collider> ();
+        toggle3Dscript = toggle3DGameObject.GetComponent<ToggleLeap>();
 
         slider1Collider = slider1.GetComponent<Collider> ();
 		slider1script = slider1.GetComponent<Slider> ();
@@ -173,6 +175,7 @@ public class HandsRaycast : MonoBehaviour {
     {
         NeutralizeSliderState(slider1script);
         NeutralizeSliderState(sliderFollowersScript);
+        //todo neutralize the toggles
     }
 
     void UpdateControlPanel () {
@@ -236,6 +239,48 @@ public class HandsRaycast : MonoBehaviour {
             graphGenerator.showLegalNodesBasedOnFilterSettings();
         }
 
+    }
+
+    void performToggleAction(ToggleLeap toggle)
+    {
+        if(toggle.toggleType == "dimensionality")
+        {
+            bool newDimensionality = toggle.switchState();
+            if (newDimensionality)
+            {
+                graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
+            }
+            else
+            {
+                graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
+            }
+        }
+
+    }
+
+    void UpdateToggleState(Collider collider, ToggleLeap toggle, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness)
+    {
+        RaycastHit hit = new RaycastHit();
+
+        if (toggle.state != toggle.DRAGGING && isActive && collider.Raycast(ray, out hit, 200.0f))
+        { // start a drag
+            toggle.state = toggle.DRAGGING;
+            toggle.OnGrab();
+            toggle.handUsed = handedness;
+
+            // do things related to starting a drag
+        }
+
+        if (toggle.state == toggle.DRAGGING && toggle.handUsed == handedness)
+        {
+
+            if (!isActive)
+            { // no longer dragging
+                toggle.state = toggle.NORMAL;
+                performToggleAction(toggle);
+            }
+
+        }
     }
 
     void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
@@ -386,26 +431,7 @@ public class HandsRaycast : MonoBehaviour {
 
 			Ray myRay = new Ray (playerCamera.transform.position, heading);
 
-            /*
-			if ( button1Collider.Raycast (myRay, out hit, 200.0f)) { // if you hit something
-
-				if (hit.transform.gameObject.tag == "Clickable") { // if it was a button //don't really need this anymore
-					//Debug.Log("Hit Clickable.");
-
-					//hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
-					//graphGenerator.showNodesOfDegreeGreaterThan (22);
-
-					graphGenerator.detailingMode = !graphGenerator.detailingMode;
-
-					if (graphGenerator.detailingMode == false) {
-						hit.transform.gameObject.GetComponent<ButtonActivate> ().OnHit ();
-					}
-					else {
-						hit.transform.gameObject.GetComponent<ButtonActivate> ().UnHit ();
-					}
-				}
-			}
-            */
+            UpdateToggleState(toggle3DCollider, toggle3Dscript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
     		UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
             UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);

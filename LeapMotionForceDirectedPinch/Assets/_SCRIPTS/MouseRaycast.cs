@@ -48,6 +48,8 @@ public class MouseRaycast : MonoBehaviour {
 
 
 		// this needs work, something is jacked up
+        // not currently using this stuff
+        /*
 		if (Input.GetMouseButton(0)){
 			//Debug.Log ("mouse being held");
 			pointer.GetComponent<Image> ().sprite = Resources.Load<Sprite> ("centeredPointerGrey");
@@ -59,7 +61,7 @@ public class MouseRaycast : MonoBehaviour {
 
 			RaycastHit hit = new RaycastHit ();
 
-			ButtonActivate hitObject;
+			//ButtonActivate hitObject;
 
 			Vector3 endRayPosition = playerCamera.transform.position + (heading.normalized * 100.0f);
 
@@ -88,7 +90,7 @@ public class MouseRaycast : MonoBehaviour {
 		} else {
 			pointer.GetComponent<Image> ().sprite = Resources.Load<Sprite> ("centeredPointer");
 		}
-
+        */
 
 	}
 
