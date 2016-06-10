@@ -50,7 +50,7 @@ public class GenerateGraph : MonoBehaviour
 
     static float EXPLOSION_TIME_1 = 3.0f;  // after this time (in seconds) show only the selected node
     static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
-    static float EXPLOSION_TIME_3 = 12.0f; // after this time, show relations of relations of the selected node
+    static float EXPLOSION_TIME_3 = 33.0f; // after this time, show relations of relations of the selected node
 
     [Tooltip("Don't put anything here in-editor.")]
     public bool detailingMode = false; // disable or enable the ability to explode a node
@@ -85,26 +85,53 @@ public class GenerateGraph : MonoBehaviour
 
         //generateGraphFromCSV("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
 
+
         nodeFileForCoroutine = "mnist_node_image";
         edgeFileForCoroutine = "mnist_edge";
         metadataFileForCoroutine = "mnist_metadata";
         graphTypeForCoroutine = GRAPH_2D;
         dataTypeForCoroutine = DATA_MNIST;
-
-        /*
+        
+    /*
         nodeFileForCoroutine = "20160531_b_nodelist";
         edgeFileForCoroutine = "20160531_b_edgelist";
         metadataFileForCoroutine = "20160531_b_metadata";
-        graphTypeForCoroutine = GRAPH_2D;
+        graphTypeForCoroutine = GRAPH_3D;
         dataTypeForCoroutine = DATA_TWITTER;
         */
-
         StartCoroutine("generateGraphFromCSVCoroutine");
 
         //generateGraphFromCSVCoroutine("b3_node", "b3_edgelist", GRAPH_3D, DATA_TWITTER);
         //generateGraphFromCSV("nodelist_MNIST", "edgelist_MNIST", GRAPH_2D, DATA_MNIST);
         //generateGraphRandomly();
 
+    }
+
+    public void loadTwitterGraph()
+    {
+        destroyOldGraph();
+
+        nodeFileForCoroutine = "20160531_b_nodelist";
+        edgeFileForCoroutine = "20160531_b_edgelist";
+        metadataFileForCoroutine = "20160531_b_metadata";
+        graphTypeForCoroutine = GRAPH_3D;
+        dataTypeForCoroutine = DATA_TWITTER;
+
+        StartCoroutine("generateGraphFromCSVCoroutine");
+    }
+
+
+    public void loadMNistGraph()
+    {
+        destroyOldGraph();
+
+        nodeFileForCoroutine = "mnist_node_image";
+        edgeFileForCoroutine = "mnist_edge";
+        metadataFileForCoroutine = "mnist_metadata";
+        graphTypeForCoroutine = GRAPH_3D;
+        dataTypeForCoroutine = DATA_MNIST;
+
+        StartCoroutine("generateGraphFromCSVCoroutine");
     }
 
     public void preGraphGeneration()
@@ -900,7 +927,7 @@ public class GenerateGraph : MonoBehaviour
 
             // show more connections over time // only do these once!
 
-            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3))
+            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3) && dataTypeForCoroutine != DATA_MNIST) // MNIST data slows down too much for some reason
             {
 
                 List<int> myList = adjacencyList.GetEdgesForVertex(highlightedNode.index);

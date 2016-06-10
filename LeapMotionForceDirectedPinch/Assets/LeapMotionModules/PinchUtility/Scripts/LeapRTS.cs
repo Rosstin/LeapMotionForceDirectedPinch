@@ -40,7 +40,7 @@ namespace Leap.Unity.PinchUtility {
 
     private float _defaultNearClip;
 
-	private float PULL_CONSTANT = 20.0f;
+	private float PULL_CONSTANT = 17.0f;
 
     void Awake() {
       if (_pinchDetectorA == null || _pinchDetectorB == null) {

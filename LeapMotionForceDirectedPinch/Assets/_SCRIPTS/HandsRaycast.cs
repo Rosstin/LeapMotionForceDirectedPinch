@@ -32,7 +32,7 @@ public class HandsRaycast : MonoBehaviour {
     float SLIDER_MOVE_SPEED = 0.004f;
 
 	// VIEWPANEL
-	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 10.0f;
+	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 14.0f;
 	float VIEWPANEL_EULER_X_UPPER_THRESHHOLD = 100.0f;
 
 	int panelState;
@@ -42,7 +42,7 @@ public class HandsRaycast : MonoBehaviour {
 	float turnPanelOnTimer = 0.0f;
 
 	float PANEL_ON_TIMER_CONSTANT = 0.5f;
-	float PANEL_OFF_TIMER_CONSTANT = 2.0f;
+	float PANEL_OFF_TIMER_CONSTANT = 1.5f;
 
 	public Camera playerCamera; // aka CenterEyeAnchor
 
@@ -119,7 +119,7 @@ public class HandsRaycast : MonoBehaviour {
 
     }
 
-    void isHandFist(CapsuleHand handScript, int handedness)
+    bool isHandFist(CapsuleHand handScript, int handedness)
     {
         //print("finger0extended: " + handScript.hand_.Fingers[0].IsExtended); // the thumb
 
@@ -132,6 +132,11 @@ public class HandsRaycast : MonoBehaviour {
             {
                 print("right hand is fist");
             }
+            return true;
+        }
+        else
+        {
+            return false;
         }
 
     }
@@ -147,18 +152,14 @@ public class HandsRaycast : MonoBehaviour {
             isHandFist(leftCapsuleHandScript, LEFT);
             isHandFist(rightCapsuleHandScript, RIGHT);
 
-            if (leftCapsuleHandScript.thumbTip != null)
-            { 
-    		    HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
-            }
-            if (rightCapsuleHandScript.thumbTip != null)
-            {
-                HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
-            }
+    		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
+            HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
 
+            /*
             if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
                 HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
             }
+            */
 
             if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
 			    graphGenerator.explodeSelectedNode (highlightedObjectL);
@@ -179,8 +180,10 @@ public class HandsRaycast : MonoBehaviour {
     }
 
     void UpdateControlPanel () {
-		// looking at panel
-		// not looking at panel
+        // looking at panel
+        // not looking at panel
+
+        //print("playerCamera.transform.eulerAngles.x: " + playerCamera.transform.eulerAngles.x);
 
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
@@ -323,9 +326,6 @@ public class HandsRaycast : MonoBehaviour {
         if (palmState == PALM_STATE_GROUP_SELECTED)
         {
 
-
-
-
             if (palmDistance > TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
             {
                 palmDeselectionTime += Time.deltaTime;
@@ -335,8 +335,8 @@ public class HandsRaycast : MonoBehaviour {
 
                     //graphGenerator.hideCentroids();
 
-                    //print("infravision toggled off");
-                    //infravisionQuad.SetActive(false);
+                    print("infravision toggled off");
+                    infravisionQuad.SetActive(false);
 
                     palmState = PALM_STATE_NORMAL;
                     palmSelectionTime = 0.0f;
@@ -381,10 +381,10 @@ public class HandsRaycast : MonoBehaviour {
                         }
                     }
 
-                    graphGenerator.nodeGroups[selectedKey].nodeGroupContainerScript.centroid.groupCentroidScript.Selected();
+                    //graphGenerator.nodeGroups[selectedKey].nodeGroupContainerScript.centroid.groupCentroidScript.Selected();
 
-                    //print("infravision toggled on");
-                    //infravisionQuad.SetActive(true);
+                    print("infravision toggled on");
+                    infravisionQuad.SetActive(true);
 
                     palmState = PALM_STATE_GROUP_SELECTED;
                     palmDeselectionTime = 0.0f;
@@ -437,6 +437,13 @@ public class HandsRaycast : MonoBehaviour {
             UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
         } else { // not looking at panel
+
+            /*
+            if(isHandFist(hand, handedness))
+            {
+                
+            }
+            */
 
 			graphGenerator.NodesAreDraggable (true);
 
@@ -541,6 +548,16 @@ public class HandsRaycast : MonoBehaviour {
 
     void CheckDebugKeyboardActions()
     {
+
+        if (Input.GetKeyDown("m"))
+        {
+            graphGenerator.loadMNistGraph();
+        }
+
+        if (Input.GetKeyDown("t"))
+        {
+            graphGenerator.loadTwitterGraph();
+        }
 
         if (Input.GetKeyDown("space"))
         {

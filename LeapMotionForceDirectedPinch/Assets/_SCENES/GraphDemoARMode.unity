@@ -2679,7 +2679,7 @@ MonoBehaviour:
   currentValue: 0
   displayString: 'Show degree > '
   sliderType: degree
-  STARTING_PERCENT_DEGREE_FILTER: 0.1
+  STARTING_PERCENT_DEGREE_FILTER: 0.15
 --- !u!23 &1443115711
 MeshRenderer:
   m_ObjectHideFlags: 0
