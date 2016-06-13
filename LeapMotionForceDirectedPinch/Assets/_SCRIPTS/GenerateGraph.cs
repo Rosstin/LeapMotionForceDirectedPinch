@@ -219,7 +219,6 @@ public class GenerateGraph : MonoBehaviour
         print("finished parseEdges");
         yield return null;
 
-
         print("pre postGraphGeneration");
         postGraphGeneration();
         print("finished postGraphGeneration");

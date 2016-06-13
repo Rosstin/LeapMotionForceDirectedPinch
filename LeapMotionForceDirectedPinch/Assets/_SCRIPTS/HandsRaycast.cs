@@ -94,6 +94,8 @@ public class HandsRaycast : MonoBehaviour {
 	float zoomPinchStartDistance;
 	float lastZoomPinchDistance;
 
+    public GameObject testCube;
+
 	void Start () {
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
 		GameObject lineToRender = Instantiate (prefabLineToRender, new Vector3 (0, 0, 0), Quaternion.identity) as GameObject;
@@ -154,6 +156,11 @@ public class HandsRaycast : MonoBehaviour {
 
     		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
             HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
+
+            //print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
+            //print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
+            print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
+            testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
 
             /*
             if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
