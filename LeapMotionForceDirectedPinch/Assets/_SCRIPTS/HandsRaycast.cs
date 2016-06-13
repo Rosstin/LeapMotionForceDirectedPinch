@@ -160,7 +160,7 @@ public class HandsRaycast : MonoBehaviour {
             //print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
             //print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
             print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
-            testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
+            //testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
 
             /*
             if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
