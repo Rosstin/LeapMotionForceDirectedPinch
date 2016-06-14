@@ -13,23 +13,6 @@ public class GenerateGraph : MonoBehaviour
     int graphTypeForCoroutine;
     int dataTypeForCoroutine;
 
-    float CHARGE_CONSTANT = 0.5f;
-    float SPRING_CONSTANT = 4.0f;
-
-    float CHANCE_OF_CONNECTION = 0.09f;
-    int NUMBER_NODES = 40;
-
-    int NODES_PROCESSED_PER_FRAME = 40; // could also do as a percentage, could have some logic for that, or the max number that can be done
-
-    float NODE_SPREAD_X = 1.0f;
-    float NODE_SPREAD_Y = 0.8f;
-    float ELEVATION_CONSTANT = 1.0f; // TRY SETTING HEIGHT BY USING PLAYER CAMERA HEIGHT?
-    float NODE_SPREAD_Z = 1.0f;
-
-    public static float DISTANCE_FROM_FACE = 17.0f;
-
-    float GRAPH_SCALE_CONSTANT = 0.005f;
-
     public static int GRAPH_3D = 100;
     public static int GRAPH_2D = 101;
 
@@ -47,10 +30,6 @@ public class GenerateGraph : MonoBehaviour
 
     public int FollowerCount = 3;
     //public static int STARTING_NODE_FOLLOWER_COUNT = 3; // starting value for nodedegree
-
-    static float EXPLOSION_TIME_1 = 3.0f;  // after this time (in seconds) show only the selected node
-    static float EXPLOSION_TIME_2 = 6.0f;  // after this time, show selected node and its relations
-    static float EXPLOSION_TIME_3 = 33.0f; // after this time, show relations of relations of the selected node
 
     [Tooltip("Don't put anything here in-editor.")]
     public bool detailingMode = false; // disable or enable the ability to explode a node
@@ -92,7 +71,7 @@ public class GenerateGraph : MonoBehaviour
         graphTypeForCoroutine = GRAPH_2D;
         dataTypeForCoroutine = DATA_MNIST;
         
-    /*
+        /*
         nodeFileForCoroutine = "20160531_b_nodelist";
         edgeFileForCoroutine = "20160531_b_edgelist";
         metadataFileForCoroutine = "20160531_b_metadata";
@@ -161,7 +140,7 @@ public class GenerateGraph : MonoBehaviour
         // RenderLinesOnce();
         // HideAllLines();
 
-        nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ELEVATION_CONSTANT, DISTANCE_FROM_FACE);
+        nodeContainer.transform.position = nodeContainer.transform.position + new Vector3(0.0f, ConstantsSpacerock.ELEVATION_CONSTANT, ConstantsSpacerock.DISTANCE_FROM_FACE);
         nodeContainerOriginalPosition = nodeContainer.transform.position;
 
         voxelCanvasContainer.transform.parent = nodeContainer.transform;
@@ -282,12 +261,12 @@ public class GenerateGraph : MonoBehaviour
                 startIndexCoordinates = 8;
             }
 
-            float x_3d = float.Parse(myPositionsGrid[startIndexCoordinates, i]) * GRAPH_SCALE_CONSTANT;
-            float y_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 1, i]) * GRAPH_SCALE_CONSTANT;
-            float z_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 2, i]) * GRAPH_SCALE_CONSTANT;
+            float x_3d = float.Parse(myPositionsGrid[startIndexCoordinates, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
+            float y_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 1, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
+            float z_3d = float.Parse(myPositionsGrid[startIndexCoordinates + 2, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
 
-            float x_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 3, i]) * GRAPH_SCALE_CONSTANT;
-            float y_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 4, i]) * GRAPH_SCALE_CONSTANT;
+            float x_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 3, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
+            float y_2d = float.Parse(myPositionsGrid[startIndexCoordinates + 4, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
 
             if (dimensionality == GRAPH_3D)
             {
@@ -408,9 +387,9 @@ public class GenerateGraph : MonoBehaviour
             // give the group its centroid
 
 
-            float x_3d = float.Parse(metaGrid[1, i]) * GRAPH_SCALE_CONSTANT;
-            float y_3d = float.Parse(metaGrid[2, i]) * GRAPH_SCALE_CONSTANT;
-            float z_3d = float.Parse(metaGrid[3, i]) * GRAPH_SCALE_CONSTANT;
+            float x_3d = float.Parse(metaGrid[1, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
+            float y_3d = float.Parse(metaGrid[2, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
+            float z_3d = float.Parse(metaGrid[3, i]) * ConstantsSpacerock.GRAPH_SCALE_CONSTANT;
 
             GameObject centroidGameObject =
                 Instantiate(Resources.Load("GroupCentroid") as GameObject,
@@ -462,7 +441,7 @@ public class GenerateGraph : MonoBehaviour
 
             GameObject myNodeInstance =
                 Instantiate(Resources.Load("Node") as GameObject,
-                    new Vector3(Random.Range(-NODE_SPREAD_X, NODE_SPREAD_X), Random.Range(-NODE_SPREAD_Y, NODE_SPREAD_Y), Random.Range(-NODE_SPREAD_Z, NODE_SPREAD_Z)),
+                    new Vector3(Random.Range(-ConstantsSpacerock.NODE_SPREAD_X, ConstantsSpacerock.NODE_SPREAD_X), Random.Range(-ConstantsSpacerock.NODE_SPREAD_Y, ConstantsSpacerock.NODE_SPREAD_Y), Random.Range(-ConstantsSpacerock.NODE_SPREAD_Z, ConstantsSpacerock.NODE_SPREAD_Z)),
                     Quaternion.identity) as GameObject;
 
             myNodeInstance.transform.parent = nodeContainer.transform;
@@ -605,18 +584,18 @@ public class GenerateGraph : MonoBehaviour
     {
         preGraphGeneration();
 
-        masterNodeList = new Node[NUMBER_NODES];
-        indicesToShowOrExplode = new int[NUMBER_NODES];
+        masterNodeList = new Node[ConstantsSpacerock.NUMBER_NODES];
+        indicesToShowOrExplode = new int[ConstantsSpacerock.NUMBER_NODES];
 
         // add nodes
         randomlyPlaceNodes();
 
         // populate adjacency
-        for (int i = 0; i < NUMBER_NODES; i++)
+        for (int i = 0; i < ConstantsSpacerock.NUMBER_NODES; i++)
         {
-            for (int j = 0; j < NUMBER_NODES; j++)
+            for (int j = 0; j < ConstantsSpacerock.NUMBER_NODES; j++)
             {
-                if (Random.Range(0.00f, 1.00f) < CHANCE_OF_CONNECTION)
+                if (Random.Range(0.00f, 1.00f) < ConstantsSpacerock.CHANCE_OF_CONNECTION)
                 {
                     addEdgeToAdjacencyListAfterValidation(i, j, (Random.value * 6.00f));
                 }
@@ -653,13 +632,13 @@ public class GenerateGraph : MonoBehaviour
         // CALC REPULSIVE FORCE
         float distance = Vector3.Distance(masterNodeList[i].gameObject.transform.localPosition, masterNodeList[j].gameObject.transform.localPosition);
 
-        float chargeForce = (CHARGE_CONSTANT) * ((masterNodeList[i].nodeForce.charge * masterNodeList[j].nodeForce.charge) / (distance * distance));
+        float chargeForce = (ConstantsSpacerock.CHARGE_CONSTANT) * ((masterNodeList[i].nodeForce.charge * masterNodeList[j].nodeForce.charge) / (distance * distance));
 
         float springForce = 0;
         if (adjacencyList.isAdjacent(i, j))
         {
             // print ("Number " + i + " and number " + j + " are adjacent.");
-            springForce = (SPRING_CONSTANT) * (distance);
+            springForce = (ConstantsSpacerock.SPRING_CONSTANT) * (distance);
             // draw a line between the points if it exists
 
             int smaller = j;
@@ -701,34 +680,34 @@ public class GenerateGraph : MonoBehaviour
         //TODO have to redo the math for these if we're going to move the thing around
 
         // now it's a local position so this should work again
-        if (newPositionForI.x > NODE_SPREAD_X)
+        if (newPositionForI.x > ConstantsSpacerock.NODE_SPREAD_X)
         {
-            newPositionForI.x = NODE_SPREAD_X;
+            newPositionForI.x = ConstantsSpacerock.NODE_SPREAD_X;
         }
 
-        if (newPositionForI.x < -NODE_SPREAD_X)
+        if (newPositionForI.x < -ConstantsSpacerock.NODE_SPREAD_X)
         {
-            newPositionForI.x = -NODE_SPREAD_X;
+            newPositionForI.x = -ConstantsSpacerock.NODE_SPREAD_X;
         }
 
-        if (newPositionForI.y > NODE_SPREAD_Y)
+        if (newPositionForI.y > ConstantsSpacerock.NODE_SPREAD_Y)
         {
-            newPositionForI.y = NODE_SPREAD_Y;
+            newPositionForI.y = ConstantsSpacerock.NODE_SPREAD_Y;
         }
 
-        if (newPositionForI.y < -NODE_SPREAD_Y)
+        if (newPositionForI.y < -ConstantsSpacerock.NODE_SPREAD_Y)
         {
-            newPositionForI.y = -NODE_SPREAD_Y;
+            newPositionForI.y = -ConstantsSpacerock.NODE_SPREAD_Y;
         }
 
-        if (newPositionForI.z > NODE_SPREAD_Z)
+        if (newPositionForI.z > ConstantsSpacerock.NODE_SPREAD_Z)
         {
-            newPositionForI.z = NODE_SPREAD_Z;
+            newPositionForI.z = ConstantsSpacerock.NODE_SPREAD_Z;
         }
 
-        if (newPositionForI.z < -NODE_SPREAD_Z)
+        if (newPositionForI.z < -ConstantsSpacerock.NODE_SPREAD_Z)
         {
-            newPositionForI.z = -NODE_SPREAD_Z;
+            newPositionForI.z = -ConstantsSpacerock.NODE_SPREAD_Z;
         }
 
         //if (i == 0) {Debug.Log ("new position for I after constraint: " + newPositionForI);}
@@ -842,7 +821,7 @@ public class GenerateGraph : MonoBehaviour
     {
 
         int nodesProcessedThisFrame = 0;
-        while (nodesProcessedThisFrame < NODES_PROCESSED_PER_FRAME)
+        while (nodesProcessedThisFrame < ConstantsSpacerock.NODES_PROCESSED_PER_FRAME)
         {
             nodesProcessedThisFrame += 1;
             currentIndex += 1;
@@ -926,7 +905,7 @@ public class GenerateGraph : MonoBehaviour
 
             // show more connections over time // only do these once!
 
-            if (time >= EXPLOSION_TIME_3 && ((time - Time.deltaTime) < EXPLOSION_TIME_3) && dataTypeForCoroutine != DATA_MNIST) // MNIST data slows down too much for some reason
+            if (time >= ConstantsSpacerock.EXPLOSION_TIME_3 && ((time - Time.deltaTime) < ConstantsSpacerock.EXPLOSION_TIME_3) && dataTypeForCoroutine != DATA_MNIST) // MNIST data slows down too much for some reason
             {
 
                 List<int> myList = adjacencyList.GetEdgesForVertex(highlightedNode.index);
@@ -937,7 +916,7 @@ public class GenerateGraph : MonoBehaviour
                 }
 
             }
-            else if (time >= EXPLOSION_TIME_2 && ((time - Time.deltaTime) < EXPLOSION_TIME_2))
+            else if (time >= ConstantsSpacerock.EXPLOSION_TIME_2 && ((time - Time.deltaTime) < ConstantsSpacerock.EXPLOSION_TIME_2))
             {
                 // a list of vertices... show every vertex here
 
@@ -945,7 +924,7 @@ public class GenerateGraph : MonoBehaviour
 
 
             }
-            else if (time >= EXPLOSION_TIME_1 && ((time - Time.deltaTime) < EXPLOSION_TIME_1))
+            else if (time >= ConstantsSpacerock.EXPLOSION_TIME_1 && ((time - Time.deltaTime) < ConstantsSpacerock.EXPLOSION_TIME_1))
             {
 
                 // hide all other nodes
