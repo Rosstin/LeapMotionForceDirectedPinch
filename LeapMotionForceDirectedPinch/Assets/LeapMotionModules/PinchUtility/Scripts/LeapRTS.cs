@@ -40,8 +40,6 @@ namespace Leap.Unity.PinchUtility {
 
     private float _defaultNearClip;
 
-	private float PULL_CONSTANT = 17.0f;
-
     void Awake() {
       if (_pinchDetectorA == null || _pinchDetectorB == null) {
         Debug.LogWarning("Both Pinch Detectors of the LeapRTS component must be assigned. This component has been disabled.");
@@ -137,7 +135,7 @@ namespace Leap.Unity.PinchUtility {
     }
 
     private void transformSingleAnchor(LeapPinchDetector singlePinch) {
- 	_anchor.position = singlePinch.Position * PULL_CONSTANT;
+ 	_anchor.position = singlePinch.Position * SpacerockConstants.PULL_CONSTANT;
 
       switch (_oneHandedRotationMethod) {
         case RotationMethod.None:
