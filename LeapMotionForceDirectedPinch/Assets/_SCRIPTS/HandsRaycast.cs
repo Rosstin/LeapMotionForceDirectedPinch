@@ -29,20 +29,11 @@ public class HandsRaycast : MonoBehaviour {
     public GameObject leftCapsuleHandObject;
     CapsuleHand leftCapsuleHandScript;
 
-    float SLIDER_MOVE_SPEED = 0.004f;
-
-	// VIEWPANEL
-	float VIEWPANEL_EULER_X_LOWER_THRESHHOLD = 14.0f;
-	float VIEWPANEL_EULER_X_UPPER_THRESHHOLD = 100.0f;
-
 	int panelState;
 	int PANEL_ON = 0;
 	float turnPanelOffTimer = 0.0f;
 	int PANEL_OFF = 1;
 	float turnPanelOnTimer = 0.0f;
-
-	float PANEL_ON_TIMER_CONSTANT = 0.5f;
-	float PANEL_OFF_TIMER_CONSTANT = 1.5f;
 
 	public Camera playerCamera; // aka CenterEyeAnchor
 
@@ -59,10 +50,6 @@ public class HandsRaycast : MonoBehaviour {
 
     float palmSelectionTime = 0.0f;
     float palmDeselectionTime = 0.0f;
-    public static float PALM_SELECTION_TIME_THRESHHOLD = 1.0f;
-    public static float PALM_DESELECTION_TIME_THRESHHOLD = 2.0f;
-
-    public static float TWO_HAND_PROXIMITY_CONSTANT = 0.10f;
 
 	//Node[] nodes;
 
@@ -84,9 +71,6 @@ public class HandsRaycast : MonoBehaviour {
 
 	int STATE_NORMAL = 0;
 	int STATE_DRAGGING = 1;
-
-	int RIGHT = 0;
-	int LEFT = 1;
 
 	Vector3 nodeContainerStartPosition;
 	Vector3 zoomPinchStartPositionL;
@@ -127,10 +111,10 @@ public class HandsRaycast : MonoBehaviour {
 
         if(!handScript.hand_.Fingers[1].IsExtended && !handScript.hand_.Fingers[2].IsExtended && !handScript.hand_.Fingers[3].IsExtended && !handScript.hand_.Fingers[4].IsExtended)
         {
-            if(handedness == LEFT) { 
+            if(handedness == ConstantsSpacerock.LEFT) { 
                 print("left hand is fist");
             }
-            else if (handedness == RIGHT)
+            else if (handedness == ConstantsSpacerock.RIGHT)
             {
                 print("right hand is fist");
             }
@@ -151,11 +135,11 @@ public class HandsRaycast : MonoBehaviour {
 
             UpdateControlPanel();
 
-            isHandFist(leftCapsuleHandScript, LEFT);
-            isHandFist(rightCapsuleHandScript, RIGHT);
+            isHandFist(leftCapsuleHandScript, ConstantsSpacerock.LEFT);
+            isHandFist(rightCapsuleHandScript, ConstantsSpacerock.RIGHT);
 
-    		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, LEFT);
-            HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, RIGHT);
+    		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, ConstantsSpacerock.LEFT);
+            HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, ConstantsSpacerock.RIGHT);
 
             //print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
             //print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
@@ -195,12 +179,12 @@ public class HandsRaycast : MonoBehaviour {
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
 
-			if (!(playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD)) {
+			if (!(playerCamera.transform.eulerAngles.x >= ConstantsSpacerock.VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= ConstantsSpacerock.VIEWPANEL_EULER_X_UPPER_THRESHHOLD)) {
 				turnPanelOnTimer = 0.0f;
 				turnPanelOffTimer += Time.deltaTime;
 
 				// if you're pinching, don't turn the panel off quite yet
-				if (!(rightPinchDetectorScript.IsPinching || leftPinchDetectorScript.IsPinching) && turnPanelOffTimer >= PANEL_OFF_TIMER_CONSTANT) {
+				if (!(rightPinchDetectorScript.IsPinching || leftPinchDetectorScript.IsPinching) && turnPanelOffTimer >= ConstantsSpacerock.PANEL_OFF_TIMER_CONSTANT) {
 					panelState = PANEL_OFF;
 
                     NeutralizeButtonState();
@@ -211,11 +195,11 @@ public class HandsRaycast : MonoBehaviour {
 
             PanelContainer.SetActive (false);
 
-			if (playerCamera.transform.eulerAngles.x >= VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
+			if (playerCamera.transform.eulerAngles.x >= ConstantsSpacerock.VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= ConstantsSpacerock.VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
 				turnPanelOffTimer = 0.0f;
 				turnPanelOnTimer += Time.deltaTime;
 
-				if (turnPanelOnTimer >= PANEL_ON_TIMER_CONSTANT) {
+				if (turnPanelOnTimer >= ConstantsSpacerock.PANEL_ON_TIMER_CONSTANT) {
 					PanelContainer.transform.eulerAngles = new Vector3( PanelContainer.transform.eulerAngles.x, playerCamera.transform.eulerAngles.y, PanelContainer.transform.eulerAngles.z ); 
 					panelState = PANEL_ON;
 				}
@@ -311,9 +295,9 @@ public class HandsRaycast : MonoBehaviour {
 			float dir = Vector3.Dot (perp, playerCamera.transform.up);
 
 			if (dir > 0f) {
-				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x + SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
+				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x + ConstantsSpacerock.SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
 			} else if (dir < 0f) {
-				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x - SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
+				slider.transform.localPosition = new Vector3( slider.transform.localPosition.x - ConstantsSpacerock.SLIDER_MOVE_SPEED, slider.transform.localPosition.y, slider.transform.localPosition.z);
 			} else {
 				//Debug.Log("ontarget");
 			}
@@ -333,10 +317,10 @@ public class HandsRaycast : MonoBehaviour {
         if (palmState == PALM_STATE_GROUP_SELECTED)
         {
 
-            if (palmDistance > TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
+            if (palmDistance > ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
             {
                 palmDeselectionTime += Time.deltaTime;
-                if(palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD)
+                if(palmDeselectionTime > ConstantsSpacerock.PALM_DESELECTION_TIME_THRESHHOLD)
                 {
                     print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
 
@@ -353,10 +337,10 @@ public class HandsRaycast : MonoBehaviour {
 
         else if(palmState == PALM_STATE_NORMAL)
         {
-            if (palmDistance < TWO_HAND_PROXIMITY_CONSTANT)
+            if (palmDistance < ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT)
             {
                 palmSelectionTime += Time.deltaTime;
-                if(palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD)
+                if(palmSelectionTime > ConstantsSpacerock.PALM_SELECTION_TIME_THRESHHOLD)
                 {
                     print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
 
@@ -421,7 +405,7 @@ public class HandsRaycast : MonoBehaviour {
 		float dotProduct;
 
 		int state = -1;
-		if( handedness == RIGHT){
+		if( handedness == ConstantsSpacerock.RIGHT){
 			state = stateR;
 		}
 		else{
@@ -473,7 +457,7 @@ public class HandsRaycast : MonoBehaviour {
 				float distanceOfDraggedObject = 0.0f;
 				float originalPinchDistance = 0.0f;
 
-				if (handedness == RIGHT) {
+				if (handedness == ConstantsSpacerock.RIGHT) {
                     graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
 					originalPinchDistance = originalPinchDistanceR;
 				} else {
@@ -481,7 +465,7 @@ public class HandsRaycast : MonoBehaviour {
 					originalPinchDistance = originalPinchDistanceL;
 				}
 
-				if (handedness == LEFT) {
+				if (handedness == ConstantsSpacerock.LEFT) {
 					highlightedObjectL = graphGenerator.masterNodeList[selectedNodeIndex];
 					highlightedObjectL.nodeForce.Selected ();
 					//Debug.Log ("start highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
@@ -493,7 +477,7 @@ public class HandsRaycast : MonoBehaviour {
 			}
 			else if (state == STATE_DRAGGING) { // already dragging
 
-				if (handedness == LEFT) {
+				if (handedness == ConstantsSpacerock.LEFT) {
 					if (highlightedObjectL != null) {
 						highlightedObjectL.nodeForce.timeSelected += Time.deltaTime;
 					}
@@ -525,7 +509,7 @@ public class HandsRaycast : MonoBehaviour {
 
                 //graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
 
-                if (handedness == LEFT) {
+                if (handedness == ConstantsSpacerock.LEFT) {
 					if (highlightedObjectL != null) {
 						//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 						highlightedObjectL.nodeForce.Unselected ();
@@ -544,7 +528,7 @@ public class HandsRaycast : MonoBehaviour {
 				}
 			}
 
-			if (handedness == RIGHT) {
+			if (handedness == ConstantsSpacerock.RIGHT) {
 				stateR = state;
 			} else {
 				stateL = state;

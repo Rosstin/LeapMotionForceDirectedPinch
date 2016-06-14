@@ -135,7 +135,7 @@ namespace Leap.Unity.PinchUtility {
     }
 
     private void transformSingleAnchor(LeapPinchDetector singlePinch) {
- 	_anchor.position = singlePinch.Position * SpacerockConstants.PULL_CONSTANT;
+ 	_anchor.position = singlePinch.Position * ConstantsSpacerock.PULL_CONSTANT;
 
       switch (_oneHandedRotationMethod) {
         case RotationMethod.None:
