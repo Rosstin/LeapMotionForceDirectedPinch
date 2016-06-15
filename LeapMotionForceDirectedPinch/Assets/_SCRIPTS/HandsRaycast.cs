@@ -9,25 +9,25 @@ public class HandsRaycast : MonoBehaviour {
 
 	public GameObject toggle3DGameObject;
 	Collider toggle3DCollider;
-    ToggleLeap toggle3Dscript;
+	ToggleLeap toggle3Dscript;
 
 	public GameObject slider1;
 	Collider slider1Collider;
 	Slider slider1script;
 
-    public GameObject sliderFollowers;
-    Collider sliderFollowersCollider;
-    Slider sliderFollowersScript;
+	public GameObject sliderFollowers;
+	Collider sliderFollowersCollider;
+	Slider sliderFollowersScript;
 
-    public GameObject PanelContainer;
-    //todo: an object with an array of all buttons should be included 
+	public GameObject PanelContainer;
+	//todo: an object with an array of all buttons should be included 
 
-    public GameObject infravisionQuad;
+	public GameObject infravisionQuad;
 
-    public GameObject rightCapsuleHandObject;
-    CapsuleHand rightCapsuleHandScript;
-    public GameObject leftCapsuleHandObject;
-    CapsuleHand leftCapsuleHandScript;
+	public GameObject rightCapsuleHandObject;
+	CapsuleHand rightCapsuleHandScript;
+	public GameObject leftCapsuleHandObject;
+	CapsuleHand leftCapsuleHandScript;
 
 	int panelState;
 	int PANEL_ON = 0;
@@ -42,14 +42,14 @@ public class HandsRaycast : MonoBehaviour {
 	public GameObject sceneGod;
 	GenerateGraph graphGenerator;
 
-    // handles two-handed action of palm proximity
-    int palmState = 0;
-    static public int PALM_STATE_NORMAL = 0;
-    static public int PALM_STATE_GROUP_SELECTED = 501;
-    int selectedKey;
+	// handles two-handed action of palm proximity
+	int palmState = 0;
+	static public int PALM_STATE_NORMAL = 0;
+	static public int PALM_STATE_GROUP_SELECTED = 501;
+	int selectedKey;
 
-    float palmSelectionTime = 0.0f;
-    float palmDeselectionTime = 0.0f;
+	float palmSelectionTime = 0.0f;
+	float palmDeselectionTime = 0.0f;
 
 	//Node[] nodes;
 
@@ -78,7 +78,7 @@ public class HandsRaycast : MonoBehaviour {
 	float zoomPinchStartDistance;
 	float lastZoomPinchDistance;
 
-    public GameObject testCube;
+	public GameObject testCube;
 
 	void Start () {
 		GameObject prefabLineToRender = Resources.Load("Line") as GameObject;
@@ -91,88 +91,88 @@ public class HandsRaycast : MonoBehaviour {
 		rightPinchDetectorScript = rightPinchDetector.GetComponent<LeapPinchDetector> ();
 		leftPinchDetectorScript = leftPinchDetector.GetComponent<LeapPinchDetector> ();
 
-        rightCapsuleHandScript = rightCapsuleHandObject.GetComponent<CapsuleHand>();
-        leftCapsuleHandScript = leftCapsuleHandObject.GetComponent<CapsuleHand>();
+		rightCapsuleHandScript = rightCapsuleHandObject.GetComponent<CapsuleHand>();
+		leftCapsuleHandScript = leftCapsuleHandObject.GetComponent<CapsuleHand>();
 
-        toggle3DCollider = toggle3DGameObject.GetComponent<Collider> ();
-        toggle3Dscript = toggle3DGameObject.GetComponent<ToggleLeap>();
+		toggle3DCollider = toggle3DGameObject.GetComponent<Collider> ();
+		toggle3Dscript = toggle3DGameObject.GetComponent<ToggleLeap>();
 
-        slider1Collider = slider1.GetComponent<Collider> ();
+		slider1Collider = slider1.GetComponent<Collider> ();
 		slider1script = slider1.GetComponent<Slider> ();
 
-        sliderFollowersCollider = sliderFollowers.GetComponent<Collider>();
-        sliderFollowersScript = sliderFollowers.GetComponent<Slider>();
+		sliderFollowersCollider = sliderFollowers.GetComponent<Collider>();
+		sliderFollowersScript = sliderFollowers.GetComponent<Slider>();
 
-    }
+	}
 
-    bool isHandFist(CapsuleHand handScript, int handedness)
-    {
-        //print("finger0extended: " + handScript.hand_.Fingers[0].IsExtended); // the thumb
+	bool isHandFist(CapsuleHand handScript, int handedness)
+	{
+		//print("finger0extended: " + handScript.hand_.Fingers[0].IsExtended); // the thumb
 
-        if(!handScript.hand_.Fingers[1].IsExtended && !handScript.hand_.Fingers[2].IsExtended && !handScript.hand_.Fingers[3].IsExtended && !handScript.hand_.Fingers[4].IsExtended)
-        {
-            handScript.changeHandColor(ConstantsSpacerock.fistColor);
-            if (handedness == ConstantsSpacerock.LEFT) { 
-                print("left hand is fist");
-            }
-            else if (handedness == ConstantsSpacerock.RIGHT)
-            {
-                print("right hand is fist");
-            }
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+		if(!handScript.hand_.Fingers[1].IsExtended && !handScript.hand_.Fingers[2].IsExtended && !handScript.hand_.Fingers[3].IsExtended && !handScript.hand_.Fingers[4].IsExtended)
+		{
+			handScript.changeHandColor(ConstantsSpacerock.fistColor);
+			if (handedness == ConstantsSpacerock.LEFT) { 
+				print("left hand is fist");
+			}
+			else if (handedness == ConstantsSpacerock.RIGHT)
+			{
+				print("right hand is fist");
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 
-    }
+	}
 
-    void FixedUpdate () {
+	void FixedUpdate () {
 
-        if (graphGenerator.interactionReady) {
+		if (graphGenerator.interactionReady) {
 
-            CheckDebugKeyboardActions();
+			CheckDebugKeyboardActions();
 
-            UpdateControlPanel();
+			UpdateControlPanel();
 
-    		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, ConstantsSpacerock.LEFT);
-            HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, ConstantsSpacerock.RIGHT);
+			HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, ConstantsSpacerock.LEFT);
+			HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, ConstantsSpacerock.RIGHT);
 
-            //print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
-            //print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
-            //print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
-            //testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
+			//print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
+			//print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
+			//print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
+			//testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
 
-            /*
-            if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
-                HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
-            }
-            */
+			/*
+			if (rightCapsuleHandScript.thumbTip != null && leftCapsuleHandScript.thumbTip != null) { 
+				HandleTwoHandedActions(leftCapsuleHandScript, leftPinchDetectorScript, rightCapsuleHandScript, rightPinchDetectorScript);
+			}
+			*/
 
-            if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
-			    graphGenerator.explodeSelectedNode (highlightedObjectL);
-		    } 
+			if (stateL == STATE_DRAGGING) { // maybe do this if the user stops moving the node around, don't do it if the node is moving a lot
+				graphGenerator.explodeSelectedNode (highlightedObjectL);
+			} 
 
-		    if (stateR == STATE_DRAGGING) {
-			    graphGenerator.explodeSelectedNode (highlightedObjectR);
-		    }
-        }
+			if (stateR == STATE_DRAGGING) {
+				graphGenerator.explodeSelectedNode (highlightedObjectR);
+			}
+		}
 
-    }
+	}
 
-    void NeutralizeButtonState() // neutralize state of all buttons in when you leave
-    {
-        NeutralizeSliderState(slider1script);
-        NeutralizeSliderState(sliderFollowersScript);
-        //todo neutralize the toggles
-    }
+	void NeutralizeButtonState() // neutralize state of all buttons in when you leave
+	{
+		NeutralizeSliderState(slider1script);
+		NeutralizeSliderState(sliderFollowersScript);
+		//todo neutralize the toggles
+	}
 
-    void UpdateControlPanel () {
-        // looking at panel
-        // not looking at panel
+	void UpdateControlPanel () {
+		// looking at panel
+		// not looking at panel
 
-        //print("playerCamera.transform.eulerAngles.x: " + playerCamera.transform.eulerAngles.x);
+		//print("playerCamera.transform.eulerAngles.x: " + playerCamera.transform.eulerAngles.x);
 
 		if (panelState == PANEL_ON) {
 			PanelContainer.SetActive (true);
@@ -185,13 +185,13 @@ public class HandsRaycast : MonoBehaviour {
 				if (!(rightPinchDetectorScript.IsPinching || leftPinchDetectorScript.IsPinching) && turnPanelOffTimer >= ConstantsSpacerock.PANEL_OFF_TIMER_CONSTANT) {
 					panelState = PANEL_OFF;
 
-                    NeutralizeButtonState();
-                }
+					NeutralizeButtonState();
+				}
 			}
 
 		} else if (panelState == PANEL_OFF) {
 
-            PanelContainer.SetActive (false);
+			PanelContainer.SetActive (false);
 
 			if (playerCamera.transform.eulerAngles.x >= ConstantsSpacerock.VIEWPANEL_EULER_X_LOWER_THRESHHOLD && playerCamera.transform.eulerAngles.x <= ConstantsSpacerock.VIEWPANEL_EULER_X_UPPER_THRESHHOLD) {
 				turnPanelOffTimer = 0.0f;
@@ -211,71 +211,71 @@ public class HandsRaycast : MonoBehaviour {
 
 	}
 
-    void NeutralizeSliderState(Slider slider)
-    {
-        slider.state = slider.NORMAL;
-        performSliderAction(slider.sliderType, slider.currentValue);
-        slider.UnGrab();
-    }
+	void NeutralizeSliderState(Slider slider)
+	{
+		slider.state = slider.NORMAL;
+		performSliderAction(slider.sliderType, slider.currentValue);
+		slider.UnGrab();
+	}
 
-    void performSliderAction(string sliderType, int value)
-    {
-        if(sliderType == "degree") // todo should be a constant string stored elsewhere
-        {
-            graphGenerator.NodeDegree = value;
-            graphGenerator.showLegalNodesBasedOnFilterSettings();
-        }
-        else if(sliderType == "followers")
-        {
-            graphGenerator.FollowerCount = value;
-            graphGenerator.showLegalNodesBasedOnFilterSettings();
-        }
+	void performSliderAction(string sliderType, int value)
+	{
+		if(sliderType == "degree") // todo should be a constant string stored elsewhere
+		{
+			graphGenerator.NodeDegree = value;
+			graphGenerator.showLegalNodesBasedOnFilterSettings();
+		}
+		else if(sliderType == "followers")
+		{
+			graphGenerator.FollowerCount = value;
+			graphGenerator.showLegalNodesBasedOnFilterSettings();
+		}
 
-    }
+	}
 
-    void performToggleAction(ToggleLeap toggle)
-    {
-        if(toggle.toggleType == "dimensionality")
-        {
-            bool newDimensionality = toggle.switchState();
-            if (newDimensionality)
-            {
-                graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
-            }
-            else
-            {
-                graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
-            }
-        }
+	void performToggleAction(ToggleLeap toggle)
+	{
+		if(toggle.toggleType == "dimensionality")
+		{
+			bool newDimensionality = toggle.switchState();
+			if (newDimensionality)
+			{
+				graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
+			}
+			else
+			{
+				graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
+			}
+		}
 
-    }
+	}
 
-    void UpdateToggleState(Collider collider, ToggleLeap toggle, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness)
-    {
-        RaycastHit hit = new RaycastHit();
+	void UpdateToggleState(Collider collider, ToggleLeap toggle, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness)
+	{
+		RaycastHit hit = new RaycastHit();
 
-        if (toggle.state != toggle.DRAGGING && isActive && collider.Raycast(ray, out hit, 200.0f))
-        { // start a drag
-            toggle.state = toggle.DRAGGING;
-            toggle.OnGrab();
-            toggle.handUsed = handedness;
+		if (toggle.state != toggle.DRAGGING && isActive && collider.Raycast(ray, out hit, 200.0f))
+		{ // start a drag
+			toggle.state = toggle.DRAGGING;
+			toggle.OnGrab();
+			toggle.handUsed = handedness;
 
-            // do things related to starting a drag
-        }
+			// do things related to starting a drag
+		}
 
-        if (toggle.state == toggle.DRAGGING && toggle.handUsed == handedness)
-        {
+		if (toggle.state == toggle.DRAGGING && toggle.handUsed == handedness)
+		{
 
-            if (!isActive)
-            { // no longer dragging
-                toggle.state = toggle.NORMAL;
-                performToggleAction(toggle);
-            }
+			if (!isActive)
+			{ // no longer dragging
+				toggle.state = toggle.NORMAL;
+				performToggleAction(toggle);
+			}
 
-        }
-    }
+		}
+	}
 
-    void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
+	void UpdateSliderState(Collider collider, Slider slider, Ray ray, Vector3 heading, Vector3 p, bool isActive, bool activeThisFrame, int handedness){ // updating for both hands is screwing it up
 
 		RaycastHit hit = new RaycastHit ();
 
@@ -300,97 +300,97 @@ public class HandsRaycast : MonoBehaviour {
 				//Debug.Log("ontarget");
 			}
 			if (slider.UpdateBarValue ()) { // value changed
-                performSliderAction(slider.sliderType, slider.currentValue);
+				performSliderAction(slider.sliderType, slider.currentValue);
 			}
 			if (!isActive) { // no longer dragging
-                NeutralizeSliderState(slider);
-            }
+				NeutralizeSliderState(slider);
+			}
 
 		}
 	}
 
-    void HandleTwoHandedActions(CapsuleHand lHand, LeapPinchDetector lDetector, CapsuleHand rHand, LeapPinchDetector rDetector)
-    {
-        float palmDistance = lHand.hand_.PalmPosition.DistanceTo(rHand.hand_.PalmPosition);
-        if (palmState == PALM_STATE_GROUP_SELECTED)
-        {
+	void HandleTwoHandedActions(CapsuleHand lHand, LeapPinchDetector lDetector, CapsuleHand rHand, LeapPinchDetector rDetector)
+	{
+		float palmDistance = lHand.hand_.PalmPosition.DistanceTo(rHand.hand_.PalmPosition);
+		if (palmState == PALM_STATE_GROUP_SELECTED)
+		{
 
-            if (palmDistance > ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
-            {
-                palmDeselectionTime += Time.deltaTime;
-                if(palmDeselectionTime > ConstantsSpacerock.PALM_DESELECTION_TIME_THRESHHOLD)
-                {
-                    print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
+			if (palmDistance > ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT * 2.0f)
+			{
+				palmDeselectionTime += Time.deltaTime;
+				if(palmDeselectionTime > ConstantsSpacerock.PALM_DESELECTION_TIME_THRESHHOLD)
+				{
+					print("palmDeselectionTime > PALM_DESELECTION_TIME_THRESHHOLD");
 
-                    //graphGenerator.hideCentroids();
+					//graphGenerator.hideCentroids();
 
-                    print("infravision toggled off");
-                    infravisionQuad.SetActive(false);
+					print("infravision toggled off");
+					infravisionQuad.SetActive(false);
 
-                    palmState = PALM_STATE_NORMAL;
-                    palmSelectionTime = 0.0f;
-                }
-            }
-        }
+					palmState = PALM_STATE_NORMAL;
+					palmSelectionTime = 0.0f;
+				}
+			}
+		}
 
-        else if(palmState == PALM_STATE_NORMAL)
-        {
-            if (palmDistance < ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT)
-            {
-                palmSelectionTime += Time.deltaTime;
-                if(palmSelectionTime > ConstantsSpacerock.PALM_SELECTION_TIME_THRESHHOLD)
-                {
-                    print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
+		else if(palmState == PALM_STATE_NORMAL)
+		{
+			if (palmDistance < ConstantsSpacerock.TWO_HAND_PROXIMITY_CONSTANT)
+			{
+				palmSelectionTime += Time.deltaTime;
+				if(palmSelectionTime > ConstantsSpacerock.PALM_SELECTION_TIME_THRESHHOLD)
+				{
+					print("palmSelectionTime > PALM_SELECTION_TIME_THRESHHOLD");
 
-                    //graphGenerator.showCentroids();
+					//graphGenerator.showCentroids();
 
-                    // do a raycast against the centroids
-                    // first, find the point between the two palms
-                    Vector3 p = Vector3.Lerp(lHand.hand_.PalmPosition.ToVector3(), rHand.hand_.PalmPosition.ToVector3(), 0.5f);
+					// do a raycast against the centroids
+					// first, find the point between the two palms
+					Vector3 p = Vector3.Lerp(lHand.hand_.PalmPosition.ToVector3(), rHand.hand_.PalmPosition.ToVector3(), 0.5f);
 
-                    Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
-                    Vector3 objectVector;
-                    float dotProduct;
-                    float biggestDotProduct = 0.0f;
+					Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
+					Vector3 objectVector;
+					float dotProduct;
+					float biggestDotProduct = 0.0f;
 
-                    // now raycast versus the face
+					// now raycast versus the face
 
-                    foreach (int key in graphGenerator.nodeGroups.Keys) // todo should check legality once that is implemented
-                    {
-                        objectVector = Vector3.Normalize(graphGenerator.nodeGroups[key].nodeGroupContainerScript.centroid.gameObject.transform.position - playerCamera.transform.position);
+					foreach (int key in graphGenerator.nodeGroups.Keys) // todo should check legality once that is implemented
+					{
+						objectVector = Vector3.Normalize(graphGenerator.nodeGroups[key].nodeGroupContainerScript.centroid.gameObject.transform.position - playerCamera.transform.position);
 
-                        dotProduct = Vector3.Dot(heading, objectVector);
+						dotProduct = Vector3.Dot(heading, objectVector);
 
-                        //print("dotProduct: " + dotProduct);
+						//print("dotProduct: " + dotProduct);
 
-                        if (dotProduct > biggestDotProduct) // should be "if visible" instead
-                        { // dont select nodes that are not visible
-                            biggestDotProduct = dotProduct;
-                            selectedKey = key;
-                        }
-                    }
+						if (dotProduct > biggestDotProduct) // should be "if visible" instead
+						{ // dont select nodes that are not visible
+							biggestDotProduct = dotProduct;
+							selectedKey = key;
+						}
+					}
 
-                    //graphGenerator.nodeGroups[selectedKey].nodeGroupContainerScript.centroid.groupCentroidScript.Selected();
+					//graphGenerator.nodeGroups[selectedKey].nodeGroupContainerScript.centroid.groupCentroidScript.Selected();
 
-                    print("infravision toggled on");
-                    infravisionQuad.SetActive(true);
+					print("infravision toggled on");
+					infravisionQuad.SetActive(true);
 
-                    palmState = PALM_STATE_GROUP_SELECTED;
-                    palmDeselectionTime = 0.0f;
-                }
-            }
-        }
-    }
+					palmState = PALM_STATE_GROUP_SELECTED;
+					palmDeselectionTime = 0.0f;
+				}
+			}
+		}
+	}
 
-    void HandlePinches(CapsuleHand hand, LeapPinchDetector detector, int handedness) {
+	void HandlePinches(CapsuleHand hand, LeapPinchDetector detector, int handedness) {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
 
-        // GET POSITION OF EVENT
-        //Vector3 p = detector.Position;
+		// GET POSITION OF EVENT
+		//Vector3 p = detector.Position;
 
-        Vector3 p = hand.thumbTip.transform.position;
+		Vector3 p = hand.thumbTip.transform.position;
 
 		// camera to pinch vector
 		Vector3 heading = Vector3.Normalize(p - playerCamera.transform.position);
@@ -399,7 +399,7 @@ public class HandsRaycast : MonoBehaviour {
 		Vector3 objectVector;
 		float biggestDotProduct= 0.0f;
 		int selectedNodeIndex = 0;
-        int hoveredNodeIndex = 0;
+		int hoveredNodeIndex = 0;
 		float dotProduct;
 
 		int state = -1;
@@ -410,7 +410,7 @@ public class HandsRaycast : MonoBehaviour {
 			state = stateL;
 		}
 
-        if (panelState == PANEL_ON) {
+		if (panelState == PANEL_ON) {
 
 			// do panel actions
 			graphGenerator.NodesAreDraggable (false);
@@ -420,27 +420,29 @@ public class HandsRaycast : MonoBehaviour {
 
 			Ray myRay = new Ray (playerCamera.transform.position, heading);
 
-            UpdateToggleState(toggle3DCollider, toggle3Dscript, myRay, heading, p, isActive, activeThisFrame, handedness);
+			UpdateToggleState(toggle3DCollider, toggle3Dscript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
-    		UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
-            UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
+			UpdateSliderState (slider1Collider, slider1script, myRay, heading, p, isActive, activeThisFrame, handedness);
+			UpdateSliderState(sliderFollowersCollider, sliderFollowersScript, myRay, heading, p, isActive, activeThisFrame, handedness);
 
-        } else { // not looking at panel
+		} else { // not looking at panel
 
-            if (isHandFist(hand, handedness))
-            {
-                //blows away what you were doing if your hand becomes a fist, but could cause disambiguation problems
-                isActive = false;
-                graphGenerator.NodesAreDraggable(false);
-            }
-            else if (isActive)
-            {
-                hand.changeHandColor(ConstantsSpacerock.pinchColor);
-                graphGenerator.NodesAreDraggable(true);
-            }
+			/*
+			if (isHandFist(hand, handedness)) // definitely causes problems
+			{
+				//blows away what you were doing if your hand becomes a fist, but could cause disambiguation problems
+				isActive = false;
+				graphGenerator.NodesAreDraggable(false);
+			}*/
+
+			if (isActive)
+			{
+				hand.changeHandColor(ConstantsSpacerock.pinchColor);
+				graphGenerator.NodesAreDraggable(true);
+			}
 
 
-            if (state != STATE_DRAGGING && isActive) { // can start a drag
+			if (state != STATE_DRAGGING && isActive) { // can start a drag
 				state = STATE_DRAGGING;
 
 				for (int i = 0; i < graphGenerator.masterNodeList.Length; i++) {
@@ -460,10 +462,10 @@ public class HandsRaycast : MonoBehaviour {
 				float originalPinchDistance = 0.0f;
 
 				if (handedness == ConstantsSpacerock.RIGHT) {
-                    graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
+					graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
 					originalPinchDistance = originalPinchDistanceR;
 				} else {
-                    graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
+					graphGenerator.masterNodeList[selectedNodeIndex].nodeForce.Selected ();
 					originalPinchDistance = originalPinchDistanceL;
 				}
 
@@ -493,25 +495,25 @@ public class HandsRaycast : MonoBehaviour {
 			if (!isActive) { // if you let go you're not dragging
 				state = STATE_NORMAL;
 
-                for (int i = 0; i < graphGenerator.masterNodeList.Length; i++)
-                {
-                    if (graphGenerator.isLegalNode(graphGenerator.masterNodeList[i]))
-                    {
-                        objectVector = Vector3.Normalize(graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
-                        dotProduct = Vector3.Dot(heading, objectVector);
+				for (int i = 0; i < graphGenerator.masterNodeList.Length; i++)
+				{
+					if (graphGenerator.isLegalNode(graphGenerator.masterNodeList[i]))
+					{
+						objectVector = Vector3.Normalize(graphGenerator.masterNodeList[i].gameObject.transform.position - playerCamera.transform.position);
+						dotProduct = Vector3.Dot(heading, objectVector);
 
-                        if (dotProduct > biggestDotProduct) // should be "if visible" instead
-                        { // dont select nodes that are not visible
-                            biggestDotProduct = dotProduct;
-                            hoveredNodeIndex = i;
-                        }
-                    }
+						if (dotProduct > biggestDotProduct) // should be "if visible" instead
+						{ // dont select nodes that are not visible
+							biggestDotProduct = dotProduct;
+							hoveredNodeIndex = i;
+						}
+					}
 
-                }
+				}
 
-                //graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
+				//graphGenerator.masterNodeList[hoveredNodeIndex].nodeForce.Hovered();
 
-                if (handedness == ConstantsSpacerock.LEFT) {
+				if (handedness == ConstantsSpacerock.LEFT) {
 					if (highlightedObjectL != null) {
 						//Debug.Log ("letgo highlightedObjectL.nodeForce.myTextMesh.text: " + highlightedObjectL.nodeForce.myTextMesh.text );
 						highlightedObjectL.nodeForce.Unselected ();
@@ -539,70 +541,70 @@ public class HandsRaycast : MonoBehaviour {
 	}
 
 
-    void CheckDebugKeyboardActions()
-    {
+	void CheckDebugKeyboardActions()
+	{
 
-        if (Input.GetKeyDown("m"))
-        {
-            graphGenerator.loadMNistGraph();
-        }
+		if (Input.GetKeyDown("m"))
+		{
+			graphGenerator.loadMNistGraph();
+		}
 
-        if (Input.GetKeyDown("t"))
-        {
-            graphGenerator.loadTwitterGraph();
-        }
+		if (Input.GetKeyDown("t"))
+		{
+			graphGenerator.loadTwitterGraph();
+		}
 
-        if (Input.GetKeyDown("space"))
-        {
-            print("infravision toggled on");
-            infravisionQuad.SetActive(true);
-        }
+		if (Input.GetKeyDown("space"))
+		{
+			print("infravision toggled on");
+			infravisionQuad.SetActive(true);
+		}
 
-        if (Input.GetKeyDown("1"))
-        {
-            print("infravision toggled off");
-            infravisionQuad.SetActive(false);
-        }
-
-
-        if (Input.GetKeyDown("c"))
-        {
-            print("show centroids");
-            graphGenerator.showCentroids();
-        }
-
-        if (Input.GetKeyDown("x"))
-        {
-            print("hide centroids");
-            graphGenerator.hideCentroids();
-        }
-
-        if (Input.GetKeyDown("d"))
-        {
-            print("graphGenerator.detailingMode = true");
-            graphGenerator.detailingMode = true;
-        }
-
-        if (Input.GetKeyDown("f"))
-        {
-            print("graphGenerator.detailingMode = false");
-            graphGenerator.detailingMode = false;
-        }
+		if (Input.GetKeyDown("1"))
+		{
+			print("infravision toggled off");
+			infravisionQuad.SetActive(false);
+		}
 
 
-        if (Input.GetKeyDown("2"))
-        {
-            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
-            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
-        }
+		if (Input.GetKeyDown("c"))
+		{
+			print("show centroids");
+			graphGenerator.showCentroids();
+		}
 
-        if (Input.GetKeyDown("3"))
-        {
-            print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D)");
-            graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
-        }
+		if (Input.GetKeyDown("x"))
+		{
+			print("hide centroids");
+			graphGenerator.hideCentroids();
+		}
 
-    }
+		if (Input.GetKeyDown("d"))
+		{
+			print("graphGenerator.detailingMode = true");
+			graphGenerator.detailingMode = true;
+		}
+
+		if (Input.GetKeyDown("f"))
+		{
+			print("graphGenerator.detailingMode = false");
+			graphGenerator.detailingMode = false;
+		}
+
+
+		if (Input.GetKeyDown("2"))
+		{
+			print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D)");
+			graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_2D);
+		}
+
+		if (Input.GetKeyDown("3"))
+		{
+			print("graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D)");
+			graphGenerator.changeNodeDimensionality(GenerateGraph.GRAPH_3D);
+		}
+
+	}
 
 
 

@@ -68,7 +68,7 @@ public class GenerateGraph : MonoBehaviour
         nodeFileForCoroutine = "mnist_node_image";
         edgeFileForCoroutine = "mnist_edge";
         metadataFileForCoroutine = "mnist_metadata";
-        graphTypeForCoroutine = GRAPH_2D;
+        graphTypeForCoroutine = GRAPH_3D;
         dataTypeForCoroutine = DATA_MNIST;
         
         /*
