@@ -175,32 +175,22 @@ public class GenerateGraph : MonoBehaviour
 
     IEnumerator generateGraphFromCSVCoroutine()
     {
-        print("pre preGraphGeneration");
         preGraphGeneration();
-        print("finished preGraphGeneration");
         yield return null;
 
         if (metadataFileForCoroutine != "none")
         {
-            print("pre parseMetadata");
             parseMetadata(metadataFileForCoroutine);
-            print("finished parseMetadata");
             yield return null;
         }
 
-        print("pre parseGraph");
         parseGraph(nodeFileForCoroutine, graphTypeForCoroutine, dataTypeForCoroutine);
-        print("finished parseGraph");
         yield return null;
 
-        print("pre parseEdges");
         parseEdges(edgeFileForCoroutine);
-        print("finished parseEdges");
         yield return null;
 
-        print("pre postGraphGeneration");
         postGraphGeneration();
-        print("finished postGraphGeneration");
         yield return null;
 
     }
@@ -215,11 +205,6 @@ public class GenerateGraph : MonoBehaviour
         // add edges
         for (int i = 1; i < numberOfEdges; i++)
         {
-
-            //Debug.Log ("outputGrid[0,i]: " + outputGrid[0,i] + "... " + "outputGrid[1,i]: " + outputGrid[1,i]);
-
-            //print ("edgesGrid [0, i]: " + edgesGrid [0, i] + "... edgesGrid [1,i]: " + edgesGrid [1,i] );
-
             int source = nameToID[(edgesGrid[0, i])]; // source
             int target = nameToID[(edgesGrid[1, i])]; // target
             float weight = float.Parse(edgesGrid[2, i]);

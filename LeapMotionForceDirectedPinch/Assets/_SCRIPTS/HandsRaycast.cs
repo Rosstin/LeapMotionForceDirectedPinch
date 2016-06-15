@@ -427,13 +427,12 @@ public class HandsRaycast : MonoBehaviour {
 
 		} else { // not looking at panel
 
-			/*
 			if (isHandFist(hand, handedness)) // definitely causes problems
 			{
 				//blows away what you were doing if your hand becomes a fist, but could cause disambiguation problems
-				isActive = false;
-				graphGenerator.NodesAreDraggable(false);
-			}*/
+				//isActive = false;
+				//graphGenerator.NodesAreDraggable(false);
+			}
 
 			if (isActive)
 			{
