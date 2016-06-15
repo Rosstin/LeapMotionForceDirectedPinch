@@ -136,9 +136,6 @@ public class HandsRaycast : MonoBehaviour {
 
             UpdateControlPanel();
 
-            isHandFist(leftCapsuleHandScript, ConstantsSpacerock.LEFT);
-            isHandFist(rightCapsuleHandScript, ConstantsSpacerock.RIGHT);
-
     		HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, ConstantsSpacerock.LEFT);
             HandlePinches(rightCapsuleHandScript, rightPinchDetectorScript, ConstantsSpacerock.RIGHT);
 
@@ -390,11 +387,6 @@ public class HandsRaycast : MonoBehaviour {
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
 
-        if (isActive)
-        {
-            hand.changeHandColor(ConstantsSpacerock.pinchColor);
-        }
-
         // GET POSITION OF EVENT
         //Vector3 p = detector.Position;
 
@@ -435,16 +427,20 @@ public class HandsRaycast : MonoBehaviour {
 
         } else { // not looking at panel
 
-            /*
-            if(isHandFist(hand, handedness))
+            if (isHandFist(hand, handedness))
             {
-                
+                //blows away what you were doing if your hand becomes a fist, but could cause disambiguation problems
+                isActive = false;
+                graphGenerator.NodesAreDraggable(false);
             }
-            */
+            else if (isActive)
+            {
+                hand.changeHandColor(ConstantsSpacerock.pinchColor);
+                graphGenerator.NodesAreDraggable(true);
+            }
 
-			graphGenerator.NodesAreDraggable (true);
 
-			if (state != STATE_DRAGGING && isActive) { // can start a drag
+            if (state != STATE_DRAGGING && isActive) { // can start a drag
 				state = STATE_DRAGGING;
 
 				for (int i = 0; i < graphGenerator.masterNodeList.Length; i++) {
@@ -481,7 +477,7 @@ public class HandsRaycast : MonoBehaviour {
 					//Debug.Log ("start highlightedObjectR.nodeForce.myTextMesh.text: " + highlightedObjectR.nodeForce.myTextMesh.text );
 				}
 			}
-			else if (state == STATE_DRAGGING) { // already dragging
+			else if (state == STATE_DRAGGING && isActive) { // already dragging
 
 				if (handedness == ConstantsSpacerock.LEFT) {
 					if (highlightedObjectL != null) {
