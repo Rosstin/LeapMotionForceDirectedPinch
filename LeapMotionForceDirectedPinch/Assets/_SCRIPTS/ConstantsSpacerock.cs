@@ -24,6 +24,10 @@ public static class ConstantsSpacerock{
 
     public static float TWO_HAND_PROXIMITY_CONSTANT = 0.10f;
 
+    // colors for hand gestures
+    public static Color pinchColor = Color.red;
+    public static Color fistColor = Color.blue;
+
 
     // ~ FOR GENERATEGRAPH.CS ~ //
 

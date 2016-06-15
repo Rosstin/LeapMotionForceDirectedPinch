@@ -183,9 +183,22 @@ namespace Leap.Unity{
         _armRenderers[i].enabled = _showArm;
       }
     }
+
+    public void changeHandColor(Color myNewColor)
+    {
+        List<Finger> fingers = hand_.Fingers;
+        for (int i = 0; i < fingers.Count; i++)
+        {
+            Finger finger = fingers[i];
+            for (int j = 0; j < 4; j++)
+            {
+                int key = getFingerJointIndex((int)finger.Type, j);
+                _jointSpheres[key].GetComponent<MeshRenderer>().material.color = myNewColor;
+            }
+        }
+    }
   
     //Geometry creation methods
-  
     private void createSpheres() {
       //Create spheres for finger joints
       List<Finger> fingers = hand_.Fingers;

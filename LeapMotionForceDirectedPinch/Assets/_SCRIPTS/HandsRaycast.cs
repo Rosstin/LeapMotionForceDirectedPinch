@@ -111,7 +111,8 @@ public class HandsRaycast : MonoBehaviour {
 
         if(!handScript.hand_.Fingers[1].IsExtended && !handScript.hand_.Fingers[2].IsExtended && !handScript.hand_.Fingers[3].IsExtended && !handScript.hand_.Fingers[4].IsExtended)
         {
-            if(handedness == ConstantsSpacerock.LEFT) { 
+            handScript.changeHandColor(ConstantsSpacerock.fistColor);
+            if (handedness == ConstantsSpacerock.LEFT) { 
                 print("left hand is fist");
             }
             else if (handedness == ConstantsSpacerock.RIGHT)
@@ -143,7 +144,7 @@ public class HandsRaycast : MonoBehaviour {
 
             //print("palm position: " + leftCapsuleHandScript.GetLeapHand().PalmPosition);
             //print("palm normal: " + leftCapsuleHandScript.GetLeapHand().PalmNormal);
-            print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
+            //print("palm velocity: " + leftCapsuleHandScript.GetLeapHand().PalmVelocity);
             //testCube.GetComponent<Rigidbody>().velocity = leftCapsuleHandScript.GetLeapHand().PalmVelocity.ToVector3;
 
             /*
@@ -388,6 +389,11 @@ public class HandsRaycast : MonoBehaviour {
 		// GET ACTIVITY -- are you pinching, clicking?
 		bool isActive = detector.IsPinching;
 		bool activeThisFrame = detector.DidStartPinch;
+
+        if (isActive)
+        {
+            hand.changeHandColor(ConstantsSpacerock.pinchColor);
+        }
 
         // GET POSITION OF EVENT
         //Vector3 p = detector.Position;
