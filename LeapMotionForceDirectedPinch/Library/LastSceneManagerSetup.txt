@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_SCENES/GraphDemoARMode.unity
+- path: Assets/_SCENES/KeyboardAR.unity
   isLoaded: 1
   isActive: 1

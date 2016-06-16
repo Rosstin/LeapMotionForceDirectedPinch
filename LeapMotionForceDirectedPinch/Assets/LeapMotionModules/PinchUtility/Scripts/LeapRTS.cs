@@ -114,6 +114,8 @@ namespace Leap.Unity.PinchUtility {
     private void transformDoubleAnchor() {
       _anchor.position = (_pinchDetectorA.Position + _pinchDetectorB.Position) / 2.0f;
 
+      //_anchor.position = new Vector3(0.0f, ConstantsSpacerock.ELEVATION_CONSTANT, ConstantsSpacerock.DISTANCE_FROM_FACE); // change it to the position of the graph's center
+
       switch (_twoHandedRotationMethod) {
         case RotationMethod.None:
           break;

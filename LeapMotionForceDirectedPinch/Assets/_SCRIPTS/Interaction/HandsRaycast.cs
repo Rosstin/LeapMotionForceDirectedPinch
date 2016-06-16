@@ -134,6 +134,8 @@ public class HandsRaycast : MonoBehaviour {
 
 			CheckDebugKeyboardActions();
 
+            DrawKeyboardFromFingers();
+
 			UpdateControlPanel();
 
 			HandlePinches (leftCapsuleHandScript, leftPinchDetectorScript, ConstantsSpacerock.LEFT);
@@ -434,7 +436,7 @@ public class HandsRaycast : MonoBehaviour {
 				//graphGenerator.NodesAreDraggable(false);
 			}
 
-			if (isActive)
+            if (isActive)
 			{
 				hand.changeHandColor(ConstantsSpacerock.pinchColor);
 				graphGenerator.NodesAreDraggable(true);
@@ -540,12 +542,26 @@ public class HandsRaycast : MonoBehaviour {
 	}
 
 
-	void CheckDebugKeyboardActions()
+    void DrawKeyboardFromFingers()
+    {
+        if (Input.GetKeyDown("j"))
+        {
+            //draw a key at location of pointer finger
+            GameObject myNodeInstance =
+                Instantiate(Resources.Load("KeyboardKey") as GameObject,
+                    rightCapsuleHandScript.hand_.Fingers[1].TipPosition.ToVector3(),
+                    Quaternion.identity) as GameObject;
+        }
+
+    }
+
+    void CheckDebugKeyboardActions()
 	{
 
-		if (Input.GetKeyDown("m"))
+
+        if (Input.GetKeyDown("m"))
 		{
-			graphGenerator.loadMNistGraph();
+            graphGenerator.loadMNistGraph();
 		}
 
 		if (Input.GetKeyDown("t"))
